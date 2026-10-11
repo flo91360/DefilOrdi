@@ -1,0 +1,42 @@
+name: Windows executable
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install verified Godot 4.6.3 and Windows templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://github.com/godotengine/godot/releases/download/4.6.3-stable
+          curl -fL "$base/SHA512-SUMS.txt" -o SHA512-SUMS.txt
+          curl -fL "$base/Godot_v4.6.3-stable_linux.x86_64.zip" -o Godot_v4.6.3-stable_linux.x86_64.zip
+          curl -fL "$base/Godot_v4.6.3-stable_export_templates.tpz" -o Godot_v4.6.3-stable_export_templates.tpz
+          rg '  Godot_v4.6.3-stable_(linux.x86_64.zip|export_templates.tpz)$' SHA512-SUMS.txt | sha512sum --check --strict
+          unzip -q Godot_v4.6.3-stable_linux.x86_64.zip -d "$RUNNER_TEMP/godot"
+          mv "$RUNNER_TEMP/godot/Godot_v4.6.3-stable_linux.x86_64" "$RUNNER_TEMP/godot/godot"
+          chmod +x "$RUNNER_TEMP/godot/godot"
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+          template_dir="$HOME/.local/share/godot/export_templates/4.6.3.stable"
+          mkdir -p "$template_dir"
+          unzip -j -q Godot_v4.6.3-stable_export_templates.tpz 'templates/windows_release_x86_64.exe' 'templates/windows_debug_x86_64.exe' -d "$template_dir"
+          rm SHA512-SUMS.txt Godot_v4.6.3-stable_linux.x86_64.zip Godot_v4.6.3-stable_export_templates.tpz
+      - name: Test and export
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --headless --path . --editor --quit
+          TEST_DATA_DIR=$(mktemp -d)
+          XDG_DATA_HOME="$TEST_DATA_DIR" godot --headless --path . --script tests/smoke.gd
+          bash scripts/export_windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DefilOrdi-Windows
+          path: exports/DefilOrdi.exe
+          if-no-files-found: error

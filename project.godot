@@ -1,0 +1,17 @@
+config_version=5
+
+[application]
+config/name="DéfilOrdi"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+
+[display]
+window/size/viewport_width=1100
+window/size/viewport_height=760
+window/size/window_width_override=1100
+window/size/window_height_override=760
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.055, 0.075, 0.13, 1)
