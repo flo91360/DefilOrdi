@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="#4f6bd9"/>
+  <rect x="96" y="120" width="320" height="300" rx="64" fill="#1f2330"/>
+  <rect x="96" y="96" width="320" height="292" rx="64" fill="#ffffff"/>
+  <text x="256" y="318" font-family="Nunito, Arial Rounded MT Bold, Arial, sans-serif" font-size="230" font-weight="900" text-anchor="middle" fill="#1f2330">D</text>
+  <rect x="184" y="338" width="144" height="14" rx="7" fill="#f3c33c"/>
+</svg>
