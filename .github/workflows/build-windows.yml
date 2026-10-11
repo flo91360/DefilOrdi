@@ -3,7 +3,6 @@ name: Windows .exe
 on:
   push:
     branches: ['**']
-    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -36,10 +35,23 @@ jobs:
             dist/DefilOrdi-Portable-*.exe
           if-no-files-found: error
 
+      # Chaque mise à jour de main publie (ou remplace) la version
+      # v<version de package.json> dans les Releases, avec les .exe à télécharger.
+      - name: Lire la version
+        id: version
+        shell: bash
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
       - name: Publier la version
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: DefilOrdi ${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            Télécharger **DefilOrdi-Installation-${{ steps.version.outputs.version }}.exe** (recommandé) ou la version portable.
+            Au premier lancement, si Windows affiche « Windows a protégé votre ordinateur » : *Informations complémentaires* puis *Exécuter quand même*.
           files: |
             dist/DefilOrdi-Installation-*.exe
             dist/DefilOrdi-Portable-*.exe
