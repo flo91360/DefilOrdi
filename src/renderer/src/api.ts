@@ -51,6 +51,15 @@ const browserApi: DefilOrdiApi = {
       input.click()
     })
   },
+  async exportCsv(nomFichier: string, contenu: string) {
+    const blob = new Blob(['\ufeff' + contenu], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = nomFichier
+    a.click()
+    URL.revokeObjectURL(a.href)
+    return 'ok'
+  },
   async openDataFolder() {},
   async toggleFullscreen() {
     if (document.fullscreenElement) await document.exitFullscreen()

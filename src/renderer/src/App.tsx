@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import { type AppData, type Profile } from '../../shared/data'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { type AppData, type Profile, type ResultatDactylo } from '../../shared/data'
 import { api } from './api'
 import { themeStyle } from './theme'
 import { setVolume } from './sounds'
@@ -8,18 +8,22 @@ import { Hub } from './screens/Hub'
 import { ProfileEditor } from './screens/ProfileEditor'
 import { ErgoSpace } from './screens/ErgoSpace'
 import { PinPad } from './components/PinPad'
+import { Dactylo } from './games/dactylo/Dactylo'
 
 type Screen =
   | { name: 'accueil' }
   | { name: 'hub'; profileId: string }
   | { name: 'editeur'; profileId: string | null; retour: Screen }
   | { name: 'ergo' }
+  | { name: 'dactylo'; profileId: string }
 
 export function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [screen, setScreen] = useState<Screen>({ name: 'accueil' })
   const [askCode, setAskCode] = useState(false)
   const [saveError, setSaveError] = useState(false)
+  const dataRef = useRef<AppData | null>(null)
+  dataRef.current = data
 
   useEffect(() => {
     api.load().then((d) => {
@@ -40,6 +44,7 @@ export function App() {
   }, [])
 
   const update = useCallback((next: AppData) => {
+    dataRef.current = next
     setData(next)
     setVolume(next.settings.volume)
     api.save(next).then(
@@ -51,7 +56,12 @@ export function App() {
   if (!data) return <div className="loading">Chargement…</div>
 
   const profileOf = (id: string): Profile | undefined => data.profiles.find((p) => p.id === id)
-  const active = screen.name === 'hub' ? profileOf(screen.profileId) : undefined
+  const active = screen.name === 'hub' || screen.name === 'dactylo' ? profileOf(screen.profileId) : undefined
+
+  const addResultat = (r: ResultatDactylo) => {
+    const d = dataRef.current
+    if (d) update({ ...d, resultats: [...d.resultats, r] })
+  }
 
   const saveProfile = (p: Profile) => {
     const exists = data.profiles.some((x) => x.id === p.id)
@@ -76,6 +86,18 @@ export function App() {
           profile={active}
           onEdit={() => setScreen({ name: 'editeur', profileId: active.id, retour: screen })}
           onSwitch={() => setScreen({ name: 'accueil' })}
+          onPlay={(jeu) => jeu === 'dactylo' && setScreen({ name: 'dactylo', profileId: active.id })}
+        />
+      ) : null
+      break
+    case 'dactylo':
+      content = active ? (
+        <Dactylo
+          profile={active}
+          listes={data.listes}
+          resultats={data.resultats}
+          onResult={addResultat}
+          onQuit={() => setScreen({ name: 'hub', profileId: active.id })}
         />
       ) : null
       break

@@ -20,16 +20,47 @@ Au premier lancement, Windows peut afficher « Windows a protégé votre
 ordinateur », car le programme n'est pas signé numériquement : cliquer sur
 **Informations complémentaires**, puis **Exécuter quand même**.
 
-## Ce que contient la version actuelle (étape 1)
+## Ce que contient la version actuelle
+
+**Étape 1 — hub et profils**
 
 - Écran d'accueil « Qui joue aujourd'hui ? » avec les profils des enfants.
 - Création et modification de profil : prénom, personnage (humain ou robot,
   personnalisable), deux couleurs préférées qui colorent l'interface, son de
   réussite et son d'erreur.
-- Hub des jeux (les jeux arrivent aux étapes suivantes).
 - Espace ergothérapeute protégé par un code à 4 chiffres (**0000 par défaut**,
-  à changer dans *Réglages*) : liste des patients, niveau de difficulté par
-  enfant, volume, sauvegarde et restauration.
+  à changer dans *Réglages*).
+
+**Étape 2 — jeu Dactylo**
+
+- L'enfant choisit une liste de phrases (celles de son niveau sont proposées en
+  premier) et le nombre de phrases (3, 5 ou 10), puis les tape.
+- Clavier AZERTY à l'écran : la touche à taper est mise en évidence, avec les
+  couleurs des doigts et une aide pour les touches spéciales (« Maj + a »,
+  « ^ puis e »).
+- Temps, frappes par minute et précision en direct ; écran de fin avec le
+  résultat, les records et les touches à travailler.
+- Espace ergothérapeute :
+  - **Phrases** : modifier les listes (une phrase par ligne), en créer, en
+    supprimer, restaurer les listes d'origine ;
+  - **Réglages** de chaque enfant : exiger ou non les accents et les majuscules,
+    bloquer sur les erreurs ou faire effacer avec ⌫, afficher le clavier, son à
+    chaque erreur ;
+  - **Statistiques** de chaque enfant : courbes de vitesse et de précision,
+    clavier des erreurs par touche, historique des parties, export Excel (CSV).
+
+### Règles de comptage
+
+- Une frappe = un caractère tapé, erreurs comprises. « ^ puis e » donne « ê » et
+  compte pour une seule frappe. Retour arrière ne compte pas.
+- Précision = caractères justes au moment de la frappe / frappes : corriger une
+  erreur ne l'efface pas des statistiques.
+- Vitesse = frappes justes par minute ; mots par minute = caractères des phrases
+  réussies / 5 par minute (convention habituelle).
+- Le chronomètre d'une phrase part à la première frappe et s'arrête quand elle
+  est entièrement juste ; les pauses entre les phrases ne comptent pas.
+- Les majuscules accentuées (É, À…) ne se tapent pas simplement sur un clavier
+  Windows : la majuscule sans accent est acceptée.
 
 ## Données et confidentialité
 

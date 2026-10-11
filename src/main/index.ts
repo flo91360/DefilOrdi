@@ -80,6 +80,21 @@ function registerIpc(): void {
     }
   })
 
+  ipcMain.handle('file:export-csv', async (e, nomFichier: string, contenu: string) => {
+    const win = BrowserWindow.fromWebContents(e.sender)
+    const nom = String(nomFichier).replace(/[\\/:*?"<>|]/g, '_')
+    const options = {
+      title: 'Exporter',
+      defaultPath: join(app.getPath('documents'), nom),
+      filters: [{ name: 'Tableau (CSV)', extensions: ['csv'] }]
+    }
+    const res = win ? await dialog.showSaveDialog(win, options) : await dialog.showSaveDialog(options)
+    if (res.canceled || !res.filePath) return 'annule'
+    // BOM pour qu'Excel lise correctement les accents.
+    await fs.writeFile(res.filePath, '\ufeff' + String(contenu), 'utf8')
+    return 'ok'
+  })
+
   ipcMain.handle('app:open-data-folder', async () => {
     await shell.openPath(storage.dir)
   })

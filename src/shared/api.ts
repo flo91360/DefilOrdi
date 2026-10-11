@@ -8,6 +8,8 @@ export interface DefilOrdiApi {
   save(data: AppData): Promise<void>
   exportBackup(data: AppData): Promise<'ok' | 'annule'>
   importBackup(): Promise<ImportResult>
+  // Enregistre un tableau (CSV) là où l'utilisateur le choisit.
+  exportCsv(nomFichier: string, contenu: string): Promise<'ok' | 'annule'>
   openDataFolder(): Promise<void>
   toggleFullscreen(): Promise<void>
 }

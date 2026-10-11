@@ -6,6 +6,7 @@ const api: DefilOrdiApi = {
   save: (data) => ipcRenderer.invoke('data:save', data),
   exportBackup: (data) => ipcRenderer.invoke('data:export', data),
   importBackup: () => ipcRenderer.invoke('data:import'),
+  exportCsv: (nomFichier, contenu) => ipcRenderer.invoke('file:export-csv', nomFichier, contenu),
   openDataFolder: () => ipcRenderer.invoke('app:open-data-folder'),
   toggleFullscreen: () => ipcRenderer.invoke('app:toggle-fullscreen')
 }

@@ -1,21 +1,18 @@
 import { useState } from 'react'
-import { type AppData, isValidCode, NIVEAUX, type Profile } from '../../../shared/data'
+import { type AppData, isValidCode, NIVEAUX, type OptionsDactylo, type Profile } from '../../../shared/data'
 import { api, isDesktop } from '../api'
 import { Avatar } from '../avatar/Avatar'
-import { ConfirmDialog } from '../components/Modal'
+import { ConfirmDialog, Modal } from '../components/Modal'
 import { FullscreenButton } from '../components/FullscreenButton'
-import { IconBack, IconDownload, IconFolder, IconPencil, IconSpeaker, IconTrash, IconUpload } from '../components/Icons'
+import { IconBack, IconChart, IconDownload, IconFolder, IconPencil, IconSettings, IconSpeaker, IconTrash, IconUpload } from '../components/Icons'
+import { vitesse } from '../games/dactylo/engine'
 import { playSound } from '../sounds'
+import { ErgoStats } from './ErgoStats'
+import { NIVEAU_LABELS } from './niveaux'
+import { PhrasesEditor } from './PhrasesEditor'
 import { Logo } from './ProfilePicker'
 
-export const NIVEAU_LABELS: Record<number, string> = {
-  1: '1 – Débutant',
-  2: '2 – Intermédiaire',
-  3: '3 – Avancé',
-  4: '4 – Expert'
-}
-
-type Section = 'patients' | 'reglages' | 'sauvegarde'
+type Section = 'patients' | 'phrases' | 'reglages' | 'sauvegarde'
 
 interface Props {
   data: AppData
@@ -26,6 +23,8 @@ interface Props {
 
 export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
   const [section, setSection] = useState<Section>('patients')
+  // Recliquer sur une section la remet à zéro (ex. retour à la liste des patients).
+  const [visite, setVisite] = useState(0)
 
   return (
     <div className="screen ergo">
@@ -45,19 +44,25 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
           {(
             [
               ['patients', 'Patients'],
+              ['phrases', 'Phrases'],
               ['reglages', 'Réglages'],
               ['sauvegarde', 'Sauvegarde']
             ] as const
           ).map(([id, label]) => (
-            <button key={id} className={section === id ? 'ergo-nav-item active' : 'ergo-nav-item'} onClick={() => setSection(id)}>
+            <button key={id} className={section === id ? 'ergo-nav-item active' : 'ergo-nav-item'} onClick={() => {
+                setSection(id)
+                setVisite((v) => v + 1)
+              }}
+            >
               {label}
             </button>
           ))}
           <p className="ergo-version">Version {__APP_VERSION__}</p>
         </nav>
 
-        <main className="ergo-main">
+        <main className="ergo-main" key={visite}>
           {section === 'patients' && <Patients data={data} onChange={onChange} onEditProfile={onEditProfile} />}
+          {section === 'phrases' && <PhrasesEditor listes={data.listes} onChange={(listes) => onChange({ ...data, listes })} />}
           {section === 'reglages' && <Reglages data={data} onChange={onChange} />}
           {section === 'sauvegarde' && <Sauvegarde data={data} onChange={onChange} />}
         </main>
@@ -68,10 +73,29 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
 
 function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
   const [toDelete, setToDelete] = useState<Profile | null>(null)
+  const [statsDe, setStatsDe] = useState<string | null>(null)
+  const [reglagesDe, setReglagesDe] = useState<Profile | null>(null)
   const profiles = [...data.profiles].sort((a, b) => a.prenom.localeCompare(b.prenom, 'fr'))
 
-  const setNiveau = (p: Profile, niveau: number) =>
-    onChange({ ...data, profiles: data.profiles.map((x) => (x.id === p.id ? { ...x, niveau } : x)) })
+  const majProfil = (p: Profile) => onChange({ ...data, profiles: data.profiles.map((x) => (x.id === p.id ? p : x)) })
+  const setNiveau = (p: Profile, niveau: number) => majProfil({ ...p, niveau })
+
+  const derniere = (p: Profile) => {
+    const r = data.resultats.filter((x) => x.profileId === p.id).sort((a, b) => b.date.localeCompare(a.date))[0]
+    return r ? `${new Date(r.date).toLocaleDateString('fr-FR')} · ${vitesse(r)} frappes/min` : '—'
+  }
+
+  const statsProfile = statsDe ? data.profiles.find((p) => p.id === statsDe) : undefined
+  if (statsProfile) {
+    return (
+      <ErgoStats
+        profile={statsProfile}
+        resultats={data.resultats}
+        onSupprimer={(id) => onChange({ ...data, resultats: data.resultats.filter((r) => r.id !== id) })}
+        onRetour={() => setStatsDe(null)}
+      />
+    )
+  }
 
   return (
     <section>
@@ -86,8 +110,8 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
           <thead>
             <tr>
               <th>Enfant</th>
-              <th>Créé le</th>
               <th>Niveau</th>
+              <th>Dernière partie</th>
               <th aria-label="Actions" />
             </tr>
           </thead>
@@ -100,7 +124,6 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
                     <strong>{p.prenom}</strong>
                   </div>
                 </td>
-                <td>{new Date(p.creeLe).toLocaleDateString('fr-FR')}</td>
                 <td>
                   <select
                     className="select"
@@ -115,12 +138,19 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
                     ))}
                   </select>
                 </td>
+                <td className="muted">{derniere(p)}</td>
                 <td className="row-actions">
-                  <button className="btn btn-ghost btn-sm" onClick={() => onEditProfile(p)}>
-                    <IconPencil size={18} /> Modifier
+                  <button className="btn btn-soft btn-sm" onClick={() => setStatsDe(p.id)}>
+                    <IconChart size={18} /> Statistiques
                   </button>
-                  <button className="btn btn-ghost btn-sm btn-danger-text" onClick={() => setToDelete(p)}>
-                    <IconTrash size={18} /> Supprimer
+                  <button className="btn btn-ghost btn-sm" onClick={() => setReglagesDe(p)}>
+                    <IconSettings size={18} /> Réglages
+                  </button>
+                  <button className="btn btn-ghost btn-sm btn-icon" onClick={() => onEditProfile(p)} title="Modifier le profil" aria-label={`Modifier le profil de ${p.prenom}`}>
+                    <IconPencil size={18} />
+                  </button>
+                  <button className="btn btn-ghost btn-sm btn-icon btn-danger-text" onClick={() => setToDelete(p)} title="Supprimer le profil" aria-label={`Supprimer le profil de ${p.prenom}`}>
+                    <IconTrash size={18} />
                   </button>
                 </td>
               </tr>
@@ -129,19 +159,34 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
         </table>
       )}
 
+      {reglagesDe && (
+        <OptionsModal
+          profile={reglagesDe}
+          onCancel={() => setReglagesDe(null)}
+          onSave={(dactylo) => {
+            majProfil({ ...reglagesDe, dactylo })
+            setReglagesDe(null)
+          }}
+        />
+      )}
+
       {toDelete && (
         <ConfirmDialog
           title="Supprimer ce profil ?"
           message={
             <>
-              Le profil de <strong>{toDelete.prenom}</strong> sera supprimé définitivement de ce PC.
+              Le profil de <strong>{toDelete.prenom}</strong> et ses statistiques seront supprimés définitivement de ce PC.
             </>
           }
           confirmLabel="Supprimer"
           danger
           onCancel={() => setToDelete(null)}
           onConfirm={() => {
-            onChange({ ...data, profiles: data.profiles.filter((x) => x.id !== toDelete.id) })
+            onChange({
+              ...data,
+              profiles: data.profiles.filter((x) => x.id !== toDelete.id),
+              resultats: data.resultats.filter((r) => r.profileId !== toDelete.id)
+            })
             setToDelete(null)
           }}
         />
@@ -279,5 +324,52 @@ function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
         />
       )}
     </section>
+  )
+}
+
+const OPTIONS: { key: keyof OptionsDactylo; titre: string; detail: string }[] = [
+  { key: 'accents', titre: 'Exiger les accents', detail: 'Sinon, « e » est accepté à la place de « é ».' },
+  { key: 'majuscules', titre: 'Exiger les majuscules', detail: 'Sinon, « a » est accepté à la place de « A ».' },
+  {
+    key: 'bloquer',
+    titre: 'Bloquer sur les erreurs',
+    detail: 'L’enfant doit taper la bonne lettre pour avancer. Sinon, il doit effacer ses erreurs avec ⌫.'
+  },
+  { key: 'clavier', titre: 'Afficher le clavier à l’écran', detail: 'Avec la touche à taper et les couleurs des doigts.' },
+  { key: 'sonErreur', titre: 'Son à chaque erreur', detail: 'Le son d’erreur choisi par l’enfant.' }
+]
+
+function OptionsModal({
+  profile,
+  onCancel,
+  onSave
+}: {
+  profile: Profile
+  onCancel: () => void
+  onSave: (o: OptionsDactylo) => void
+}) {
+  const [o, setO] = useState(profile.dactylo)
+  return (
+    <Modal title={`Dactylo : réglages de ${profile.prenom}`} onClose={onCancel} width={560}>
+      <div className="options-list">
+        {OPTIONS.map((opt) => (
+          <label key={opt.key} className="option-row">
+            <input type="checkbox" className="switch" checked={o[opt.key]} onChange={(e) => setO({ ...o, [opt.key]: e.target.checked })} />
+            <span>
+              <strong>{opt.titre}</strong>
+              <span className="option-detail">{opt.detail}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      <div className="modal-actions">
+        <button className="btn btn-ghost" onClick={onCancel}>
+          Annuler
+        </button>
+        <button className="btn btn-primary" onClick={() => onSave(o)}>
+          Enregistrer
+        </button>
+      </div>
+    </Modal>
   )
 }

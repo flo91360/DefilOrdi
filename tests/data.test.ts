@@ -42,3 +42,27 @@ describe('looksLikeAppData', () => {
     expect(looksLikeAppData([])).toBe(false)
   })
 })
+
+describe('migration des données de la version 1', () => {
+  it('ajoute les listes d’origine, les réglages Dactylo et un historique vide', () => {
+    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' } as Record<string, unknown>
+    delete p.dactylo
+    const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '1234', volume: 0.5 } })
+    expect(data.version).toBe(2)
+    expect(data.listes.length).toBe(4)
+    expect(data.resultats).toEqual([])
+    expect(data.profiles[0].dactylo).toEqual(newProfile('x', '').dactylo)
+  })
+
+  it('garde une liste vide si l’ergothérapeute a tout supprimé', () => {
+    expect(normalizeAppData({ version: 2, profiles: [], listes: [] }).listes).toEqual([])
+  })
+
+  it('écarte les résultats d’un profil supprimé', () => {
+    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const r = { id: 'r', profileId: 'a1', date: '2026-02-01T00:00:00.000Z', frappes: 10, erreurs: 1, erreursParTouche: { é: 1 } }
+    const data = normalizeAppData({ profiles: [p], resultats: [r, { ...r, id: 'r2', profileId: 'autre' }] })
+    expect(data.resultats.map((x) => x.id)).toEqual(['r'])
+    expect(data.resultats[0].erreursParTouche).toEqual({ é: 1 })
+  })
+})

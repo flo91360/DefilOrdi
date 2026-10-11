@@ -2,7 +2,11 @@
 // Toute donnée lue (fichier, import de sauvegarde) passe par normalizeAppData :
 // un champ absent ou invalide est remplacé par sa valeur par défaut.
 
-export const DATA_VERSION = 1
+import { defaultListes, type ListePhrases } from './phrases'
+
+export type { ListePhrases }
+
+export const DATA_VERSION = 2
 
 export type AvatarStyle = 'personnage' | 'robot'
 
@@ -36,6 +40,31 @@ export interface Profile {
   sonEchec: string
   // Réglé par l'ergothérapeute : 1 (débutant) à 4 (expert)
   niveau: number
+  dactylo: OptionsDactylo
+}
+
+// Réglages du jeu de dactylographie, propres à chaque enfant.
+export interface OptionsDactylo {
+  accents: boolean // é et e sont différents
+  majuscules: boolean // A et a sont différents
+  bloquer: boolean // une erreur n'avance pas : il faut taper la bonne lettre
+  clavier: boolean // clavier affiché à l'écran avec la touche à taper
+  sonErreur: boolean // son d'erreur à chaque faute
+}
+
+// Une partie de dactylographie terminée (ou arrêtée après au moins une phrase).
+export interface ResultatDactylo {
+  id: string
+  profileId: string
+  jeu: 'dactylo'
+  date: string
+  listeNom: string
+  phrases: number
+  dureeMs: number
+  caracteres: number // caractères des phrases réussies
+  frappes: number // caractères tapés, erreurs comprises (Retour arrière exclu)
+  erreurs: number
+  erreursParTouche: Record<string, number> // caractère attendu -> nombre d'erreurs
 }
 
 export interface Settings {
@@ -46,6 +75,8 @@ export interface Settings {
 export interface AppData {
   version: number
   profiles: Profile[]
+  listes: ListePhrases[]
+  resultats: ResultatDactylo[]
   settings: Settings
 }
 
@@ -106,19 +137,28 @@ export function newProfile(id: string, creeLe: string): Profile {
     couleurSecondaire: COULEURS_PREFEREES[2],
     sonReussite: SONS_REUSSITE[0],
     sonEchec: SONS_ECHEC[0],
-    niveau: 1
+    niveau: 1,
+    dactylo: defaultOptionsDactylo()
   }
+}
+
+export function defaultOptionsDactylo(): OptionsDactylo {
+  return { accents: true, majuscules: true, bloquer: true, clavier: true, sonErreur: true }
 }
 
 export function defaultAppData(): AppData {
   return {
     version: DATA_VERSION,
     profiles: [],
+    listes: defaultListes(),
+    resultats: [],
     settings: { codeErgo: '0000', volume: 0.7 }
   }
 }
 
 export const PRENOM_MAX = 20
+export const NOM_LISTE_MAX = 40
+export const PHRASE_MAX = 300
 
 type Obj = Record<string, unknown>
 
@@ -153,7 +193,61 @@ function normalizeProfile(v: unknown): Profile | null {
     couleurSecondaire: pick(v.couleurSecondaire, COULEURS_PREFEREES, d.couleurSecondaire),
     sonReussite: pick(v.sonReussite, SONS_REUSSITE, d.sonReussite),
     sonEchec: pick(v.sonEchec, SONS_ECHEC, d.sonEchec),
-    niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau
+    niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
+    dactylo: normalizeOptions(v.dactylo)
+  }
+}
+
+function normalizeOptions(v: unknown): OptionsDactylo {
+  const d = defaultOptionsDactylo()
+  if (!isObj(v)) return d
+  const out = { ...d }
+  for (const key of Object.keys(d) as (keyof OptionsDactylo)[]) {
+    if (typeof v[key] === 'boolean') out[key] = v[key] as boolean
+  }
+  return out
+}
+
+function normalizeListe(v: unknown): ListePhrases | null {
+  if (!isObj(v) || typeof v.id !== 'string' || v.id === '') return null
+  const nom = typeof v.nom === 'string' ? v.nom.trim().slice(0, NOM_LISTE_MAX) : ''
+  const phrases = (Array.isArray(v.phrases) ? v.phrases : [])
+    .filter((p): p is string => typeof p === 'string')
+    .map((p) => p.trim().slice(0, PHRASE_MAX))
+    .filter((p) => p !== '')
+  return {
+    id: v.id,
+    nom: nom || 'Sans nom',
+    niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : 1,
+    phrases
+  }
+}
+
+function count(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0
+}
+
+function normalizeResultat(v: unknown, profileIds: Set<string>): ResultatDactylo | null {
+  if (!isObj(v) || typeof v.id !== 'string' || typeof v.profileId !== 'string') return null
+  if (!profileIds.has(v.profileId) || typeof v.date !== 'string' || Number.isNaN(Date.parse(v.date))) return null
+  const erreursParTouche: Record<string, number> = {}
+  if (isObj(v.erreursParTouche)) {
+    for (const [k, n] of Object.entries(v.erreursParTouche)) {
+      if (k.length > 0 && k.length <= 2 && count(n) > 0) erreursParTouche[k] = count(n)
+    }
+  }
+  return {
+    id: v.id,
+    profileId: v.profileId,
+    jeu: 'dactylo',
+    date: v.date,
+    listeNom: typeof v.listeNom === 'string' ? v.listeNom.slice(0, NOM_LISTE_MAX) : '',
+    phrases: count(v.phrases),
+    dureeMs: count(v.dureeMs),
+    caracteres: count(v.caracteres),
+    frappes: count(v.frappes),
+    erreurs: count(v.erreurs),
+    erreursParTouche
   }
 }
 
@@ -173,11 +267,21 @@ export function normalizeAppData(v: unknown): AppData {
       profiles.push(p)
     }
   }
+  // Listes absentes (ancienne sauvegarde) : on remet celles d'origine.
+  // Une liste vide est gardée telle quelle : l'ergothérapeute a tout supprimé.
+  const listes = Array.isArray(v.listes)
+    ? v.listes.map(normalizeListe).filter((l): l is ListePhrases => l !== null)
+    : d.listes
+  const resultats = (Array.isArray(v.resultats) ? v.resultats : [])
+    .map((r) => normalizeResultat(r, seen))
+    .filter((r): r is ResultatDactylo => r !== null)
   const s = isObj(v.settings) ? v.settings : {}
   const volume = typeof s.volume === 'number' && s.volume >= 0 && s.volume <= 1 ? s.volume : d.settings.volume
   return {
     version: DATA_VERSION,
     profiles,
+    listes,
+    resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,
       volume

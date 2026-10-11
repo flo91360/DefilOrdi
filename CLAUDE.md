@@ -19,6 +19,13 @@ le code et les commentaires aussi.
 - `src/renderer/src/avatar/` : personnage SVG par calques.
 - `src/renderer/src/sounds.ts` : sons synthétisés (Web Audio), pas de fichiers.
 - `src/renderer/src/theme.ts` : couleurs de l'enfant en variables CSS.
+- `src/renderer/src/games/dactylo/` : jeu Dactylo ; `engine.ts` contient toute
+  la logique et les règles de comptage (testées dans `tests/engine.test.ts`).
+- `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
+  presser pour chaque caractère) et son affichage.
+- `src/shared/phrases.ts` : listes de phrases d'origine (uniquement des
+  caractères tapables sur un clavier AZERTY Windows).
+- Espace ergo : `screens/ErgoSpace.tsx`, `ErgoStats.tsx`, `PhrasesEditor.tsx`.
 
 ## Commandes
 
@@ -31,4 +38,6 @@ fabriqué par la CI Windows `.github/workflows/build-windows.yml`).
 
 - Données d'enfants : rien ne doit quitter le PC (pas de réseau, pas de télémétrie).
 - Les sons d'erreur restent doux, jamais punitifs.
-- Les jeux à venir sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
+- Les jeux sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
+- Chaque livraison : augmenter `version` dans `package.json` ; la CI publie la
+  Release `v<version>` à chaque mise à jour de main.

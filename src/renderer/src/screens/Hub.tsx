@@ -4,14 +4,13 @@ import { FullscreenButton } from '../components/FullscreenButton'
 import { GameArt, IconPencil, IconUsers } from '../components/Icons'
 import { Logo } from './ProfilePicker'
 
-// Les jeux arrivent dans les prochaines étapes : pour l'instant les tuiles
-// sont visibles mais marquées « Bientôt ».
+// Les jeux pas encore prêts restent visibles, marqués « Bientôt ».
 export const GAMES = [
   {
     id: 'dactylo',
     titre: 'Dactylo',
     description: 'Tape les phrases le plus juste et le plus vite possible.',
-    disponible: false
+    disponible: true
   },
   {
     id: 'memoire',
@@ -37,9 +36,10 @@ interface Props {
   profile: Profile
   onEdit: () => void
   onSwitch: () => void
+  onPlay: (jeu: string) => void
 }
 
-export function Hub({ profile, onEdit, onSwitch }: Props) {
+export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
   return (
     <div className="screen hub">
       <header className="topbar">
@@ -72,6 +72,7 @@ export function Hub({ profile, onEdit, onSwitch }: Props) {
               key={g.id}
               className={i % 2 === 0 ? 'game-tile' : 'game-tile game-tile-alt'}
               disabled={!g.disponible}
+              onClick={() => onPlay(g.id)}
               aria-label={`${g.titre}${g.disponible ? '' : ' (bientôt disponible)'}`}
             >
               <div className="game-art">

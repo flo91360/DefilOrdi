@@ -104,6 +104,21 @@ export const IconUpload = ({ size }: P) => (
   </Icon>
 )
 
+export const IconChart = ({ size }: P) => (
+  <Icon size={size}>
+    <path d="M4 20V4M4 20h16" />
+    <path d="M7 15l4-4 3 3 5-6" />
+  </Icon>
+)
+
+export const IconSettings = ({ size }: P) => (
+  <Icon size={size}>
+    <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
+    <circle cx="16" cy="7" r="2" />
+    <circle cx="10" cy="17" r="2" />
+  </Icon>
+)
+
 // Illustrations des jeux (plus grandes, en couleur pleine).
 export function GameArt({ game }: { game: string }) {
   switch (game) {
