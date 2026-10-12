@@ -145,9 +145,10 @@ npm run dist:portable  # fabrique seulement le .exe portable (fonctionne sous Li
 
 ## Archivage Google Drive
 
-Après une fabrication réussie sur `main`, le workflow peut archiver les `.exe`
-dans votre dossier Drive personnel, avec un sous-dossier par projet et version.
-Configurez `GOOGLE_DRIVE_CREDENTIALS` (secret Actions) et `GOOGLE_DRIVE_FOLDER_ID`
-(variable Actions) selon le [guide PlaniFiKateur](https://github.com/flo91360/PlaniFiKateur/blob/main/docs/google-drive.md).
+Une Release `v<version>` est publiée quand une nouvelle version de `package.json`
+arrive sur `main` ; une version déjà publiée n'est pas remplacée. Le site
+PlaniFiKateur archive automatiquement ses `.exe` dans le dossier Drive configuré
+sur son serveur, sous `DefilOrdi/<version>/`, sans secret dans ce dépôt (voir le
+[guide PlaniFiKateur](https://github.com/flo91360/PlaniFiKateur/blob/main/docs/google-drive.md)).
 Les anciens exécutables sont conservés. Les cartes traitées par le worker avec
 le profil de ce projet augmentent automatiquement la version avant les tests.

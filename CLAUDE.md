@@ -59,4 +59,5 @@ fabriqué par la CI Windows `.github/workflows/build-windows.yml`).
 - Les sons d'erreur restent doux, jamais punitifs.
 - Les jeux sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
 - Chaque livraison : augmenter `version` dans `package.json` ; la CI publie la
-  Release `v<version>` à chaque mise à jour de main.
+  Release `v<version>` quand une nouvelle version arrive sur main (une version
+  déjà publiée n'est pas remplacée). PlaniFiKateur archive ses .exe dans Google Drive.
