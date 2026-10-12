@@ -46,15 +46,29 @@ jobs:
             dist/DefilOrdi-Portable-*.exe
           if-no-files-found: error
 
-      # Chaque mise à jour de main publie (ou remplace) la version
-      # v<version de package.json> dans les Releases, avec les .exe à télécharger.
+      # Une nouvelle version de package.json arrivée sur main est publiée dans
+      # les Releases (v<version>), avec les .exe à télécharger. Une version déjà
+      # publiée n'est jamais remplacée : PlaniFiKateur archive chaque Release
+      # dans Google Drive et refuse d'écraser une version existante.
       - name: Lire la version
         id: version
         shell: bash
         run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
-      - name: Publier la version
+      - name: Vérifier si la version est déjà publiée
+        id: published
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null; then
+            echo "Version v${{ steps.version.outputs.version }} déjà publiée : rien à publier. Augmenter version dans package.json pour une nouvelle Release."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publier la version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.published.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
@@ -66,27 +80,3 @@ jobs:
           files: |
             dist/DefilOrdi-Installation-*.exe
             dist/DefilOrdi-Portable-*.exe
-
-  publish-drive:
-    name: Archiver sur Google Drive
-    needs: build
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    concurrency:
-      group: drive-${{ github.repository }}
-      cancel-in-progress: false
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: DefilOrdi-windows
-          path: drive-artifacts
-      - uses: flo91360/PlaniFiKateur/.github/actions/publish-drive@fc4c6b4e9e778dbee9b89d91db2a39d24a949b4a
-        with:
-          credentials: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-          folder-id: ${{ vars.GOOGLE_DRIVE_FOLDER_ID }}
-          version: v${{ needs.build.outputs.version }}
-          artifact-dir: drive-artifacts
-          github-token: ${{ secrets.GITHUB_TOKEN }}
