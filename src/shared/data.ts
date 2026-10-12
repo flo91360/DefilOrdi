@@ -124,6 +124,29 @@ export interface ResultatQuiz {
   ratees: string[] // identifiants des questions ratées
 }
 
+// Questions du quiz écrites par l'ergothérapeute (Vrai/Faux ou QCM).
+export const THEMES_QUIZ = ['materiel', 'windows', 'internet', 'bureautique', 'clavier'] as const
+export type ThemeQuiz = (typeof THEMES_QUIZ)[number]
+export const QUESTION_MAX = 300
+
+export interface QuestionPerso {
+  id: string
+  type: 'vraifaux' | 'choix'
+  theme: ThemeQuiz
+  niveau: number
+  question: string
+  explication: string
+  icone: string // '' = pas d'image
+  reponse: boolean // Vrai/Faux : la bonne réponse
+  choix: [string, string, string, string] // QCM
+  bonne: number // QCM : index de la bonne réponse
+}
+
+export function questionPersoValide(q: QuestionPerso): boolean {
+  if (q.question.trim() === '') return false
+  return q.type === 'vraifaux' || q.choix.every((c) => c.trim() !== '')
+}
+
 export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz
 export type JeuId = Resultat['jeu']
 
@@ -137,6 +160,8 @@ export interface AppData {
   profiles: Profile[]
   listes: ListePhrases[] // phrases du jeu Dactylo
   mots: ListePhrases[] // listes de mots du jeu Mots à retenir
+  questionsPerso: QuestionPerso[]
+  questionsMasquees: string[] // questions fournies désactivées par l'ergothérapeute
   resultats: Resultat[]
   settings: Settings
 }
@@ -213,6 +238,8 @@ export function defaultAppData(): AppData {
     profiles: [],
     listes: defaultListes(),
     mots: defaultListesMots(),
+    questionsPerso: [],
+    questionsMasquees: [],
     resultats: [],
     settings: { codeErgo: '0000', volume: 0.7 }
   }
@@ -298,6 +325,28 @@ function compteurs(v: unknown): Record<string, number> {
     }
   }
   return out
+}
+
+function texte(v: unknown, max = QUESTION_MAX): string {
+  return typeof v === 'string' ? v.slice(0, max) : ''
+}
+
+function normalizeQuestionPerso(v: unknown): QuestionPerso | null {
+  if (!isObj(v) || typeof v.id !== 'string' || v.id === '') return null
+  const choix = Array.isArray(v.choix) ? v.choix : []
+  const q: QuestionPerso = {
+    id: v.id.slice(0, 60),
+    type: v.type === 'choix' ? 'choix' : 'vraifaux',
+    theme: pick(v.theme, THEMES_QUIZ, 'materiel'),
+    niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : 1,
+    question: texte(v.question).trim(),
+    explication: texte(v.explication).trim(),
+    icone: texte(v.icone, 40),
+    reponse: v.reponse !== false,
+    choix: [0, 1, 2, 3].map((i) => texte(choix[i]).trim()) as [string, string, string, string],
+    bonne: typeof v.bonne === 'number' && [0, 1, 2, 3].includes(v.bonne) ? v.bonne : 0
+  }
+  return questionPersoValide(q) ? q : null
 }
 
 function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null {
@@ -388,6 +437,12 @@ export function normalizeAppData(v: unknown): AppData {
   const mots = Array.isArray(v.mots)
     ? v.mots.map(normalizeListe).filter((l): l is ListePhrases => l !== null)
     : d.mots
+  const questionsPerso = (Array.isArray(v.questionsPerso) ? v.questionsPerso : [])
+    .map(normalizeQuestionPerso)
+    .filter((q): q is QuestionPerso => q !== null)
+  const questionsMasquees = (Array.isArray(v.questionsMasquees) ? v.questionsMasquees : []).filter(
+    (x): x is string => typeof x === 'string' && x.length <= 60
+  )
   const resultats = (Array.isArray(v.resultats) ? v.resultats : [])
     .map((r) => normalizeResultat(r, seen))
     .filter((r): r is Resultat => r !== null)
@@ -398,6 +453,8 @@ export function normalizeAppData(v: unknown): AppData {
     profiles,
     listes,
     mots,
+    questionsPerso,
+    questionsMasquees,
     resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,

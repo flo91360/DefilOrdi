@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { JeuId, Profile, Resultat, ResultatCouleurs, ResultatDactylo, ResultatEspace, ResultatMemoire, ResultatQuiz } from '../../../shared/data'
+import type { JeuId, Profile, QuestionPerso, Resultat, ResultatCouleurs, ResultatDactylo, ResultatEspace, ResultatMemoire, ResultatQuiz } from '../../../shared/data'
 import { api } from '../api'
 import { Avatar } from '../avatar/Avatar'
 import { LineChart, type Point } from '../components/LineChart'
@@ -8,7 +8,7 @@ import { IconBack, IconDownload, IconTrash } from '../components/Icons'
 import { pourcentage } from '../games/commun'
 import { formatDuree, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
 import { cadence } from '../games/espace/engine'
-import { trouverQuestion } from '../games/quiz/engine'
+import { construireBanque } from '../games/quiz/engine'
 import { toucheDe } from '../keyboard/azerty'
 import { couleurChaleur, Keyboard } from '../keyboard/Keyboard'
 
@@ -98,11 +98,12 @@ function secondes(ms: number): string {
 interface Props {
   profile: Profile
   resultats: Resultat[]
+  questionsPerso: QuestionPerso[]
   onSupprimer: (id: string) => void
   onRetour: () => void
 }
 
-export function ErgoStats({ profile, resultats, onSupprimer, onRetour }: Props) {
+export function ErgoStats({ profile, resultats, questionsPerso, onSupprimer, onRetour }: Props) {
   const [aSupprimer, setASupprimer] = useState<Resultat | null>(null)
   const siens = resultats.filter((r) => r.profileId === profile.id).sort((a, b) => a.date.localeCompare(b.date))
   const parJeu = {
@@ -170,7 +171,7 @@ export function ErgoStats({ profile, resultats, onSupprimer, onRetour }: Props) 
       ) : jeu === 'espace' ? (
         <StatsEspace parties={parJeu.espace} onSupprimer={supprimer} />
       ) : (
-        <StatsQuiz parties={parJeu.quiz} onSupprimer={supprimer} />
+        <StatsQuiz parties={parJeu.quiz} questionsPerso={questionsPerso} onSupprimer={supprimer} />
       )}
 
       {aSupprimer && (
@@ -338,7 +339,17 @@ function StatsEspace({ parties, onSupprimer }: { parties: ResultatEspace[]; onSu
   )
 }
 
-function StatsQuiz({ parties, onSupprimer }: { parties: ResultatQuiz[]; onSupprimer: (r: Resultat) => void }) {
+function StatsQuiz({
+  parties,
+  questionsPerso,
+  onSupprimer
+}: {
+  parties: ResultatQuiz[]
+  questionsPerso: QuestionPerso[]
+  onSupprimer: (r: Resultat) => void
+}) {
+  // Toutes les questions, même désactivées, pour retrouver leur texte.
+  const parId = new Map(construireBanque(questionsPerso, []).map((q) => [q.id, q]))
   const derniere = parties[parties.length - 1]
   const reussite = (r: ResultatQuiz) => pourcentage(r.justes, r.questions)
   const totalQuestions = parties.reduce((t, r) => t + r.questions, 0)
@@ -347,7 +358,7 @@ function StatsQuiz({ parties, onSupprimer }: { parties: ResultatQuiz[]; onSuppri
   const pires = Object.entries(ratees)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
-    .map(([id, n]) => ({ q: trouverQuestion(id), n }))
+    .map(([id, n]) => ({ q: parId.get(id), n }))
     .filter((x) => x.q)
   return (
     <>

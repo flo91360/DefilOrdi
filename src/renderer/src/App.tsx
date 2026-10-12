@@ -12,6 +12,7 @@ import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
 import { Espace } from './games/espace/Espace'
 import { Memoire } from './games/memoire/Memoire'
+import { construireBanque } from './games/quiz/engine'
 import { Quiz } from './games/quiz/Quiz'
 
 type Screen =
@@ -105,7 +106,7 @@ export function App() {
       if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} />
       else if (screen.jeu === 'memoire') content = <Memoire {...commun} listes={data.mots} />
       else if (screen.jeu === 'espace') content = <Espace {...commun} />
-      else if (screen.jeu === 'quiz') content = <Quiz {...commun} />
+      else if (screen.jeu === 'quiz') content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
       else content = <Couleurs {...commun} />
       break
     }

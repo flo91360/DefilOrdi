@@ -1,6 +1,8 @@
 // Types des questions du quiz « L'ordinateur et moi ».
 
-export type ThemeId = 'materiel' | 'windows' | 'internet' | 'bureautique' | 'clavier'
+import type { ThemeQuiz } from '../../../../shared/data'
+
+export type ThemeId = ThemeQuiz
 
 export const THEMES: { id: ThemeId; nom: string }[] = [
   { id: 'materiel', nom: 'Le matériel' },
@@ -23,6 +25,7 @@ interface Base {
   question: string
   explication: string // affichée après la réponse
   visuel?: Visuel
+  perso?: boolean // écrite par l'ergothérapeute
 }
 
 export interface QuestionVraiFaux extends Base {

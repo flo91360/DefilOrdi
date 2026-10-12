@@ -10,9 +10,10 @@ import { playSound } from '../sounds'
 import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
 import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
+import { QuizEditor } from './QuizEditor'
 import { Logo } from './ProfilePicker'
 
-type Section = 'patients' | 'phrases' | 'mots' | 'reglages' | 'sauvegarde'
+type Section = 'patients' | 'phrases' | 'mots' | 'quiz' | 'reglages' | 'sauvegarde'
 
 const TEXTES_PHRASES: TextesEditeur = {
   titre: 'Phrases',
@@ -60,6 +61,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
               ['patients', 'Patients'],
               ['phrases', 'Phrases'],
               ['mots', 'Mots'],
+              ['quiz', 'Quiz'],
               ['reglages', 'Réglages'],
               ['sauvegarde', 'Sauvegarde']
             ] as const
@@ -79,6 +81,13 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
           {section === 'patients' && <Patients data={data} onChange={onChange} onEditProfile={onEditProfile} />}
           {section === 'phrases' && (
             <PhrasesEditor textes={TEXTES_PHRASES} listes={data.listes} onChange={(listes) => onChange({ ...data, listes })} />
+          )}
+          {section === 'quiz' && (
+            <QuizEditor
+              perso={data.questionsPerso}
+              masquees={data.questionsMasquees}
+              onChange={(questionsPerso, questionsMasquees) => onChange({ ...data, questionsPerso, questionsMasquees })}
+            />
           )}
           {section === 'mots' && <PhrasesEditor textes={TEXTES_MOTS} listes={data.mots} onChange={(mots) => onChange({ ...data, mots })} />}
           {section === 'reglages' && <Reglages data={data} onChange={onChange} />}
@@ -109,6 +118,7 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
       <ErgoStats
         profile={statsProfile}
         resultats={data.resultats}
+        questionsPerso={data.questionsPerso}
         onSupprimer={(id) => onChange({ ...data, resultats: data.resultats.filter((r) => r.id !== id) })}
         onRetour={() => setStatsDe(null)}
       />

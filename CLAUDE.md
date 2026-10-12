@@ -29,7 +29,9 @@ le code et les commentaires aussi.
 - `src/renderer/src/games/quiz/` : quiz. `questions.ts` = banque de questions
   (identifiants stables, utilisés dans les statistiques) ; `scenes/` = faux
   écrans cliquables, chaque élément est une `Zone` nommée. `tests/quiz.test.tsx`
-  vérifie que chaque zone attendue existe à chaque étape.
+  vérifie que chaque zone attendue existe à chaque étape. Questions de
+  l'ergothérapeute : `questionsPerso` / `questionsMasquees` dans les données,
+  fusionnées par `construireBanque` ; éditeur dans `screens/QuizEditor.tsx`.
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
   statistiques par jeu dans `screens/ErgoStats.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à

@@ -31,6 +31,7 @@ const DESCRIPTIONS: Record<ThemeId | 'tout', string> = {
 
 interface Props {
   profile: Profile
+  banque: Question[] // questions fournies actives + questions de l'ergothérapeute
   resultats: Resultat[]
   onResult: (r: ResultatQuiz) => void
   onQuit: () => void
@@ -46,11 +47,11 @@ type Phase =
   | { nom: 'jeu'; theme: ThemeId | 'tout'; questions: Question[] }
   | { nom: 'fin'; theme: ThemeId | 'tout'; reponses: Reponse[]; resultat: ResultatQuiz; record: boolean }
 
-export function Quiz({ profile, resultats, onResult, onQuit }: Props) {
+export function Quiz({ profile, banque, resultats, onResult, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState<Nombre>(10)
 
-  const lancer = (theme: ThemeId | 'tout') => setPhase({ nom: 'jeu', theme, questions: tirerQuestions(profile.niveau, theme, nombre) })
+  const lancer = (theme: ThemeId | 'tout') => setPhase({ nom: 'jeu', theme, questions: tirerQuestions(banque, profile.niveau, theme, nombre) })
 
   const terminer = (theme: ThemeId | 'tout', reponses: Reponse[], dureeMs: number, complete: boolean) => {
     if (reponses.length === 0) return onQuit()
@@ -138,9 +139,9 @@ export function Quiz({ profile, resultats, onResult, onQuit }: Props) {
         <Chips label="Nombre de questions" values={NOMBRES} value={nombre} onChange={setNombre} />
         <div className="liste-grid">
           {(['tout', ...THEMES.map((t) => t.id)] as (ThemeId | 'tout')[]).map((t) => {
-            const n = questionsDisponibles(profile.niveau, t).length
+            const n = questionsDisponibles(banque, profile.niveau, t).length
             return (
-              <button key={t} className="liste-card" onClick={() => lancer(t)}>
+              <button key={t} className="liste-card" onClick={() => lancer(t)} disabled={n === 0}>
                 <span className="liste-nom">{NOMS_THEMES[t]}</span>
                 <span className="liste-exemple wrap">{DESCRIPTIONS[t]}</span>
                 <span className="liste-info">

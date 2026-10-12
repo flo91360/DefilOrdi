@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { melangerChoix, questionsDisponibles, tirerQuestions } from '../src/renderer/src/games/quiz/engine'
+import { construireBanque, melangerChoix, questionsDisponibles, tirerQuestions } from '../src/renderer/src/games/quiz/engine'
 import { QUESTIONS } from '../src/renderer/src/games/quiz/questions'
 import { THEMES } from '../src/renderer/src/games/quiz/types'
 import { Ecran, ICONES } from '../src/renderer/src/games/quiz/visuels'
@@ -18,8 +18,8 @@ describe('banque de questions', () => {
   })
 
   it('propose au moins 10 questions pour chaque niveau', () => {
-    for (const n of [1, 2, 3, 4]) expect(questionsDisponibles(n, 'tout').length).toBeGreaterThanOrEqual(10)
-    for (const t of THEMES) expect(questionsDisponibles(4, t.id).length).toBeGreaterThanOrEqual(8)
+    for (const n of [1, 2, 3, 4]) expect(questionsDisponibles(QUESTIONS, n, 'tout').length).toBeGreaterThanOrEqual(10)
+    for (const t of THEMES) expect(questionsDisponibles(QUESTIONS, 4, t.id).length).toBeGreaterThanOrEqual(8)
   })
 
   it('chaque visuel existe', () => {
@@ -45,7 +45,7 @@ describe('banque de questions', () => {
 
 describe('tirage', () => {
   it('tire le nombre demandé, sans doublon', () => {
-    const qs = tirerQuestions(2, 'tout', 10)
+    const qs = tirerQuestions(QUESTIONS, 2, 'tout', 10)
     expect(qs).toHaveLength(10)
     expect(new Set(qs.map((q) => q.id)).size).toBe(10)
     expect(qs.every((q) => q.niveau <= 3)).toBe(true)
@@ -59,5 +59,27 @@ describe('tirage', () => {
       expect(m.textes[m.bonne]).toBe(q.choix[q.bonne])
       expect(new Set(m.textes).size).toBe(4)
     }
+  })
+})
+
+describe('questions de l’ergothérapeute', () => {
+  it('ajoute ses questions et retire les questions désactivées', () => {
+    const perso = {
+      id: 'perso-1',
+      type: 'choix' as const,
+      theme: 'clavier' as const,
+      niveau: 1,
+      question: 'Combien de touches Maj y a-t-il ?',
+      explication: 'Deux : une à gauche, une à droite.',
+      icone: 'maj',
+      reponse: true,
+      choix: ['Deux', 'Une', 'Trois', 'Aucune'] as [string, string, string, string],
+      bonne: 0
+    }
+    const banque = construireBanque([perso], ['mat-souris'])
+    expect(banque.find((q) => q.id === 'mat-souris')).toBeUndefined()
+    const q = banque.find((x) => x.id === 'perso-1')
+    expect(q).toMatchObject({ type: 'choix', perso: true, visuel: { icone: 'maj' }, bonne: 0 })
+    expect(banque.length).toBe(QUESTIONS.length)
   })
 })

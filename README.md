@@ -96,6 +96,9 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
 - Chaque réponse est suivie d'une explication ; la fin du quiz récapitule ce
   qu'il faut retenir. Les statistiques montrent les questions les plus souvent
   ratées.
+- Espace ergothérapeute, section **Quiz** : écrire ses propres questions
+  (Vrai/Faux ou QCM, avec thème, niveau, explication et image facultative),
+  et désactiver les questions fournies qui ne conviennent pas.
 
 ### Règles de comptage (Dactylo)
 

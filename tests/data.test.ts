@@ -85,3 +85,17 @@ describe('migration vers la version 3', () => {
     expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
   })
 })
+
+describe('questions du quiz de l’ergothérapeute', () => {
+  it('garde les questions valides et écarte les incomplètes', () => {
+    const base = { id: 'q1', type: 'vraifaux', theme: 'clavier', niveau: 2, question: ' La touche Entrée va à la ligne. ', explication: '', icone: '', reponse: true, choix: ['', '', '', ''], bonne: 0 }
+    const data = normalizeAppData({
+      profiles: [],
+      questionsPerso: [base, { ...base, id: 'q2', type: 'choix', choix: ['a', 'b', '', 'd'] }, { ...base, id: 'q3', question: '  ' }],
+      questionsMasquees: ['mat-souris', 42]
+    })
+    expect(data.questionsPerso.map((q) => q.id)).toEqual(['q1'])
+    expect(data.questionsPerso[0].question).toBe('La touche Entrée va à la ligne.')
+    expect(data.questionsMasquees).toEqual(['mat-souris'])
+  })
+})
