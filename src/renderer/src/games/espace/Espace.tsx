@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Profile, Resultat, ResultatEspace } from '../../../../shared/data'
+import type { Profile, Resultat, ResultatEspace, ThemeChasse } from '../../../../shared/data'
 import { IconBack } from '../../components/Icons'
 import { geste } from '../../keyboard/azerty'
 import { Keyboard } from '../../keyboard/Keyboard'
@@ -8,7 +8,7 @@ import { uid } from '../../uid'
 import { pourcentage } from '../commun'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import { avancer, cadence, DUREES, estTerminee, type Etat, type Lettre, nouvelEtat, type Reglages, type Serie, SERIES, tirer } from './engine'
-import { Scene } from './Scene'
+import { THEMES_JEU, type ThemeJeu } from './themes'
 
 interface Props {
   profile: Profile
@@ -18,28 +18,31 @@ interface Props {
 }
 
 type Phase =
-  | { nom: 'choix' }
-  | { nom: 'jeu'; reglages: Reglages }
-  | { nom: 'fin'; reglages: Reglages; resultat: ResultatEspace; record: boolean }
+  | { nom: 'aventure' }
+  | { nom: 'lettres'; theme: ThemeJeu }
+  | { nom: 'jeu'; theme: ThemeJeu; reglages: Reglages }
+  | { nom: 'fin'; theme: ThemeJeu; reglages: Reglages; resultat: ResultatEspace; record: boolean }
 
 const formatMinutes = (s: number) => `${s / 60} min`
 
 export function Espace({ profile, resultats, onResult, onQuit }: Props) {
-  const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
+  const siens = resultats.filter((r): r is ResultatEspace => r.jeu === 'espace' && r.profileId === profile.id)
+  const dernier: ThemeChasse | null = siens.length > 0 ? siens.reduce((a, b) => (a.date > b.date ? a : b)).theme : null
+  const [phase, setPhase] = useState<Phase>({ nom: 'aventure' })
   const [duree, setDuree] = useState<(typeof DUREES)[number]>(60)
 
-  const lancer = (serie: Serie) => setPhase({ nom: 'jeu', reglages: { serie, dureeS: duree, niveau: profile.niveau } })
+  const lancer = (theme: ThemeJeu, serie: Serie) =>
+    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau } })
 
-  const terminer = (reglages: Reglages, e: Etat, complete: boolean) => {
-    if (e.detruites + e.manquees + e.erreurs === 0) return complete ? setPhase({ nom: 'choix' }) : onQuit()
-    const anciens = resultats.filter(
-      (r): r is ResultatEspace => r.jeu === 'espace' && r.profileId === profile.id && r.serieNom === reglages.serie.nom
-    )
+  const terminer = (theme: ThemeJeu, reglages: Reglages, e: Etat, complete: boolean) => {
+    if (e.detruites + e.manquees + e.erreurs === 0) return complete ? setPhase({ nom: 'lettres', theme }) : onQuit()
+    const anciens = siens.filter((r) => r.serieNom === reglages.serie.nom && r.theme === theme.id)
     const r: ResultatEspace = {
       id: uid(),
       profileId: profile.id,
       jeu: 'espace',
       date: new Date().toISOString(),
+      theme: theme.id,
       serieNom: reglages.serie.nom,
       dureeMs: Math.round(e.temps * 1000),
       detruites: e.detruites,
@@ -50,37 +53,43 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
     onResult(r)
     if (!complete) return onQuit()
     const meilleur = Math.max(0, ...anciens.map((a) => cadence(a.detruites, a.dureeMs)))
-    setPhase({ nom: 'fin', reglages, resultat: r, record: anciens.length > 0 && cadence(r.detruites, r.dureeMs) > meilleur })
+    setPhase({ nom: 'fin', theme, reglages, resultat: r, record: anciens.length > 0 && cadence(r.detruites, r.dureeMs) > meilleur })
   }
 
   if (phase.nom === 'jeu') {
     return (
       <Partie
         profile={profile}
+        theme={phase.theme}
         reglages={phase.reglages}
-        onFin={(e) => terminer(phase.reglages, e, true)}
-        onQuitter={(e) => terminer(phase.reglages, e, false)}
+        onFin={(e) => terminer(phase.theme, phase.reglages, e, true)}
+        onQuitter={(e) => terminer(phase.theme, phase.reglages, e, false)}
       />
     )
   }
 
   if (phase.nom === 'fin') {
-    const r = phase.resultat
+    const { theme, resultat: r } = phase
     const tirs = r.detruites + r.erreurs
     const aTravailler = Object.entries(r.lettresRatees)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 4)
       .map(([c]) => c)
-    const message = r.manquees === 0 ? 'Aucune lettre n’a touché le sol !' : r.detruites >= r.manquees * 3 ? 'Très bonne défense !' : 'Bien joué, continue à t’entraîner !'
+    const message =
+      r.manquees === 0
+        ? theme.parfait
+        : r.detruites >= r.manquees * 3
+          ? 'Super réflexes, bravo !'
+          : 'Bien joué, continue à t’entraîner !'
     return (
       <div className="screen dactylo">
-        <GameTopbar titre="Lettres de l’espace" />
+        <GameTopbar titre={theme.nom} />
         <main className="fin-main">
           <FinHero profile={profile} message={message} record={phase.record ? 'Nouveau record !' : undefined} />
           <div className="fin-stats">
-            <StatTile value={String(r.detruites)} label="lettres détruites" detail={`${cadence(r.detruites, r.dureeMs)} par minute`} />
-            <StatTile value={`${pourcentage(r.detruites, tirs)} %`} label="de tirs réussis" detail={`${r.erreurs} tir${r.erreurs > 1 ? 's' : ''} dans le vide`} />
-            <StatTile value={String(r.manquees)} label={r.manquees > 1 ? 'lettres tombées' : 'lettre tombée'} detail={phase.reglages.serie.nom} />
+            <StatTile value={String(r.detruites)} label={theme.reussites(r.detruites)} detail={`${cadence(r.detruites, r.dureeMs)} par minute`} />
+            <StatTile value={`${pourcentage(r.detruites, tirs)} %`} label="de lettres justes" detail={`${r.erreurs} touche${r.erreurs > 1 ? 's' : ''} à côté`} />
+            <StatTile value={String(r.manquees)} label={`${theme.tombees.toLowerCase()}`} detail={phase.reglages.serie.nom} />
           </div>
           {aTravailler.length > 0 && (
             <p className="fin-travail">
@@ -94,10 +103,13 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
             <button className="btn btn-ghost btn-lg" onClick={onQuit}>
               <IconBack /> Menu
             </button>
-            <button className="btn btn-soft btn-lg" onClick={() => setPhase({ nom: 'choix' })}>
+            <button className="btn btn-soft btn-lg" onClick={() => setPhase({ nom: 'aventure' })}>
+              Changer d’aventure
+            </button>
+            <button className="btn btn-soft btn-lg" onClick={() => setPhase({ nom: 'lettres', theme })}>
               Autres lettres
             </button>
-            <button className="btn btn-primary btn-lg" onClick={() => lancer(phase.reglages.serie)} autoFocus>
+            <button className="btn btn-primary btn-lg" onClick={() => lancer(theme, phase.reglages.serie)} autoFocus>
               Rejouer
             </button>
           </div>
@@ -106,38 +118,126 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
     )
   }
 
-  const triees = [...SERIES].sort(
-    (a, b) => Number(b.niveau === profile.niveau) - Number(a.niveau === profile.niveau) || a.niveau - b.niveau
-  )
+  if (phase.nom === 'lettres') {
+    const { theme } = phase
+    const triees = [...SERIES].sort(
+      (a, b) => Number(b.niveau === profile.niveau) - Number(a.niveau === profile.niveau) || a.niveau - b.niveau
+    )
+    return (
+      <div className="screen dactylo">
+        <GameTopbar titre={theme.nom} onBack={() => setPhase({ nom: 'aventure' })} backLabel="Aventures" />
+        <main className="choix-main">
+          <div className="chasse-entete">
+            <div className="chasse-entete-apercu">
+              <Apercu theme={theme} profile={profile} />
+            </div>
+            <div>
+              <h2 className="choix-title">Quelles lettres vont tomber ?</h2>
+              <Chips label="Durée" values={DUREES} value={duree} onChange={setDuree} format={formatMinutes} />
+              <p className="choix-note">{theme.consigne} Échap met le jeu en pause.</p>
+            </div>
+          </div>
+          <div className="liste-grid">
+            {triees.map((s) => (
+              <button key={s.id} className="liste-card" onClick={() => lancer(theme, s)}>
+                {s.niveau === profile.niveau && <span className="liste-badge">Pour toi</span>}
+                <span className="liste-nom">{s.nom}</span>
+                <span className="serie-lettres">
+                  {[...s.lettres].slice(0, 12).join(' ')}
+                  {s.lettres.length > 12 ? ' …' : ''}
+                </span>
+                <span className="liste-info">Niveau {s.niveau}</span>
+              </button>
+            ))}
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="screen dactylo">
-      <GameTopbar titre="Lettres de l’espace" onBack={onQuit} />
+      <GameTopbar titre="Chasse aux lettres" onBack={onQuit} />
       <main className="choix-main">
-        <h2 className="choix-title">Quelles lettres vont tomber ?</h2>
-        <Chips label="Durée de la mission" values={DUREES} value={duree} onChange={setDuree} format={formatMinutes} />
-        <div className="liste-grid">
-          {triees.map((s) => (
-            <button key={s.id} className="liste-card" onClick={() => lancer(s)}>
-              {s.niveau === profile.niveau && <span className="liste-badge">Pour toi</span>}
-              <span className="liste-nom">{s.nom}</span>
-              <span className="serie-lettres">{[...s.lettres].slice(0, 12).join(' ')}{s.lettres.length > 12 ? ' …' : ''}</span>
-              <span className="liste-info">Niveau {s.niveau}</span>
+        <h2 className="choix-title">Choisis ton aventure</h2>
+        <div className="aventures">
+          {THEMES_JEU.map((t) => (
+            <button key={t.id} className="aventure-card" onClick={() => setPhase({ nom: 'lettres', theme: t })}>
+              <div className="aventure-apercu">
+                <Apercu theme={t} profile={profile} />
+                {dernier === t.id && <span className="liste-badge">Ta dernière aventure</span>}
+              </div>
+              <span className="aventure-nom">{t.nom}</span>
+              <span className="aventure-desc">{t.description}</span>
             </button>
           ))}
         </div>
-        <p className="choix-note">Tape la lettre qui tombe pour tirer dessus avec le laser. Échap met le jeu en pause.</p>
       </main>
     </div>
   )
 }
 
+// Aperçu animé d'un décor, avec quelques lettres d'exemple.
+function Apercu({ theme, profile }: { theme: ThemeJeu; profile: Profile }) {
+  const ref = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    const canvas = ref.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const scene = theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire })
+    const exemples: Lettre[] = [
+      { id: 1, char: 'f', x: 0.18, y: 0.3, vitesse: 0 },
+      { id: 2, char: 'j', x: 0.62, y: 0.62, vitesse: 0 },
+      { id: 3, char: 'k', x: 0.86, y: 0.12, vitesse: 0 }
+    ]
+    let w = 0
+    let h = 0
+    const taille = () => {
+      const r = canvas.getBoundingClientRect()
+      const dpr = window.devicePixelRatio || 1
+      w = r.width
+      h = r.height
+      canvas.width = Math.round(w * dpr)
+      canvas.height = Math.round(h * dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    taille()
+    const ro = new ResizeObserver(taille)
+    ro.observe(canvas)
+    let raf = 0
+    let avant = performance.now()
+    let accu = 0
+    const frame = (now: number) => {
+      const dt = Math.min(0.05, (now - avant) / 1000)
+      avant = now
+      accu += dt
+      // 30 images par seconde suffisent pour un aperçu
+      if (accu >= 1 / 30) {
+        scene.avancer(accu, exemples)
+        scene.dessiner(ctx, w, h, exemples, 2)
+        accu = 0
+      }
+      raf = requestAnimationFrame(frame)
+    }
+    raf = requestAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(raf)
+      ro.disconnect()
+    }
+  }, [theme, profile.couleurPrincipale, profile.couleurSecondaire])
+  return <canvas ref={ref} className="apercu-canvas" aria-hidden="true" />
+}
+
 function Partie({
   profile,
+  theme,
   reglages,
   onFin,
   onQuitter
 }: {
   profile: Profile
+  theme: ThemeJeu
   reglages: Reglages
   onFin: (e: Etat) => void
   onQuitter: (e: Etat) => void
@@ -145,18 +245,38 @@ function Partie({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const zoneRef = useRef<HTMLDivElement>(null)
   const etat = useRef<Etat>(nouvelEtat())
-  const scene = useRef(new Scene(profile.couleurPrincipale, profile.couleurSecondaire))
+  const scene = useRef(theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire }))
   const pause = useRef(false)
   const fini = useRef(false)
+  const enCompte = useRef(true)
   const dernierSon = useRef(0)
+  const [decompte, setDecompte] = useState<number | null>(3)
   const [affiche, setAffiche] = useState({ ...etat.current, pause: false })
   const callbacks = useRef({ onFin, onQuitter })
   callbacks.current = { onFin, onQuitter }
 
   const basculerPause = (p?: boolean) => {
+    if (enCompte.current) return
     pause.current = p ?? !pause.current
     setAffiche((a) => ({ ...a, pause: pause.current }))
   }
+
+  // Compte à rebours 3, 2, 1, c'est parti !
+  useEffect(() => {
+    if (decompte === null) return
+    playSound(decompte > 0 ? 'decompte' : 'partez')
+    const t = setTimeout(
+      () => {
+        if (decompte > 0) setDecompte(decompte - 1)
+        else {
+          enCompte.current = false
+          setDecompte(null)
+        }
+      },
+      decompte > 0 ? 750 : 600
+    )
+    return () => clearTimeout(t)
+  }, [decompte])
 
   // Boucle de jeu
   useEffect(() => {
@@ -188,21 +308,23 @@ function Partie({
     const frame = (now: number) => {
       const dt = Math.min(0.05, (now - precedent) / 1000)
       precedent = now
-      if (!pause.current && !fini.current) {
-        const res = avancer(etat.current, dt, reglages)
-        etat.current = res.etat
-        for (const ev of res.evenements) {
-          if (ev.type === 'sol') {
-            scene.current.auSol(ev.lettre)
-            playSound('sol')
+      if (!pause.current) {
+        if (!fini.current && !enCompte.current) {
+          const res = avancer(etat.current, dt, reglages)
+          etat.current = res.etat
+          for (const ev of res.evenements) {
+            if (ev.type === 'sol') {
+              scene.current.auSol(ev.lettre)
+              playSound(theme.sons.sol)
+            }
+          }
+          if (estTerminee(etat.current, reglages)) {
+            fini.current = true
+            playSound(profile.sonReussite)
+            setTimeout(() => callbacks.current.onFin(etat.current), 1100)
           }
         }
-        scene.current.avancer(dt)
-        if (estTerminee(etat.current, reglages)) {
-          fini.current = true
-          playSound(profile.sonReussite)
-          setTimeout(() => callbacks.current.onFin(etat.current), 900)
-        }
+        scene.current.avancer(dt, etat.current.lettres)
       }
       const visee = plusBasse(etat.current.lettres)?.id ?? null
       scene.current.dessiner(ctx, w, h, fini.current ? [] : etat.current.lettres, visee)
@@ -217,7 +339,7 @@ function Partie({
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [reglages, profile.sonReussite])
+  }, [reglages, theme, profile.sonReussite])
 
   // Clavier
   useEffect(() => {
@@ -229,18 +351,19 @@ function Partie({
       }
       if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || e.key === ' ') return
       e.preventDefault()
-      if (pause.current || fini.current) return
+      if (pause.current || fini.current || enCompte.current) return
       const { etat: suivant, evenement } = tirer(etat.current, e.key, reglages)
       etat.current = suivant
       if (evenement?.type === 'detruite') {
-        scene.current.tirSur(evenement.lettre)
-        playSound('laser')
-        setTimeout(() => playSound('explosion'), 60)
+        scene.current.toucher(evenement.lettre)
+        theme.sons.toucher.forEach((s, i) => (i === 0 ? playSound(s) : setTimeout(() => playSound(s), 60 * i)))
       } else if (evenement?.type === 'erreur') {
+        scene.current.rater(etat.current.lettres)
+        playSound(theme.sons.rater)
         const t = Date.now()
         if (profile.dactylo.sonErreur && t - dernierSon.current > 700) {
           dernierSon.current = t
-          playSound(profile.sonEchec)
+          setTimeout(() => playSound(profile.sonEchec), 120)
         }
       }
     }
@@ -252,21 +375,22 @@ function Partie({
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('blur', onBlur)
     }
-  }, [reglages, profile.dactylo.sonErreur, profile.sonEchec])
+  }, [reglages, theme, profile.dactylo.sonErreur, profile.sonEchec])
 
   const reste = Math.max(0, Math.ceil(reglages.dureeS - affiche.temps))
   const basse = plusBasse(affiche.lettres)
   const g = basse ? geste(basse.char) : null
 
   return (
-    <div className="screen espace">
+    <div className={`screen espace ${theme.classe}`}>
       <header className="topbar espace-topbar">
         <button className="btn btn-ghost btn-dark" onClick={() => callbacks.current.onQuitter(etat.current)}>
           <IconBack /> Arrêter
         </button>
-        <button className="btn btn-ghost btn-dark" onClick={() => basculerPause()}>
+        <button className="btn btn-ghost btn-dark" onClick={() => basculerPause()} disabled={decompte !== null}>
           {affiche.pause ? 'Reprendre' : 'Pause'}
         </button>
+        <span className="espace-titre">{theme.nom}</span>
         <div className="live-stats">
           <div className="live-stat live-stat-dark">
             <span className="live-stat-value">
@@ -276,16 +400,21 @@ function Partie({
           </div>
           <div className="live-stat live-stat-dark">
             <span className="live-stat-value">{affiche.detruites}</span>
-            <span className="live-stat-label">Détruites</span>
+            <span className="live-stat-label">{theme.compteur}</span>
           </div>
           <div className="live-stat live-stat-dark">
             <span className="live-stat-value">{affiche.manquees}</span>
-            <span className="live-stat-label">Tombées</span>
+            <span className="live-stat-label">{theme.tombees}</span>
           </div>
         </div>
       </header>
       <div className="espace-zone" ref={zoneRef}>
         <canvas ref={canvasRef} aria-label="Zone de jeu" />
+        {decompte !== null && (
+          <div className="espace-decompte" key={decompte}>
+            {decompte > 0 ? decompte : 'C’est parti !'}
+          </div>
+        )}
         {affiche.pause && (
           <div className="espace-pause">
             <p>Pause</p>
@@ -308,3 +437,4 @@ function Partie({
 function plusBasse(lettres: Lettre[]): Lettre | null {
   return lettres.reduce<Lettre | null>((b, l) => (!b || l.y > b.y ? l : b), null)
 }
+

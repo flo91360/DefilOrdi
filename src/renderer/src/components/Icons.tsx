@@ -171,19 +171,24 @@ export function GameArt({ game }: { game: string }) {
     case 'espace':
       return (
         <svg viewBox="0 0 120 80" aria-hidden="true">
-          <circle cx="16" cy="12" r="1.6" fill="var(--tile-ink)" />
-          <circle cx="98" cy="20" r="1.6" fill="var(--tile-ink)" />
-          <circle cx="70" cy="8" r="1.2" fill="var(--tile-ink)" />
-          <rect x="22" y="14" width="20" height="20" rx="5" fill="#ffffff" stroke="var(--tile-ink)" strokeWidth="2.5" />
-          <text x="32" y="29" fontSize="14" fontWeight="900" textAnchor="middle" fill="var(--tile-ink)" fontFamily="inherit">
-            A
-          </text>
-          <rect x="76" y="30" width="20" height="20" rx="5" fill="#ffffff" stroke="var(--tile-ink)" strokeWidth="2.5" />
-          <text x="86" y="45" fontSize="14" fontWeight="900" textAnchor="middle" fill="var(--tile-ink)" fontFamily="inherit">
-            K
-          </text>
-          <path d="M61 56 L83 51" stroke="#ff5a7a" strokeWidth="3" strokeLinecap="round" />
-          <path d="M60 58 L68 74 H52 Z" fill="var(--tile-ink)" />
+          {/* fusée */}
+          <path d="M22 14 Q30 24 28 44 L16 44 Q14 24 22 14 Z" fill="#ffffff" stroke="var(--tile-ink)" strokeWidth="2.5" />
+          <path d="M22 14 Q27 19 27.5 24 L16.5 24 Q17 19 22 14 Z" fill="var(--tile-ink)" />
+          <circle cx="22" cy="31" r="3.5" fill="#7dd3fc" stroke="var(--tile-ink)" strokeWidth="1.5" />
+          <path d="M18 44 L22 54 L26 44 Z" fill="#ffb347" />
+          {/* bouteille */}
+          <rect x="56" y="10" width="6" height="5" rx="1" fill="#b07a42" />
+          <path d="M55 15 h8 v8 q8 3 8 9 v20 q0 3 -3 3 h-18 q-3 0 -3 -3 v-20 q0 -6 8 -9 z" fill="#2f9e44" opacity="0.9" stroke="var(--tile-ink)" strokeWidth="2" />
+          <rect x="51" y="35" width="16" height="12" rx="2" fill="#f7ecd2" />
+          <text x="59" y="45" textAnchor="middle" fontSize="10" fontWeight="900" fill="#3b2412" fontFamily="inherit">K</text>
+          {/* poisson */}
+          <path d="M86 52 l-8 -7 l0 14 z" fill="#ff6b00" />
+          <ellipse cx="96" cy="52" rx="13" ry="9" fill="#ff8c2b" stroke="var(--tile-ink)" strokeWidth="2" />
+          <rect x="91" y="43" width="4" height="18" fill="#ffffff" />
+          <circle cx="103" cy="50" r="2" fill="#111827" />
+          <circle cx="104" cy="30" r="3" fill="none" stroke="var(--tile-ink)" strokeWidth="1.5" />
+          <circle cx="98" cy="22" r="2" fill="none" stroke="var(--tile-ink)" strokeWidth="1.5" />
+          <path d="M8 70 H112" stroke="var(--tile-ink)" strokeWidth="2" strokeDasharray="4 5" opacity="0.5" />
         </svg>
       )
     case 'quiz':

@@ -97,12 +97,16 @@ export interface ResultatMemoire {
   dureeMs: number // temps de rappel
 }
 
-// Une partie de « Lettres de l'espace ».
+// Une partie de « Chasse aux lettres » (identifiant historique : 'espace').
+export const THEMES_CHASSE = ['espace', 'western', 'ocean'] as const
+export type ThemeChasse = (typeof THEMES_CHASSE)[number]
+
 export interface ResultatEspace {
   id: string
   profileId: string
   jeu: 'espace'
   date: string
+  theme: ThemeChasse // décor choisi : fusée, cow-boy ou sous-marin
   serieNom: string
   dureeMs: number
   detruites: number
@@ -381,6 +385,7 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
     return {
       ...base,
       jeu: 'espace',
+      theme: pick(v.theme, THEMES_CHASSE, 'espace'),
       serieNom: typeof v.serieNom === 'string' ? v.serieNom.slice(0, NOM_LISTE_MAX) : '',
       detruites: count(v.detruites),
       manquees: count(v.manquees),

@@ -13,7 +13,7 @@ function jouer(e: Etat, r: Reglages, secondes: number): Etat {
   return etat
 }
 
-describe('Lettres de l’espace', () => {
+describe('Chasse aux lettres (moteur)', () => {
   it('fait apparaître des lettres de la série, différentes entre elles', () => {
     const r = reglages()
     const e = jouer(nouvelEtat(), r, 6)

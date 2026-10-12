@@ -24,8 +24,14 @@ le code et les commentaires aussi.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
-- `src/renderer/src/games/espace/` : jeu en canvas ; `engine.ts` (logique,
-  testée dans `tests/espace.test.ts`) et `Scene.ts` (dessin uniquement).
+- `src/renderer/src/games/espace/` : « Chasse aux lettres » (identifiant `espace`
+  conservé), jeu en canvas. `engine.ts` = logique, commune aux aventures
+  (testée dans `tests/espace.test.ts`) ; `themes.ts` = les aventures (noms,
+  sons, scène) ; `scenes/` = dessin uniquement : `base.ts` (classe
+  `SceneTheme`, particules, fond mis en cache), `Spatial.ts` (fusée),
+  `Western.ts` (cow-boy), `Ocean.ts` (sous-marin). Ajouter une aventure =
+  l'ajouter à `THEMES_CHASSE` (`src/shared/data.ts`), à `THEMES_JEU` et écrire
+  sa scène.
 - `src/renderer/src/games/quiz/` : quiz. `questions.ts` = banque de questions
   (identifiants stables, utilisés dans les statistiques) ; `scenes/` = faux
   écrans cliquables, chaque élément est une `Zone` nommée. `tests/quiz.test.tsx`

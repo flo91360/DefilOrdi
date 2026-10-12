@@ -65,18 +65,27 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   un onglet par jeu dans les statistiques de chaque enfant (courbes,
   historique, export Excel).
 
-**Étape 4 — Lettres de l'espace**
+**Étape 4 — Chasse aux lettres** (anciennement « Lettres de l'espace »)
 
-- Des lettres-météorites tombent ; taper la bonne touche envoie un laser depuis
-  le vaisseau (aux couleurs de l'enfant) et détruit la lettre la plus basse.
+- Des lettres tombent ; taper la bonne touche attrape la lettre la plus basse.
+  L'enfant choisit son aventure, chacune avec son décor animé et ses sons :
+  - **Mission spatiale** : des météorites-lettres foncent vers une planète ; la
+    fusée (aux couleurs de l'enfant) les pulvérise d'un faisceau laser ;
+  - **Stand de tir** : des bouteilles en verre suspendues à des cordes ; le
+    cow-boy tire et la bouteille vole en éclats ;
+  - **Plongée sous-marine** : poissons, coquillages, étoiles de mer, pièces
+    d'or et coffres descendent vers le sable ; le sous-marin les aspire avec
+    son rayon.
 - Séries : rangée du milieu, du haut, du bas, toutes les lettres, lettres
-  accentuées, majuscules. Mission de 1, 2 ou 3 minutes ; la vitesse dépend du
-  niveau et augmente doucement pendant la partie. Pas de « game over » : une
-  lettre qui touche le sol est simplement comptée comme tombée.
+  accentuées, majuscules. Partie de 1, 2 ou 3 minutes, précédée d'un décompte
+  3-2-1 ; la vitesse dépend du niveau et augmente doucement pendant la partie.
+  Pas de « game over » : une lettre qui touche le sol est simplement comptée
+  comme tombée.
 - Clavier à l'écran avec la touche à taper (si activé dans les réglages de
   l'enfant). Échap ou la perte du focus met le jeu en pause.
-- Sont mesurés : lettres détruites (et par minute), tirs réussis, lettres
-  tombées, et les lettres ratées (clavier coloré dans les statistiques).
+- Sont mesurés : aventure choisie, lettres attrapées (et par minute), lettres
+  justes, lettres tombées, et les lettres ratées (clavier coloré dans les
+  statistiques). Les records sont comptés par série et par aventure.
 
 **Quiz de l'ordinateur**
 

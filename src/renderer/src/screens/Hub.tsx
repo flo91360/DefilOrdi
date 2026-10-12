@@ -25,8 +25,8 @@ export const GAMES: { id: JeuId; titre: string; description: string; disponible:
   },
   {
     id: 'espace',
-    titre: 'Lettres de l’espace',
-    description: 'Détruis les lettres qui tombent avant qu’elles n’atterrissent.',
+    titre: 'Chasse aux lettres',
+    description: 'Fusée, cow-boy ou sous-marin : attrape les lettres avant qu’elles ne tombent.',
     disponible: true
   },
   {

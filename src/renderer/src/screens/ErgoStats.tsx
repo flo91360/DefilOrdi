@@ -18,7 +18,7 @@ export const NOMS_JEUX: Record<JeuId, string> = {
   dactylo: 'Dactylo',
   couleurs: 'Couleurs piégées',
   memoire: 'Mots à retenir',
-  espace: 'Lettres de l’espace',
+  espace: 'Chasse aux lettres',
   quiz: 'Quiz'
 }
 
@@ -34,7 +34,7 @@ export function resumePartie(r: Resultat): string {
   if (r.jeu === 'couleurs') return `${r.justes}/${r.manches} justes`
   if (r.jeu === 'memoire') return `${r.trouves}/${r.mots} mots`
   if (r.jeu === 'quiz') return `${r.justes}/${r.questions} bonnes réponses`
-  return `${r.detruites} lettres détruites`
+  return `${r.detruites} lettres attrapées`
 }
 
 const dateCourte = (iso: string) => new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
@@ -75,12 +75,15 @@ const COLONNES_MEMOIRE: Colonne<ResultatMemoire>[] = [
 
 const tirsReussis = (r: ResultatEspace) => pourcentage(r.detruites, r.detruites + r.erreurs)
 
+const NOMS_AVENTURES: Record<ResultatEspace['theme'], string> = { espace: 'Fusée', western: 'Cow-boy', ocean: 'Sous-marin' }
+
 const COLONNES_ESPACE: Colonne<ResultatEspace>[] = [
+  { titre: 'Aventure', valeur: (r) => NOMS_AVENTURES[r.theme] },
   { titre: 'Lettres', valeur: (r) => r.serieNom },
   { titre: 'Durée', valeur: (r) => formatDuree(r.dureeMs), num: true },
-  { titre: 'Détruites', valeur: (r) => r.detruites, num: true },
+  { titre: 'Attrapées', valeur: (r) => r.detruites, num: true },
   { titre: 'Par minute', valeur: (r) => cadence(r.detruites, r.dureeMs), num: true },
-  { titre: 'Tirs réussis', valeur: (r) => `${tirsReussis(r)} %`, num: true },
+  { titre: 'Lettres justes', valeur: (r) => `${tirsReussis(r)} %`, num: true },
   { titre: 'Tombées', valeur: (r) => r.manquees, num: true }
 ]
 
@@ -313,18 +316,18 @@ function StatsEspace({ parties, onSupprimer }: { parties: ResultatEspace[]; onSu
         <Tile
           valeur={String(parties.length)}
           label={parties.length > 1 ? 'parties jouées' : 'partie jouée'}
-          detail={`${parties.reduce((t, r) => t + r.detruites, 0)} lettres détruites au total`}
+          detail={`${parties.reduce((t, r) => t + r.detruites, 0)} lettres attrapées au total`}
         />
-        <Tile valeur={String(cadence(derniere.detruites, derniere.dureeMs))} label="lettres détruites/min" detail={`dernière partie · record ${meilleur}`} />
-        <Tile valeur={`${tirsReussis(derniere)} %`} label="de tirs réussis" detail={`dernière partie · ${derniere.manquees} tombées`} />
+        <Tile valeur={String(cadence(derniere.detruites, derniere.dureeMs))} label="lettres attrapées/min" detail={`dernière partie · record ${meilleur}`} />
+        <Tile valeur={`${tirsReussis(derniere)} %`} label="de lettres justes" detail={`dernière partie · ${derniere.manquees} tombées`} />
       </div>
       {parties.length > 1 && (
         <div className="stats-charts">
           <div className="card">
-            <LineChart titre="Lettres détruites par minute" points={points(parties, (r) => cadence(r.detruites, r.dureeMs), (r) => r.serieNom)} />
+            <LineChart titre="Lettres attrapées par minute" points={points(parties, (r) => cadence(r.detruites, r.dureeMs), (r) => `${NOMS_AVENTURES[r.theme]} · ${r.serieNom}`)} />
           </div>
           <div className="card">
-            <LineChart titre="Tirs réussis" unite=" %" max={100} points={points(parties, tirsReussis, (r) => r.serieNom)} />
+            <LineChart titre="Lettres justes" unite=" %" max={100} points={points(parties, tirsReussis, (r) => `${NOMS_AVENTURES[r.theme]} · ${r.serieNom}`)} />
           </div>
         </div>
       )}

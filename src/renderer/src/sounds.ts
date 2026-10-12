@@ -132,13 +132,52 @@ const SOUNDS: Record<string, () => void> = {
     playNoise(0.1, 0.35, 1800, 300, 0.25)
   },
   aucun: () => {},
-  // Effets du jeu « Lettres de l'espace » (pas proposés au choix de l'enfant)
-  laser: () => playNotes([{ freq: 1400, slideTo: 380, start: 0, dur: 0.16, type: 'square', gain: 0.07 }]),
+  // Effets du jeu « Chasse aux lettres » (pas proposés au choix de l'enfant)
+  laser: () =>
+    playNotes([
+      { freq: 1800, slideTo: 420, start: 0, dur: 0.18, type: 'square', gain: 0.06 },
+      { freq: 2400, slideTo: 600, start: 0.01, dur: 0.14, type: 'sawtooth', gain: 0.03 }
+    ]),
   explosion: () => {
-    playNoise(0, 0.32, 900, 120, 0.35)
-    playNotes([{ freq: 160, slideTo: 50, start: 0, dur: 0.25, gain: 0.25 }])
+    playNoise(0, 0.45, 1200, 90, 0.4)
+    playNotes([{ freq: 150, slideTo: 40, start: 0, dur: 0.35, gain: 0.3 }])
   },
-  sol: () => playNotes([{ freq: 220, slideTo: 140, start: 0, dur: 0.3, type: 'triangle', gain: 0.18 }])
+  impact: () => {
+    playNoise(0, 0.35, 500, 80, 0.3)
+    playNotes([{ freq: 110, slideTo: 45, start: 0, dur: 0.3, type: 'triangle', gain: 0.25 }])
+  },
+  pfft: () => playNoise(0, 0.14, 700, 300, 0.12),
+  tir: () => {
+    playNoise(0, 0.16, 2200, 300, 0.55)
+    playNotes([{ freq: 130, slideTo: 45, start: 0, dur: 0.18, gain: 0.35 }])
+  },
+  verre: () => {
+    playNoise(0.03, 0.3, 6000, 2500, 0.18)
+    playNotes(
+      [3100, 4200, 2600, 5200, 3700].map((freq, i) => ({ freq, start: 0.03 + i * 0.025, dur: 0.12 + (i % 2) * 0.08, gain: 0.05 }))
+    )
+  },
+  ricochet: () => playNotes([{ freq: 2600, slideTo: 900, start: 0.02, dur: 0.32, type: 'triangle', gain: 0.08 }]),
+  clonk: () => playNotes([{ freq: 420, slideTo: 300, start: 0, dur: 0.18, type: 'triangle', gain: 0.18 }]),
+  aspire: () =>
+    playNotes([
+      { freq: 220, slideTo: 760, start: 0, dur: 0.32, type: 'triangle', gain: 0.12 },
+      { freq: 330, slideTo: 990, start: 0.04, dur: 0.28, gain: 0.08 }
+    ]),
+  tresor: () =>
+    playNotes([
+      { freq: 1319, start: 0, dur: 0.18, type: 'triangle', gain: 0.12 },
+      { freq: 1568, start: 0.07, dur: 0.18, type: 'triangle', gain: 0.12 },
+      { freq: 2093, start: 0.14, dur: 0.35, type: 'triangle', gain: 0.1 }
+    ]),
+  bloup: () =>
+    playNotes([
+      { freq: 260, slideTo: 620, start: 0, dur: 0.1, gain: 0.2 },
+      { freq: 340, slideTo: 800, start: 0.09, dur: 0.09, gain: 0.15 }
+    ]),
+  sable: () => playNoise(0, 0.3, 400, 150, 0.2),
+  decompte: () => playNotes([{ freq: 660, start: 0, dur: 0.14, type: 'triangle', gain: 0.18 }]),
+  partez: () => playNotes([{ freq: 990, start: 0, dur: 0.4, type: 'triangle', gain: 0.2 }])
 }
 
 export function playSound(id: string): void {

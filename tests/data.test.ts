@@ -99,3 +99,20 @@ describe('questions du quiz de l’ergothérapeute', () => {
     expect(data.questionsMasquees).toEqual(['mat-souris'])
   })
 })
+
+describe('Chasse aux lettres', () => {
+  it('garde l’aventure choisie et prend la fusée pour les anciennes parties', () => {
+    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const base = { profileId: 'a1', date: '2026-02-01T00:00:00.000Z', jeu: 'espace', serieNom: 'Ligne du milieu', dureeMs: 60000, detruites: 12, manquees: 2, erreurs: 1, lettresRatees: { k: 2 } }
+    const data = normalizeAppData({
+      profiles: [p],
+      resultats: [
+        { ...base, id: 'ancienne' },
+        { ...base, id: 'cowboy', theme: 'western' },
+        { ...base, id: 'sousmarin', theme: 'ocean' },
+        { ...base, id: 'inconnu', theme: 'jungle' }
+      ]
+    })
+    expect(data.resultats.map((r) => (r.jeu === 'espace' ? r.theme : null))).toEqual(['espace', 'western', 'ocean', 'espace'])
+  })
+})

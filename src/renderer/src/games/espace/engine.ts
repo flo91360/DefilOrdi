@@ -1,6 +1,6 @@
-// « Lettres de l'espace » : des lettres tombent du haut de l'écran ; taper la
-// bonne touche tire un laser qui détruit la lettre la plus basse portant ce
-// caractère. Une lettre qui touche le sol est « manquée » (pas de game over :
+// « Chasse aux lettres » : des lettres tombent du haut de l'écran ; taper la
+// bonne touche attrape (laser, tir ou rayon selon l'aventure) la lettre la plus
+// basse portant ce caractère. Une lettre qui touche le sol est « manquée » (pas de game over :
 // la partie dure le temps choisi).
 //
 // Les positions sont en proportions de l'écran (0 à 1) pour que la logique ne
