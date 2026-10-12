@@ -78,6 +78,25 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
 - Sont mesurés : lettres détruites (et par minute), tirs réussis, lettres
   tombées, et les lettres ratées (clavier coloré dans les statistiques).
 
+**Quiz de l'ordinateur**
+
+- 68 questions sur 5 thèmes (matériel, Windows et fichiers, Internet
+  et sécurité, traitement de texte, raccourcis clavier), proposées jusqu'au
+  niveau de l'enfant + 1. On choisit le thème et le nombre de questions
+  (5 à 20).
+- Trois sortes de questions :
+  - Vrai/Faux et QCM à 4 réponses (souris, ou clavier : V/F, 1 à 4) ;
+  - questions avec un visuel : icône, ou morceau d'écran avec un élément
+    entouré ;
+  - mises en situation : un faux écran cliquable (bureau Windows, traitement
+    de texte, navigateur, explorateur de fichiers) où l'enfant fait la
+    manipulation étape par étape (éteindre l'ordinateur, éjecter une clé USB,
+    créer un PDF, créer un dossier…). Après deux erreurs, un indice s'affiche.
+    La question compte comme juste si elle est réussie sans mauvais clic.
+- Chaque réponse est suivie d'une explication ; la fin du quiz récapitule ce
+  qu'il faut retenir. Les statistiques montrent les questions les plus souvent
+  ratées.
+
 ### Règles de comptage (Dactylo)
 
 - Une frappe = un caractère tapé, erreurs comprises. « ^ puis e » donne « ê » et

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { JeuId, Profile, Resultat, ResultatCouleurs, ResultatDactylo, ResultatEspace, ResultatMemoire } from '../../../shared/data'
+import type { JeuId, Profile, Resultat, ResultatCouleurs, ResultatDactylo, ResultatEspace, ResultatMemoire, ResultatQuiz } from '../../../shared/data'
 import { api } from '../api'
 import { Avatar } from '../avatar/Avatar'
 import { LineChart, type Point } from '../components/LineChart'
@@ -8,6 +8,7 @@ import { IconBack, IconDownload, IconTrash } from '../components/Icons'
 import { pourcentage } from '../games/commun'
 import { formatDuree, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
 import { cadence } from '../games/espace/engine'
+import { trouverQuestion } from '../games/quiz/engine'
 import { toucheDe } from '../keyboard/azerty'
 import { couleurChaleur, Keyboard } from '../keyboard/Keyboard'
 
@@ -17,7 +18,8 @@ export const NOMS_JEUX: Record<JeuId, string> = {
   dactylo: 'Dactylo',
   couleurs: 'Couleurs piégées',
   memoire: 'Mots à retenir',
-  espace: 'Lettres de l’espace'
+  espace: 'Lettres de l’espace',
+  quiz: 'Quiz'
 }
 
 export const MODES_COULEURS_LABELS: Record<ResultatCouleurs['mode'], string> = {
@@ -31,6 +33,7 @@ export function resumePartie(r: Resultat): string {
   if (r.jeu === 'dactylo') return `${vitesse(r)} frappes/min`
   if (r.jeu === 'couleurs') return `${r.justes}/${r.manches} justes`
   if (r.jeu === 'memoire') return `${r.trouves}/${r.mots} mots`
+  if (r.jeu === 'quiz') return `${r.justes}/${r.questions} bonnes réponses`
   return `${r.detruites} lettres détruites`
 }
 
@@ -81,6 +84,13 @@ const COLONNES_ESPACE: Colonne<ResultatEspace>[] = [
   { titre: 'Tombées', valeur: (r) => r.manquees, num: true }
 ]
 
+const COLONNES_QUIZ: Colonne<ResultatQuiz>[] = [
+  { titre: 'Thème', valeur: (r) => r.themeNom },
+  { titre: 'Bonnes réponses', valeur: (r) => `${r.justes} / ${r.questions}`, num: true },
+  { titre: 'Réussite', valeur: (r) => `${pourcentage(r.justes, r.questions)} %`, num: true },
+  { titre: 'Durée', valeur: (r) => formatDuree(r.dureeMs), num: true }
+]
+
 function secondes(ms: number): string {
   return (ms / 1000).toFixed(1).replace('.', ',')
 }
@@ -99,7 +109,8 @@ export function ErgoStats({ profile, resultats, onSupprimer, onRetour }: Props) 
     dactylo: siens.filter((r): r is ResultatDactylo => r.jeu === 'dactylo'),
     couleurs: siens.filter((r): r is ResultatCouleurs => r.jeu === 'couleurs'),
     memoire: siens.filter((r): r is ResultatMemoire => r.jeu === 'memoire'),
-    espace: siens.filter((r): r is ResultatEspace => r.jeu === 'espace')
+    espace: siens.filter((r): r is ResultatEspace => r.jeu === 'espace'),
+    quiz: siens.filter((r): r is ResultatQuiz => r.jeu === 'quiz')
   }
   // Onglet de départ : le jeu de la dernière partie.
   const [jeu, setJeu] = useState<JeuId>(siens[siens.length - 1]?.jeu ?? 'dactylo')
@@ -112,7 +123,9 @@ export function ErgoStats({ profile, resultats, onSupprimer, onRetour }: Props) 
           ? versCsv(parJeu.couleurs, COLONNES_COULEURS)
           : jeu === 'memoire'
             ? versCsv(parJeu.memoire, COLONNES_MEMOIRE)
-            : versCsv(parJeu.espace, COLONNES_ESPACE)
+            : jeu === 'espace'
+              ? versCsv(parJeu.espace, COLONNES_ESPACE)
+              : versCsv(parJeu.quiz, COLONNES_QUIZ)
     void api.exportCsv(`DefilOrdi-${profile.prenom}-${jeu}.csv`, csv)
   }
 
@@ -154,8 +167,10 @@ export function ErgoStats({ profile, resultats, onSupprimer, onRetour }: Props) 
         <StatsCouleurs parties={parJeu.couleurs} onSupprimer={supprimer} />
       ) : jeu === 'memoire' ? (
         <StatsMemoire parties={parJeu.memoire} onSupprimer={supprimer} />
-      ) : (
+      ) : jeu === 'espace' ? (
         <StatsEspace parties={parJeu.espace} onSupprimer={supprimer} />
+      ) : (
+        <StatsQuiz parties={parJeu.quiz} onSupprimer={supprimer} />
       )}
 
       {aSupprimer && (
@@ -319,6 +334,52 @@ function StatsEspace({ parties, onSupprimer }: { parties: ResultatEspace[]; onSu
         legende="Lettres le plus souvent tombées ou manquées"
       />
       <Historique parties={parties} colonnes={COLONNES_ESPACE} onSupprimer={onSupprimer} />
+    </>
+  )
+}
+
+function StatsQuiz({ parties, onSupprimer }: { parties: ResultatQuiz[]; onSupprimer: (r: Resultat) => void }) {
+  const derniere = parties[parties.length - 1]
+  const reussite = (r: ResultatQuiz) => pourcentage(r.justes, r.questions)
+  const totalQuestions = parties.reduce((t, r) => t + r.questions, 0)
+  const totalJustes = parties.reduce((t, r) => t + r.justes, 0)
+  const ratees = cumulerCompteurs(parties.map((r) => Object.fromEntries(r.ratees.map((id) => [id, 1]))))
+  const pires = Object.entries(ratees)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([id, n]) => ({ q: trouverQuestion(id), n }))
+    .filter((x) => x.q)
+  return (
+    <>
+      <div className="stats-tiles">
+        <Tile valeur={String(parties.length)} label={parties.length > 1 ? 'quiz joués' : 'quiz joué'} detail={`${totalQuestions} questions au total`} />
+        <Tile valeur={`${reussite(derniere)} %`} label="de réussite" detail={`dernier quiz (${derniere.themeNom.toLowerCase()})`} />
+        <Tile valeur={`${pourcentage(totalJustes, totalQuestions)} %`} label="de réussite en tout" detail="sur tous les quiz" />
+      </div>
+      {parties.length > 1 && (
+        <div className="card">
+          <LineChart titre="Réussite" unite=" %" max={100} points={points(parties, reussite, (r) => r.themeNom)} />
+        </div>
+      )}
+      <div className="card">
+        <h2 className="card-title">Questions le plus souvent ratées</h2>
+        {pires.length === 0 ? (
+          <p className="ergo-help">Aucune question ratée, bravo !</p>
+        ) : (
+          <ul className="quiz-ratees">
+            {pires.map(({ q, n }) => (
+              <li key={q!.id}>
+                <span className="quiz-ratees-n">{n}×</span>
+                <span>
+                  <strong>{q!.question}</strong>
+                  <span className="quiz-ratees-theme"> · niveau {q!.niveau}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <Historique parties={parties} colonnes={COLONNES_QUIZ} onSupprimer={onSupprimer} />
     </>
   )
 }

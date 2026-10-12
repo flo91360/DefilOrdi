@@ -186,6 +186,18 @@ export function GameArt({ game }: { game: string }) {
           <path d="M60 58 L68 74 H52 Z" fill="var(--tile-ink)" />
         </svg>
       )
+    case 'quiz':
+      return (
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <rect x="14" y="8" width="64" height="44" rx="10" fill="var(--tile-ink)" />
+          <path d="M30 52l-6 14 18-14" fill="var(--tile-ink)" />
+          <text x="46" y="42" textAnchor="middle" fontSize="32" fontWeight="900" fill="#ffffff" fontFamily="inherit">
+            ?
+          </text>
+          <rect x="70" y="30" width="40" height="40" rx="8" fill="#ffffff" stroke="var(--tile-ink)" strokeWidth="3" />
+          <path d="M79 50l7 7 14-15" fill="none" stroke="var(--tile-ink)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )
     default:
       return null
   }

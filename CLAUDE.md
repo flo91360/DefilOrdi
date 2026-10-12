@@ -26,6 +26,10 @@ le code et les commentaires aussi.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
 - `src/renderer/src/games/espace/` : jeu en canvas ; `engine.ts` (logique,
   testée dans `tests/espace.test.ts`) et `Scene.ts` (dessin uniquement).
+- `src/renderer/src/games/quiz/` : quiz. `questions.ts` = banque de questions
+  (identifiants stables, utilisés dans les statistiques) ; `scenes/` = faux
+  écrans cliquables, chaque élément est une `Zone` nommée. `tests/quiz.test.tsx`
+  vérifie que chaque zone attendue existe à chaque étape.
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
   statistiques par jeu dans `screens/ErgoStats.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à

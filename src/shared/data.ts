@@ -111,7 +111,20 @@ export interface ResultatEspace {
   lettresRatees: Record<string, number> // lettre -> fois où elle est tombée ou a été manquée
 }
 
-export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace
+// Une partie du quiz « L'ordinateur et moi ».
+export interface ResultatQuiz {
+  id: string
+  profileId: string
+  jeu: 'quiz'
+  date: string
+  themeNom: string
+  dureeMs: number
+  questions: number
+  justes: number
+  ratees: string[] // identifiants des questions ratées
+}
+
+export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz
 export type JeuId = Resultat['jeu']
 
 export interface Settings {
@@ -324,6 +337,17 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       manquees: count(v.manquees),
       erreurs: count(v.erreurs),
       lettresRatees: compteurs(v.lettresRatees)
+    }
+  }
+  if (v.jeu === 'quiz') {
+    const questions = count(v.questions)
+    return {
+      ...base,
+      jeu: 'quiz',
+      themeNom: typeof v.themeNom === 'string' ? v.themeNom.slice(0, NOM_LISTE_MAX) : '',
+      questions,
+      justes: Math.min(count(v.justes), questions),
+      ratees: (Array.isArray(v.ratees) ? v.ratees : []).filter((x): x is string => typeof x === 'string' && x.length <= 60).slice(0, 100)
     }
   }
   // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.

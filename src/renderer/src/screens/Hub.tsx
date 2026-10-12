@@ -28,6 +28,12 @@ export const GAMES: { id: JeuId; titre: string; description: string; disponible:
     titre: 'Lettres de l’espace',
     description: 'Détruis les lettres qui tombent avant qu’elles n’atterrissent.',
     disponible: true
+  },
+  {
+    id: 'quiz',
+    titre: 'Quiz de l’ordinateur',
+    description: 'Vrai ou faux, QCM et mises en situation sur de vrais écrans.',
+    disponible: true
   }
 ]
 
