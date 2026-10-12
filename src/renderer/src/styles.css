@@ -1979,3 +1979,289 @@ th.num {
 .switch:checked::after {
   transform: translateX(18px);
 }
+
+/* ---------- Éléments communs aux jeux ---------- */
+
+.progress-dot.faux {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.liste-badge-neutre {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.liste-exemple.wrap {
+  white-space: normal;
+}
+
+.choix-note {
+  margin: 24px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.reponse-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.reponse-input {
+  width: min(100%, 560px);
+  padding: 16px 24px;
+  font: inherit;
+  font-size: 34px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  user-select: text;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.reponse-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px var(--accent-soft), var(--shadow);
+}
+
+.reponse-input::placeholder {
+  color: #b5b9c3;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.reponse-input.reponse-juste {
+  border-color: var(--success);
+  background: #f0faf4;
+}
+
+.reponse-input.reponse-faux {
+  border-color: var(--danger);
+  animation: shake 0.3s ease;
+}
+
+.reponse-retour {
+  min-height: 30px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.reponse-retour.juste {
+  color: var(--success);
+  font-weight: 900;
+}
+
+.reponse-retour.faux {
+  color: var(--danger);
+}
+
+/* ---------- Couleurs piégées ---------- */
+
+.mode-card {
+  align-items: flex-start;
+}
+
+.mode-exemple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #262b38;
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.mode-fleche {
+  color: #8a90a0;
+}
+
+.mode-reponse {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.stroop-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vh, 36px);
+  padding: 0 32px 32px;
+  min-height: 0;
+}
+
+.consigne {
+  padding: 10px 26px;
+  border-radius: 999px;
+  font-size: 26px;
+  font-weight: 700;
+  animation: fade 0.25s ease;
+}
+
+.consigne strong {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.consigne-mot {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.consigne-couleur {
+  background: var(--accent-2-soft);
+  color: var(--accent-2-ink);
+}
+
+.stroop-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: min(100%, 1000px);
+}
+
+.stroop-spacer {
+  width: 106px;
+  flex-shrink: 0;
+}
+
+.stroop-card {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: clamp(160px, 28vh, 260px);
+  border-radius: 28px;
+  background: #262b38;
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.2s ease;
+}
+
+.stroop-mot {
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Mots à retenir ---------- */
+
+.memoire-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 4vh, 34px);
+  padding: 0 32px 32px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.memoire-entete {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.memoire-titre {
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.mots-grille {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  max-width: 1000px;
+}
+
+.mot-carte {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 170px;
+  padding: 18px 26px;
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 3px solid transparent;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.mot-carte.visible {
+  border-color: var(--accent);
+  animation: pop 0.25s ease;
+}
+
+.mot-carte.cache {
+  background: var(--surface-2);
+  color: #b5b0a3;
+  box-shadow: none;
+  border: 3px dashed #d3cdbf;
+}
+
+.mot-carte.trouve {
+  border-color: var(--success);
+  color: var(--success);
+  background: #f0faf4;
+}
+
+.mot-carte.nouveau {
+  animation: pop 0.3s ease;
+}
+
+.mot-carte.oublie {
+  color: var(--ink-2);
+  border: 3px dashed #d3cdbf;
+  box-shadow: none;
+}
+
+.fin-mots {
+  margin: 28px auto 0;
+}
+
+.fin-mots .mot-carte {
+  min-width: 0;
+  font-size: 22px;
+  padding: 10px 18px;
+}
+
+.compte-a-rebours {
+  width: min(100%, 520px);
+  height: 14px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.compte-barre {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+
+.stats-tabs {
+  margin-bottom: 20px;
+}

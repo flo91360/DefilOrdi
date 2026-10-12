@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type AppData, type Profile, type ResultatDactylo } from '../../shared/data'
+import { type AppData, type JeuId, type Profile, type Resultat } from '../../shared/data'
 import { api } from './api'
 import { themeStyle } from './theme'
 import { setVolume } from './sounds'
@@ -8,14 +8,16 @@ import { Hub } from './screens/Hub'
 import { ProfileEditor } from './screens/ProfileEditor'
 import { ErgoSpace } from './screens/ErgoSpace'
 import { PinPad } from './components/PinPad'
+import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
+import { Memoire } from './games/memoire/Memoire'
 
 type Screen =
   | { name: 'accueil' }
   | { name: 'hub'; profileId: string }
   | { name: 'editeur'; profileId: string | null; retour: Screen }
   | { name: 'ergo' }
-  | { name: 'dactylo'; profileId: string }
+  | { name: 'jeu'; jeu: JeuId; profileId: string }
 
 export function App() {
   const [data, setData] = useState<AppData | null>(null)
@@ -56,9 +58,9 @@ export function App() {
   if (!data) return <div className="loading">Chargement…</div>
 
   const profileOf = (id: string): Profile | undefined => data.profiles.find((p) => p.id === id)
-  const active = screen.name === 'hub' || screen.name === 'dactylo' ? profileOf(screen.profileId) : undefined
+  const active = screen.name === 'hub' || screen.name === 'jeu' ? profileOf(screen.profileId) : undefined
 
-  const addResultat = (r: ResultatDactylo) => {
+  const addResultat = (r: Resultat) => {
     const d = dataRef.current
     if (d) update({ ...d, resultats: [...d.resultats, r] })
   }
@@ -86,20 +88,23 @@ export function App() {
           profile={active}
           onEdit={() => setScreen({ name: 'editeur', profileId: active.id, retour: screen })}
           onSwitch={() => setScreen({ name: 'accueil' })}
-          onPlay={(jeu) => jeu === 'dactylo' && setScreen({ name: 'dactylo', profileId: active.id })}
+          onPlay={(jeu) => setScreen({ name: 'jeu', jeu, profileId: active.id })}
         />
       ) : null
       break
-    case 'dactylo':
-      content = active ? (
-        <Dactylo
-          profile={active}
-          listes={data.listes}
-          resultats={data.resultats}
-          onResult={addResultat}
-          onQuit={() => setScreen({ name: 'hub', profileId: active.id })}
-        />
-      ) : null
+    case 'jeu': {
+      if (!active) break
+      const commun = {
+        profile: active,
+        resultats: data.resultats,
+        onResult: addResultat,
+        onQuit: () => setScreen({ name: 'hub', profileId: active.id })
+      }
+      if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} />
+      else if (screen.jeu === 'memoire') content = <Memoire {...commun} listes={data.mots} />
+      else content = <Couleurs {...commun} />
+      break
+    }
       break
     case 'editeur': {
       const retour = screen.retour

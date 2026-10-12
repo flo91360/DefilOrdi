@@ -5,14 +5,28 @@ import { Avatar } from '../avatar/Avatar'
 import { ConfirmDialog, Modal } from '../components/Modal'
 import { FullscreenButton } from '../components/FullscreenButton'
 import { IconBack, IconChart, IconDownload, IconFolder, IconPencil, IconSettings, IconSpeaker, IconTrash, IconUpload } from '../components/Icons'
-import { vitesse } from '../games/dactylo/engine'
+import { defaultListes, defaultListesMots } from '../../../shared/phrases'
 import { playSound } from '../sounds'
-import { ErgoStats } from './ErgoStats'
+import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
-import { PhrasesEditor } from './PhrasesEditor'
+import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
 import { Logo } from './ProfilePicker'
 
-type Section = 'patients' | 'phrases' | 'reglages' | 'sauvegarde'
+type Section = 'patients' | 'phrases' | 'mots' | 'reglages' | 'sauvegarde'
+
+const TEXTES_PHRASES: TextesEditeur = {
+  titre: 'Phrases',
+  aide: 'Les listes de phrases du jeu Dactylo. Chaque enfant voit d’abord les listes de son niveau. Vous pouvez les modifier avec l’enfant : une phrase par ligne.',
+  element: 'phrase',
+  origine: defaultListes
+}
+
+const TEXTES_MOTS: TextesEditeur = {
+  titre: 'Mots',
+  aide: 'Les listes de mots du jeu Mots à retenir. À chaque partie, quelques mots sont tirés au hasard dans la liste choisie : prévoyez-en au moins 8 par liste. Un mot par ligne.',
+  element: 'mot',
+  origine: defaultListesMots
+}
 
 interface Props {
   data: AppData
@@ -45,6 +59,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
             [
               ['patients', 'Patients'],
               ['phrases', 'Phrases'],
+              ['mots', 'Mots'],
               ['reglages', 'Réglages'],
               ['sauvegarde', 'Sauvegarde']
             ] as const
@@ -62,7 +77,10 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
 
         <main className="ergo-main" key={visite}>
           {section === 'patients' && <Patients data={data} onChange={onChange} onEditProfile={onEditProfile} />}
-          {section === 'phrases' && <PhrasesEditor listes={data.listes} onChange={(listes) => onChange({ ...data, listes })} />}
+          {section === 'phrases' && (
+            <PhrasesEditor textes={TEXTES_PHRASES} listes={data.listes} onChange={(listes) => onChange({ ...data, listes })} />
+          )}
+          {section === 'mots' && <PhrasesEditor textes={TEXTES_MOTS} listes={data.mots} onChange={(mots) => onChange({ ...data, mots })} />}
           {section === 'reglages' && <Reglages data={data} onChange={onChange} />}
           {section === 'sauvegarde' && <Sauvegarde data={data} onChange={onChange} />}
         </main>
@@ -82,7 +100,7 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
 
   const derniere = (p: Profile) => {
     const r = data.resultats.filter((x) => x.profileId === p.id).sort((a, b) => b.date.localeCompare(a.date))[0]
-    return r ? `${new Date(r.date).toLocaleDateString('fr-FR')} · ${vitesse(r)} frappes/min` : '—'
+    return r ? `${new Date(r.date).toLocaleDateString('fr-FR')} · ${NOMS_JEUX[r.jeu]} · ${resumePartie(r)}` : '—'
   }
 
   const statsProfile = statsDe ? data.profiles.find((p) => p.id === statsDe) : undefined

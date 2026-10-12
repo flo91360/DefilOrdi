@@ -77,3 +77,43 @@ export function defaultListes(): ListePhrases[] {
     }
   ]
 }
+
+// Listes de mots du jeu « Mots à retenir » (même format : un mot par ligne).
+export function defaultListesMots(): ListePhrases[] {
+  return [
+    {
+      id: 'mots-1',
+      nom: 'Mots courts',
+      niveau: 1,
+      phrases: ['chat', 'lune', 'pomme', 'bus', 'lit', 'sac', 'main', 'pain', 'loup', 'robe', 'mur', 'nez', 'lac', 'four', 'jus', 'pont']
+    },
+    {
+      id: 'mots-2',
+      nom: 'Animaux',
+      niveau: 2,
+      phrases: [
+        'lapin', 'tigre', 'cheval', 'souris', 'girafe', 'mouton', 'requin', 'canard',
+        'renard', 'tortue', 'zèbre', 'hibou', 'singe', 'baleine', 'poule', 'abeille'
+      ]
+    },
+    {
+      id: 'mots-3',
+      nom: 'À la maison',
+      niveau: 3,
+      phrases: [
+        'fenêtre', 'escalier', 'cuisine', 'téléphone', 'oreiller', 'armoire', 'lumière', 'tapis',
+        'bougie', 'étagère', 'grenier', 'cheminée', 'réveil', 'fauteuil', 'baignoire', 'placard'
+      ]
+    },
+    {
+      id: 'mots-4',
+      nom: 'Mots plus longs',
+      niveau: 4,
+      phrases: [
+        'bibliothèque', 'hélicoptère', 'parapluie', 'anniversaire', 'dictionnaire', 'ordinateur',
+        'thermomètre', 'champignon', 'astronaute', 'chocolatier', 'boulangerie', 'trampoline',
+        'kangourou', 'aquarium', 'calendrier', 'papillon'
+      ]
+    }
+  ]
+}

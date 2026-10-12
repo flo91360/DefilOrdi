@@ -21,9 +21,14 @@ le code et les commentaires aussi.
 - `src/renderer/src/theme.ts` : couleurs de l'enfant en variables CSS.
 - `src/renderer/src/games/dactylo/` : jeu Dactylo ; `engine.ts` contient toute
   la logique et les règles de comptage (testées dans `tests/engine.test.ts`).
+- `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
+  retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
+  `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
+- Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
+  statistiques par jeu dans `screens/ErgoStats.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
   presser pour chaque caractère) et son affichage.
-- `src/shared/phrases.ts` : listes de phrases d'origine (uniquement des
+- `src/shared/phrases.ts` : listes de phrases et de mots d'origine (uniquement des
   caractères tapables sur un clavier AZERTY Windows).
 - Espace ergo : `screens/ErgoSpace.tsx`, `ErgoStats.tsx`, `PhrasesEditor.tsx`.
 

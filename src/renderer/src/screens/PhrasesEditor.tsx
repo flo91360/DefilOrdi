@@ -1,17 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { type ListePhrases, NIVEAUX, NOM_LISTE_MAX, PHRASE_MAX } from '../../../shared/data'
-import { defaultListes } from '../../../shared/phrases'
 import { ConfirmDialog } from '../components/Modal'
 import { IconPlus, IconTrash } from '../components/Icons'
 import { uid } from '../uid'
 import { NIVEAU_LABELS } from './niveaux'
 
+// Textes propres à chaque éditeur (phrases de Dactylo, mots de Mots à retenir).
+export interface TextesEditeur {
+  titre: string
+  aide: string
+  element: string // « phrase » ou « mot »
+  origine: () => ListePhrases[]
+}
+
 interface Props {
+  textes: TextesEditeur
   listes: ListePhrases[]
   onChange: (listes: ListePhrases[]) => void
 }
 
-export function PhrasesEditor({ listes, onChange }: Props) {
+const pluriel = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`
+
+export function PhrasesEditor({ textes, listes, onChange }: Props) {
   const [selection, setSelection] = useState<string | null>(listes[0]?.id ?? null)
   const [aSupprimer, setASupprimer] = useState<ListePhrases | null>(null)
   const [restaurer, setRestaurer] = useState(false)
@@ -34,11 +44,8 @@ export function PhrasesEditor({ listes, onChange }: Props) {
 
   return (
     <section>
-      <h1 className="ergo-title">Phrases</h1>
-      <p className="ergo-help">
-        Les listes de phrases du jeu Dactylo. Chaque enfant voit d’abord les listes de son niveau. Vous pouvez les modifier
-        avec l’enfant : une phrase par ligne.
-      </p>
+      <h1 className="ergo-title">{textes.titre}</h1>
+      <p className="ergo-help">{textes.aide}</p>
 
       <div className="phrases-layout">
         <div className="phrases-side">
@@ -50,7 +57,7 @@ export function PhrasesEditor({ listes, onChange }: Props) {
             >
               <span className="phrases-item-nom">{l.nom}</span>
               <span className="phrases-item-info">
-                Niveau {l.niveau} · {l.phrases.length} phrase{l.phrases.length > 1 ? 's' : ''}
+                Niveau {l.niveau} · {pluriel(l.phrases.length, textes.element)}
               </span>
             </button>
           ))}
@@ -63,7 +70,7 @@ export function PhrasesEditor({ listes, onChange }: Props) {
         </div>
 
         {courante ? (
-          <ListeForm key={courante.id} liste={courante} onChange={modifier} onSupprimer={() => setASupprimer(courante)} />
+          <ListeForm key={courante.id} element={textes.element} liste={courante} onChange={modifier} onSupprimer={() => setASupprimer(courante)} />
         ) : (
           <p className="empty">Aucune liste. Créez-en une avec « Nouvelle liste ».</p>
         )}
@@ -74,7 +81,7 @@ export function PhrasesEditor({ listes, onChange }: Props) {
           title="Supprimer cette liste ?"
           message={
             <>
-              La liste <strong>{aSupprimer.nom}</strong> et ses {aSupprimer.phrases.length} phrases seront supprimées.
+              La liste <strong>{aSupprimer.nom}</strong> ({pluriel(aSupprimer.phrases.length, textes.element)}) sera supprimée.
             </>
           }
           confirmLabel="Supprimer"
@@ -92,11 +99,11 @@ export function PhrasesEditor({ listes, onChange }: Props) {
       {restaurer && (
         <ConfirmDialog
           title="Restaurer les listes d’origine ?"
-          message="Les quatre listes fournies avec le logiciel seront remises dans leur état d’origine. Vos autres listes sont conservées."
+          message="Les listes fournies avec le logiciel seront remises dans leur état d’origine. Vos autres listes sont conservées."
           confirmLabel="Restaurer"
           onCancel={() => setRestaurer(false)}
           onConfirm={() => {
-            const origine = defaultListes()
+            const origine = textes.origine()
             const ids = new Set(origine.map((l) => l.id))
             onChange([...origine, ...listes.filter((l) => !ids.has(l.id))])
             setSelection(origine[0].id)
@@ -109,10 +116,12 @@ export function PhrasesEditor({ listes, onChange }: Props) {
 }
 
 function ListeForm({
+  element,
   liste,
   onChange,
   onSupprimer
 }: {
+  element: string
   liste: ListePhrases
   onChange: (l: ListePhrases) => void
   onSupprimer: () => void
@@ -170,7 +179,7 @@ function ListeForm({
         </button>
       </div>
       <label className="field">
-        Phrases ({nbPhrases}) — une par ligne
+        {element === 'mot' ? 'Mots' : 'Phrases'} ({nbPhrases}) — un{element === 'mot' ? '' : 'e'} par ligne
         <textarea
           className="input phrases-textarea"
           value={texte}

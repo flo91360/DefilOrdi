@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { ListePhrases, Profile, ResultatDactylo } from '../../../../shared/data'
+import type { ListePhrases, Profile, Resultat, ResultatDactylo } from '../../../../shared/data'
 import { Avatar } from '../../avatar/Avatar'
 import { FullscreenButton } from '../../components/FullscreenButton'
 import { IconBack, IconCheck } from '../../components/Icons'
@@ -7,6 +7,7 @@ import { geste } from '../../keyboard/azerty'
 import { Keyboard } from '../../keyboard/Keyboard'
 import { playSound } from '../../sounds'
 import { uid } from '../../uid'
+import { StatTile } from '../ui'
 import {
   choisirPhrases,
   cumuler,
@@ -25,7 +26,7 @@ const NOMBRES = [3, 5, 10]
 interface Props {
   profile: Profile
   listes: ListePhrases[]
-  resultats: ResultatDactylo[]
+  resultats: Resultat[]
   onResult: (r: ResultatDactylo) => void
   onQuit: () => void
 }
@@ -40,7 +41,7 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
   const [nombre, setNombre] = useState(5)
 
   const meilleure = useMemo(
-    () => Math.max(0, ...resultats.filter((r) => r.profileId === profile.id).map((r) => vitesse(r))),
+    () => Math.max(0, ...resultats.filter((r): r is ResultatDactylo => r.jeu === 'dactylo' && r.profileId === profile.id).map((r) => vitesse(r))),
     [resultats, profile.id]
   )
 
@@ -424,16 +425,6 @@ function Fin({
           </button>
         </div>
       </main>
-    </div>
-  )
-}
-
-function StatTile({ value, label, detail }: { value: string; label: string; detail: string }) {
-  return (
-    <div className="stat-tile">
-      <span className="stat-value">{value}</span>
-      <span className="stat-label">{label}</span>
-      <span className="stat-detail">{detail}</span>
     </div>
   )
 }

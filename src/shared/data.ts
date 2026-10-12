@@ -2,11 +2,11 @@
 // Toute donnée lue (fichier, import de sauvegarde) passe par normalizeAppData :
 // un champ absent ou invalide est remplacé par sa valeur par défaut.
 
-import { defaultListes, type ListePhrases } from './phrases'
+import { defaultListes, defaultListesMots, type ListePhrases } from './phrases'
 
 export type { ListePhrases }
 
-export const DATA_VERSION = 2
+export const DATA_VERSION = 3
 
 export type AvatarStyle = 'personnage' | 'robot'
 
@@ -67,6 +67,39 @@ export interface ResultatDactylo {
   erreursParTouche: Record<string, number> // caractère attendu -> nombre d'erreurs
 }
 
+export const MODES_COULEURS = ['mot', 'couleur', 'melange'] as const
+export type ModeCouleurs = (typeof MODES_COULEURS)[number]
+
+// Une partie de « Couleurs piégées » (effet Stroop).
+export interface ResultatCouleurs {
+  id: string
+  profileId: string
+  jeu: 'couleurs'
+  date: string
+  mode: ModeCouleurs // écrire le mot, la couleur de l'encre, ou les deux au hasard
+  manches: number
+  justes: number
+  dureeMs: number // temps total de réponse
+  piegesJustes: number // réponses justes quand le mot et l'encre diffèrent
+  pieges: number
+}
+
+// Une partie de « Mots à retenir ».
+export interface ResultatMemoire {
+  id: string
+  profileId: string
+  jeu: 'memoire'
+  date: string
+  listeNom: string
+  mots: number // mots à retenir
+  trouves: number
+  erreurs: number // mots proposés qui n'étaient pas dans la liste
+  dureeMs: number // temps de rappel
+}
+
+export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire
+export type JeuId = Resultat['jeu']
+
 export interface Settings {
   codeErgo: string
   volume: number
@@ -75,8 +108,9 @@ export interface Settings {
 export interface AppData {
   version: number
   profiles: Profile[]
-  listes: ListePhrases[]
-  resultats: ResultatDactylo[]
+  listes: ListePhrases[] // phrases du jeu Dactylo
+  mots: ListePhrases[] // listes de mots du jeu Mots à retenir
+  resultats: Resultat[]
   settings: Settings
 }
 
@@ -151,6 +185,7 @@ export function defaultAppData(): AppData {
     version: DATA_VERSION,
     profiles: [],
     listes: defaultListes(),
+    mots: defaultListesMots(),
     resultats: [],
     settings: { codeErgo: '0000', volume: 0.7 }
   }
@@ -227,9 +262,35 @@ function count(v: unknown): number {
   return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0
 }
 
-function normalizeResultat(v: unknown, profileIds: Set<string>): ResultatDactylo | null {
+function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null {
   if (!isObj(v) || typeof v.id !== 'string' || typeof v.profileId !== 'string') return null
   if (!profileIds.has(v.profileId) || typeof v.date !== 'string' || Number.isNaN(Date.parse(v.date))) return null
+  const base = { id: v.id, profileId: v.profileId, date: v.date, dureeMs: count(v.dureeMs) }
+  if (v.jeu === 'couleurs') {
+    const manches = count(v.manches)
+    const pieges = Math.min(count(v.pieges), manches)
+    return {
+      ...base,
+      jeu: 'couleurs',
+      mode: pick(v.mode, MODES_COULEURS, 'mot'),
+      manches,
+      justes: Math.min(count(v.justes), manches),
+      pieges,
+      piegesJustes: Math.min(count(v.piegesJustes), pieges)
+    }
+  }
+  if (v.jeu === 'memoire') {
+    const mots = count(v.mots)
+    return {
+      ...base,
+      jeu: 'memoire',
+      listeNom: typeof v.listeNom === 'string' ? v.listeNom.slice(0, NOM_LISTE_MAX) : '',
+      mots,
+      trouves: Math.min(count(v.trouves), mots),
+      erreurs: count(v.erreurs)
+    }
+  }
+  // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.
   const erreursParTouche: Record<string, number> = {}
   if (isObj(v.erreursParTouche)) {
     for (const [k, n] of Object.entries(v.erreursParTouche)) {
@@ -237,13 +298,10 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): ResultatDactylo
     }
   }
   return {
-    id: v.id,
-    profileId: v.profileId,
+    ...base,
     jeu: 'dactylo',
-    date: v.date,
     listeNom: typeof v.listeNom === 'string' ? v.listeNom.slice(0, NOM_LISTE_MAX) : '',
     phrases: count(v.phrases),
-    dureeMs: count(v.dureeMs),
     caracteres: count(v.caracteres),
     frappes: count(v.frappes),
     erreurs: count(v.erreurs),
@@ -272,15 +330,19 @@ export function normalizeAppData(v: unknown): AppData {
   const listes = Array.isArray(v.listes)
     ? v.listes.map(normalizeListe).filter((l): l is ListePhrases => l !== null)
     : d.listes
+  const mots = Array.isArray(v.mots)
+    ? v.mots.map(normalizeListe).filter((l): l is ListePhrases => l !== null)
+    : d.mots
   const resultats = (Array.isArray(v.resultats) ? v.resultats : [])
     .map((r) => normalizeResultat(r, seen))
-    .filter((r): r is ResultatDactylo => r !== null)
+    .filter((r): r is Resultat => r !== null)
   const s = isObj(v.settings) ? v.settings : {}
   const volume = typeof s.volume === 'number' && s.volume >= 0 && s.volume <= 1 ? s.volume : d.settings.volume
   return {
     version: DATA_VERSION,
     profiles,
     listes,
+    mots,
     resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,

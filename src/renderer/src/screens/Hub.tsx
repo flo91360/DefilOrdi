@@ -1,11 +1,11 @@
-import type { Profile } from '../../../shared/data'
+import type { JeuId, Profile } from '../../../shared/data'
 import { Avatar } from '../avatar/Avatar'
 import { FullscreenButton } from '../components/FullscreenButton'
 import { GameArt, IconPencil, IconUsers } from '../components/Icons'
 import { Logo } from './ProfilePicker'
 
 // Les jeux pas encore prêts restent visibles, marqués « Bientôt ».
-export const GAMES = [
+export const GAMES: { id: JeuId | 'espace'; titre: string; description: string; disponible: boolean }[] = [
   {
     id: 'dactylo',
     titre: 'Dactylo',
@@ -16,13 +16,13 @@ export const GAMES = [
     id: 'memoire',
     titre: 'Mots à retenir',
     description: 'Mémorise une liste de mots, puis retape-les de tête.',
-    disponible: false
+    disponible: true
   },
   {
     id: 'couleurs',
     titre: 'Couleurs piégées',
     description: 'Le mot ou sa couleur ? Ne te laisse pas piéger !',
-    disponible: false
+    disponible: true
   },
   {
     id: 'espace',
@@ -36,7 +36,7 @@ interface Props {
   profile: Profile
   onEdit: () => void
   onSwitch: () => void
-  onPlay: (jeu: string) => void
+  onPlay: (jeu: JeuId) => void
 }
 
 export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
@@ -72,7 +72,7 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
               key={g.id}
               className={i % 2 === 0 ? 'game-tile' : 'game-tile game-tile-alt'}
               disabled={!g.disponible}
-              onClick={() => onPlay(g.id)}
+              onClick={() => g.id !== 'espace' && onPlay(g.id)}
               aria-label={`${g.titre}${g.disponible ? '' : ' (bientôt disponible)'}`}
             >
               <div className="game-art">

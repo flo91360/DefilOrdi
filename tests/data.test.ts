@@ -48,7 +48,7 @@ describe('migration des données de la version 1', () => {
     const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' } as Record<string, unknown>
     delete p.dactylo
     const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '1234', volume: 0.5 } })
-    expect(data.version).toBe(2)
+    expect(data.version).toBe(3)
     expect(data.listes.length).toBe(4)
     expect(data.resultats).toEqual([])
     expect(data.profiles[0].dactylo).toEqual(newProfile('x', '').dactylo)
@@ -63,6 +63,25 @@ describe('migration des données de la version 1', () => {
     const r = { id: 'r', profileId: 'a1', date: '2026-02-01T00:00:00.000Z', frappes: 10, erreurs: 1, erreursParTouche: { é: 1 } }
     const data = normalizeAppData({ profiles: [p], resultats: [r, { ...r, id: 'r2', profileId: 'autre' }] })
     expect(data.resultats.map((x) => x.id)).toEqual(['r'])
-    expect(data.resultats[0].erreursParTouche).toEqual({ é: 1 })
+    expect(data.resultats[0]).toMatchObject({ jeu: 'dactylo', erreursParTouche: { é: 1 } })
+  })
+})
+
+describe('migration vers la version 3', () => {
+  it('ajoute les listes de mots et lit les résultats des nouveaux jeux', () => {
+    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const date = '2026-02-01T00:00:00.000Z'
+    const data = normalizeAppData({
+      version: 2,
+      profiles: [p],
+      resultats: [
+        { id: 'c', profileId: 'a1', date, jeu: 'couleurs', mode: 'inconnu', manches: 10, justes: 12, pieges: 7, piegesJustes: 5, dureeMs: 30000 },
+        { id: 'm', profileId: 'a1', date, jeu: 'memoire', listeNom: 'Animaux', mots: 5, trouves: 4, erreurs: 2, dureeMs: 40000 }
+      ]
+    })
+    expect(data.version).toBe(3)
+    expect(data.mots.length).toBe(4)
+    expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5 })
+    expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
   })
 })

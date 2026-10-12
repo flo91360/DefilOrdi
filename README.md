@@ -49,7 +49,23 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   - **Statistiques** de chaque enfant : courbes de vitesse et de précision,
     clavier des erreurs par touche, historique des parties, export Excel (CSV).
 
-### Règles de comptage
+**Étape 3 — Couleurs piégées et Mots à retenir**
+
+- **Couleurs piégées** (effet Stroop) : un nom de couleur est écrit dans une
+  autre couleur. Selon le mode, l'enfant tape le mot, la couleur de l'encre,
+  ou les deux selon une consigne qui change à chaque manche (mode « difficile »).
+  10 ou 20 manches ; 4 couleurs au niveau 1, jusqu'à 8 au niveau 4. Sont
+  mesurés : bonnes réponses, pièges déjoués (mot et encre différents), temps
+  moyen de réponse.
+- **Mots à retenir** : quelques mots s'affichent (3 à 8, selon le niveau par
+  défaut), l'enfant les mémorise puis les retape de tête dans l'ordre qu'il
+  veut. Accents et majuscules ne comptent pas. Sont mesurés : mots retrouvés,
+  mots proposés en trop, temps.
+- Espace ergothérapeute : section **Mots** pour modifier les listes de mots, et
+  un onglet par jeu dans les statistiques de chaque enfant (courbes,
+  historique, export Excel).
+
+### Règles de comptage (Dactylo)
 
 - Une frappe = un caractère tapé, erreurs comprises. « ^ puis e » donne « ê » et
   compte pour une seule frappe. Retour arrière ne compte pas.
