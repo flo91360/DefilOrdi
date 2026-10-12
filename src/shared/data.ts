@@ -97,7 +97,21 @@ export interface ResultatMemoire {
   dureeMs: number // temps de rappel
 }
 
-export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire
+// Une partie de « Lettres de l'espace ».
+export interface ResultatEspace {
+  id: string
+  profileId: string
+  jeu: 'espace'
+  date: string
+  serieNom: string
+  dureeMs: number
+  detruites: number
+  manquees: number // lettres tombées au sol
+  erreurs: number // touches qui ne visaient aucune lettre
+  lettresRatees: Record<string, number> // lettre -> fois où elle est tombée ou a été manquée
+}
+
+export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace
 export type JeuId = Resultat['jeu']
 
 export interface Settings {
@@ -262,6 +276,17 @@ function count(v: unknown): number {
   return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0
 }
 
+// Compteurs par caractère : clés d'un ou deux caractères, valeurs positives.
+function compteurs(v: unknown): Record<string, number> {
+  const out: Record<string, number> = {}
+  if (isObj(v)) {
+    for (const [k, n] of Object.entries(v)) {
+      if (k.length > 0 && k.length <= 2 && count(n) > 0) out[k] = count(n)
+    }
+  }
+  return out
+}
+
 function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null {
   if (!isObj(v) || typeof v.id !== 'string' || typeof v.profileId !== 'string') return null
   if (!profileIds.has(v.profileId) || typeof v.date !== 'string' || Number.isNaN(Date.parse(v.date))) return null
@@ -290,13 +315,19 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       erreurs: count(v.erreurs)
     }
   }
-  // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.
-  const erreursParTouche: Record<string, number> = {}
-  if (isObj(v.erreursParTouche)) {
-    for (const [k, n] of Object.entries(v.erreursParTouche)) {
-      if (k.length > 0 && k.length <= 2 && count(n) > 0) erreursParTouche[k] = count(n)
+  if (v.jeu === 'espace') {
+    return {
+      ...base,
+      jeu: 'espace',
+      serieNom: typeof v.serieNom === 'string' ? v.serieNom.slice(0, NOM_LISTE_MAX) : '',
+      detruites: count(v.detruites),
+      manquees: count(v.manquees),
+      erreurs: count(v.erreurs),
+      lettresRatees: compteurs(v.lettresRatees)
     }
   }
+  // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.
+  const erreursParTouche = compteurs(v.erreursParTouche)
   return {
     ...base,
     jeu: 'dactylo',

@@ -10,6 +10,7 @@ import { ErgoSpace } from './screens/ErgoSpace'
 import { PinPad } from './components/PinPad'
 import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
+import { Espace } from './games/espace/Espace'
 import { Memoire } from './games/memoire/Memoire'
 
 type Screen =
@@ -102,6 +103,7 @@ export function App() {
       }
       if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} />
       else if (screen.jeu === 'memoire') content = <Memoire {...commun} listes={data.mots} />
+      else if (screen.jeu === 'espace') content = <Espace {...commun} />
       else content = <Couleurs {...commun} />
       break
     }

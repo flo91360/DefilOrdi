@@ -65,6 +65,19 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   un onglet par jeu dans les statistiques de chaque enfant (courbes,
   historique, export Excel).
 
+**Étape 4 — Lettres de l'espace**
+
+- Des lettres-météorites tombent ; taper la bonne touche envoie un laser depuis
+  le vaisseau (aux couleurs de l'enfant) et détruit la lettre la plus basse.
+- Séries : rangée du milieu, du haut, du bas, toutes les lettres, lettres
+  accentuées, majuscules. Mission de 1, 2 ou 3 minutes ; la vitesse dépend du
+  niveau et augmente doucement pendant la partie. Pas de « game over » : une
+  lettre qui touche le sol est simplement comptée comme tombée.
+- Clavier à l'écran avec la touche à taper (si activé dans les réglages de
+  l'enfant). Échap ou la perte du focus met le jeu en pause.
+- Sont mesurés : lettres détruites (et par minute), tirs réussis, lettres
+  tombées, et les lettres ratées (clavier coloré dans les statistiques).
+
 ### Règles de comptage (Dactylo)
 
 - Une frappe = un caractère tapé, erreurs comprises. « ^ puis e » donne « ê » et

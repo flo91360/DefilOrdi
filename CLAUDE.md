@@ -24,6 +24,8 @@ le code et les commentaires aussi.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
+- `src/renderer/src/games/espace/` : jeu en canvas ; `engine.ts` (logique,
+  testée dans `tests/espace.test.ts`) et `Scene.ts` (dessin uniquement).
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
   statistiques par jeu dans `screens/ErgoStats.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à

@@ -4,8 +4,7 @@ import { FullscreenButton } from '../components/FullscreenButton'
 import { GameArt, IconPencil, IconUsers } from '../components/Icons'
 import { Logo } from './ProfilePicker'
 
-// Les jeux pas encore prêts restent visibles, marqués « Bientôt ».
-export const GAMES: { id: JeuId | 'espace'; titre: string; description: string; disponible: boolean }[] = [
+export const GAMES: { id: JeuId; titre: string; description: string; disponible: boolean }[] = [
   {
     id: 'dactylo',
     titre: 'Dactylo',
@@ -28,7 +27,7 @@ export const GAMES: { id: JeuId | 'espace'; titre: string; description: string; 
     id: 'espace',
     titre: 'Lettres de l’espace',
     description: 'Détruis les lettres qui tombent avant qu’elles n’atterrissent.',
-    disponible: false
+    disponible: true
   }
 ]
 
@@ -72,7 +71,7 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
               key={g.id}
               className={i % 2 === 0 ? 'game-tile' : 'game-tile game-tile-alt'}
               disabled={!g.disponible}
-              onClick={() => g.id !== 'espace' && onPlay(g.id)}
+              onClick={() => onPlay(g.id)}
               aria-label={`${g.titre}${g.disponible ? '' : ' (bientôt disponible)'}`}
             >
               <div className="game-art">

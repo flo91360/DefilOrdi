@@ -131,7 +131,14 @@ const SOUNDS: Record<string, () => void> = {
     playNotes([{ freq: 900, slideTo: 200, start: 0, dur: 0.18, gain: 0.25 }])
     playNoise(0.1, 0.35, 1800, 300, 0.25)
   },
-  aucun: () => {}
+  aucun: () => {},
+  // Effets du jeu « Lettres de l'espace » (pas proposés au choix de l'enfant)
+  laser: () => playNotes([{ freq: 1400, slideTo: 380, start: 0, dur: 0.16, type: 'square', gain: 0.07 }]),
+  explosion: () => {
+    playNoise(0, 0.32, 900, 120, 0.35)
+    playNotes([{ freq: 160, slideTo: 50, start: 0, dur: 0.25, gain: 0.25 }])
+  },
+  sol: () => playNotes([{ freq: 220, slideTo: 140, start: 0, dur: 0.3, type: 'triangle', gain: 0.18 }])
 }
 
 export function playSound(id: string): void {

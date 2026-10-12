@@ -2265,3 +2265,103 @@ th.num {
 .stats-tabs {
   margin-bottom: 20px;
 }
+
+/* ---------- Lettres de l'espace ---------- */
+
+.serie-lettres {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--accent-ink);
+}
+
+.espace {
+  background: #0b1026;
+  color: #ffffff;
+}
+
+.espace-topbar {
+  padding: 12px 24px;
+  background: #0b1026;
+}
+
+.espace-topbar .live-stats {
+  margin-left: auto;
+}
+
+.btn-dark {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-dark:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+}
+
+.live-stat-dark {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.live-stat-dark .live-stat-label {
+  color: #aab0d6;
+}
+
+.espace-zone {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.espace-zone canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.espace-pause {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(11, 16, 38, 0.7);
+  animation: fade 0.15s ease;
+}
+
+.espace-pause p {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 900;
+}
+
+.espace-clavier {
+  display: flex;
+  justify-content: center;
+  padding: 10px 24px 14px;
+  background: #151838;
+  color: var(--ink);
+}
+
+.espace-clavier .kb {
+  width: min(100%, 760px);
+  padding: 8px;
+  gap: 4px;
+}
+
+.espace-clavier .kb-row {
+  gap: 4px;
+}
+
+.espace-clavier .kb-key {
+  height: clamp(24px, 3.6vh, 34px);
+  font-size: 14px;
+}
+
+.espace-clavier .kb-up {
+  font-size: 9px;
+}
