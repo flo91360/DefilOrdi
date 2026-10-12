@@ -35,6 +35,8 @@ interface Note {
   type?: OscillatorType
   gain?: number
   slideTo?: number
+  // Durée de la montée en secondes (0,015 par défaut ; plus court = plus sec).
+  attack?: number
 }
 
 function playNotes(notes: Note[]): void {
@@ -51,7 +53,7 @@ function playNotes(notes: Note[]): void {
     if (n.slideTo) osc.frequency.exponentialRampToValueAtTime(n.slideTo, t0 + n.start + n.dur)
     const peak = n.gain ?? 0.3
     g.gain.setValueAtTime(0.0001, t0 + n.start)
-    g.gain.exponentialRampToValueAtTime(peak, t0 + n.start + 0.015)
+    g.gain.exponentialRampToValueAtTime(peak, t0 + n.start + (n.attack ?? 0.015))
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.start + n.dur)
     osc.connect(g).connect(out)
     osc.start(t0 + n.start)
@@ -59,25 +61,87 @@ function playNotes(notes: Note[]): void {
   }
 }
 
-function playNoise(start: number, dur: number, fromHz: number, toHz: number, gain: number): void {
+interface Bruit {
+  start: number
+  dur: number
+  fromHz: number
+  toHz?: number
+  gain: number
+  filtre?: BiquadFilterType
+  q?: number
+  // Montée en secondes ; sans montée, le bruit démarre directement au maximum.
+  attack?: number
+}
+
+// Bruit blanc filtré dont le volume décroît jusqu'au silence.
+function bruit(b: Bruit): void {
   const ac = audio()
-  const len = Math.floor(ac.sampleRate * dur)
+  const len = Math.max(1, Math.floor(ac.sampleRate * b.dur))
   const buffer = ac.createBuffer(1, len, ac.sampleRate)
   const ch = buffer.getChannelData(0)
   for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1
   const src = ac.createBufferSource()
   src.buffer = buffer
   const filter = ac.createBiquadFilter()
-  filter.type = 'bandpass'
-  filter.Q.value = 2
+  filter.type = b.filtre ?? 'bandpass'
+  filter.Q.value = b.q ?? 2
   const g = ac.createGain()
-  const t0 = ac.currentTime + 0.02 + start
-  filter.frequency.setValueAtTime(fromHz, t0)
-  filter.frequency.exponentialRampToValueAtTime(toHz, t0 + dur)
-  g.gain.setValueAtTime(gain * masterVolume, t0)
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur)
+  const t0 = ac.currentTime + 0.02 + b.start
+  filter.frequency.setValueAtTime(b.fromHz, t0)
+  filter.frequency.exponentialRampToValueAtTime(b.toHz ?? b.fromHz, t0 + b.dur)
+  const peak = Math.max(0.0001, b.gain * masterVolume)
+  if (b.attack) {
+    g.gain.setValueAtTime(0.0001, t0)
+    g.gain.exponentialRampToValueAtTime(peak, t0 + b.attack)
+  } else {
+    g.gain.setValueAtTime(peak, t0)
+  }
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + b.dur)
   src.connect(filter).connect(g).connect(ac.destination)
   src.start(t0)
+}
+
+function playNoise(start: number, dur: number, fromHz: number, toHz: number, gain: number): void {
+  bruit({ start, dur, fromHz, toHz, gain })
+}
+
+const hasard = (min: number, max: number) => min + Math.random() * (max - min)
+
+// Coup de revolver : claquement sec, souffle grave, puis écho dans le canyon.
+function coupDeRevolver(): void {
+  bruit({ start: 0, dur: 0.07, fromHz: 1800, gain: 0.45, filtre: 'highpass', q: 0.7 })
+  bruit({ start: 0, dur: 0.32, fromHz: 4000, toHz: 220, gain: 0.5, filtre: 'lowpass', q: 0.8 })
+  playNotes([{ freq: 140, slideTo: 42, start: 0, dur: 0.22, gain: 0.4, attack: 0.003 }])
+  // Écho qui revient des falaises, de plus en plus étouffé
+  bruit({ start: 0.24, dur: 0.38, fromHz: 1400, toHz: 260, gain: 0.1, filtre: 'lowpass', q: 0.7, attack: 0.01 })
+  bruit({ start: 0.52, dur: 0.45, fromHz: 900, toHz: 200, gain: 0.04, filtre: 'lowpass', q: 0.7, attack: 0.02 })
+}
+
+// Bouteille qui vole en éclats : fracas aigu, scintillement, puis tintement
+// des morceaux de verre qui retombent. Le hasard rend chaque bouteille unique.
+function bouteilleCassee(): void {
+  bruit({ start: 0, dur: 0.1, fromHz: 2600, gain: 0.32, filtre: 'highpass', q: 0.7 })
+  bruit({ start: 0, dur: 0.18, fromHz: 1700, toHz: 900, gain: 0.14, filtre: 'bandpass', q: 1.2 })
+  bruit({ start: 0.01, dur: 0.5, fromHz: 7500, toHz: 3800, gain: 0.12, filtre: 'bandpass', q: 1.5 })
+
+  const eclats: Note[] = []
+  const n = 16
+  for (let i = 0; i < n; i++) {
+    // Plus d'éclats au début, quelques-uns plus tard
+    const start = 0.005 + 0.6 * Math.pow(Math.random(), 1.7)
+    const freq = hasard(2200, 6400)
+    const gain = 0.075 * (1 - start * 0.9)
+    const dur = hasard(0.05, 0.16)
+    eclats.push({ freq, start, dur, gain, attack: 0.002 })
+    // Harmonique non entière : c'est elle qui donne le timbre « verre »
+    eclats.push({ freq: Math.min(12000, freq * 2.76), start, dur: dur * 0.6, gain: gain * 0.4, attack: 0.002 })
+  }
+  playNotes(eclats)
+
+  // Petits morceaux qui rebondissent sur le comptoir
+  for (let i = 0; i < 6; i++) {
+    bruit({ start: hasard(0.22, 0.7), dur: hasard(0.015, 0.03), fromHz: hasard(4000, 8000), gain: 0.08, filtre: 'bandpass', q: 3 })
+  }
 }
 
 const SOUNDS: Record<string, () => void> = {
@@ -147,16 +211,8 @@ const SOUNDS: Record<string, () => void> = {
     playNotes([{ freq: 110, slideTo: 45, start: 0, dur: 0.3, type: 'triangle', gain: 0.25 }])
   },
   pfft: () => playNoise(0, 0.14, 700, 300, 0.12),
-  tir: () => {
-    playNoise(0, 0.16, 2200, 300, 0.55)
-    playNotes([{ freq: 130, slideTo: 45, start: 0, dur: 0.18, gain: 0.35 }])
-  },
-  verre: () => {
-    playNoise(0.03, 0.3, 6000, 2500, 0.18)
-    playNotes(
-      [3100, 4200, 2600, 5200, 3700].map((freq, i) => ({ freq, start: 0.03 + i * 0.025, dur: 0.12 + (i % 2) * 0.08, gain: 0.05 }))
-    )
-  },
+  tir: coupDeRevolver,
+  verre: bouteilleCassee,
   ricochet: () => playNotes([{ freq: 2600, slideTo: 900, start: 0.02, dur: 0.32, type: 'triangle', gain: 0.08 }]),
   clonk: () => playNotes([{ freq: 420, slideTo: 300, start: 0, dur: 0.18, type: 'triangle', gain: 0.18 }]),
   aspire: () =>
