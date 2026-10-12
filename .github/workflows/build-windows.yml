@@ -10,7 +10,7 @@ on:
 
 concurrency:
   group: validation-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: write
@@ -19,6 +19,8 @@ jobs:
   build:
     runs-on: windows-latest
     timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,3 +66,27 @@ jobs:
           files: |
             dist/DefilOrdi-Installation-*.exe
             dist/DefilOrdi-Portable-*.exe
+
+  publish-drive:
+    name: Archiver sur Google Drive
+    needs: build
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: drive-${{ github.repository }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: DefilOrdi-windows
+          path: drive-artifacts
+      - uses: flo91360/PlaniFiKateur/.github/actions/publish-drive@fc4c6b4e9e778dbee9b89d91db2a39d24a949b4a
+        with:
+          credentials: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
+          folder-id: ${{ vars.GOOGLE_DRIVE_FOLDER_ID }}
+          version: v${{ needs.build.outputs.version }}
+          artifact-dir: drive-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}

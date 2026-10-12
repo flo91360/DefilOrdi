@@ -142,3 +142,12 @@ npm test
 npm run dist:win     # fabrique les .exe dans dist/ (sous Linux : nécessite wine 32 bits pour l'installeur)
 npm run dist:portable  # fabrique seulement le .exe portable (fonctionne sous Linux sans wine)
 ```
+
+## Archivage Google Drive
+
+Après une fabrication réussie sur `main`, le workflow peut archiver les `.exe`
+dans votre dossier Drive personnel, avec un sous-dossier par projet et version.
+Configurez `GOOGLE_DRIVE_CREDENTIALS` (secret Actions) et `GOOGLE_DRIVE_FOLDER_ID`
+(variable Actions) selon le [guide PlaniFiKateur](https://github.com/flo91360/PlaniFiKateur/blob/main/docs/google-drive.md).
+Les anciens exécutables sont conservés. Les cartes traitées par le worker avec
+le profil de ce projet augmentent automatiquement la version avant les tests.
