@@ -52,7 +52,7 @@ jobs:
           path: |
             dist/DefilOrdi-Installation-*.exe
             dist/DefilOrdi-Portable-*.exe
-            dist/CHANGELOG.md
+            dist/NOTES.md
             dist/CHANGELOG.md
           if-no-files-found: error
 
