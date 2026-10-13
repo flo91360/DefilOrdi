@@ -12,6 +12,7 @@ import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
 import { Espace } from './games/espace/Espace'
 import { Memoire } from './games/memoire/Memoire'
+import { PetitBac } from './games/petitbac/PetitBac'
 import { construireBanque } from './games/quiz/engine'
 import { Quiz } from './games/quiz/Quiz'
 
@@ -107,6 +108,7 @@ export function App() {
       else if (screen.jeu === 'memoire') content = <Memoire {...commun} listes={data.mots} />
       else if (screen.jeu === 'espace') content = <Espace {...commun} />
       else if (screen.jeu === 'quiz') content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
+      else if (screen.jeu === 'petitbac') content = <PetitBac {...commun} reglages={data.petitBac} />
       else content = <Couleurs {...commun} />
       break
     }

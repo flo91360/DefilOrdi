@@ -38,13 +38,18 @@ le code et les commentaires aussi.
   vérifie que chaque zone attendue existe à chaque étape. Questions de
   l'ergothérapeute : `questionsPerso` / `questionsMasquees` dans les données,
   fusionnées par `construireBanque` ; éditeur dans `screens/QuizEditor.tsx`.
+- `src/renderer/src/games/petitbac/` : Petit bac. `engine.ts` (tirage, vérification
+  de la première lettre) testé dans `tests/petitbac.test.ts`. Catégories et
+  lettres réglées par l'ergothérapeute : `petitBac` dans les données, éditeur
+  dans `screens/PetitBacEditor.tsx`.
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
   statistiques par jeu dans `screens/ErgoStats.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
   presser pour chaque caractère) et son affichage.
 - `src/shared/phrases.ts` : listes de phrases et de mots d'origine (uniquement des
   caractères tapables sur un clavier AZERTY Windows).
-- Espace ergo : `screens/ErgoSpace.tsx`, `ErgoStats.tsx`, `PhrasesEditor.tsx`.
+- Espace ergo : `screens/ErgoSpace.tsx`, `ErgoStats.tsx`, `PhrasesEditor.tsx`,
+  `QuizEditor.tsx`, `PetitBacEditor.tsx`.
 
 ## Commandes
 

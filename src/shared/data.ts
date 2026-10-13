@@ -151,7 +151,59 @@ export function questionPersoValide(q: QuestionPerso): boolean {
   return q.type === 'vraifaux' || q.choix.every((c) => c.trim() !== '')
 }
 
-export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz
+// Petit bac : catégories et lettres réglées par l'ergothérapeute.
+export const LETTRES_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+export const LETTRES_DIFFICILES = ['K', 'Q', 'W', 'X', 'Y', 'Z']
+export const CATEGORIE_MAX = 40 // caractères d'une catégorie
+export const CATEGORIES_MAX = 30 // catégories dans la liste
+export const MOT_BAC_MAX = 40 // caractères d'une réponse
+
+export interface ReglagesPetitBac {
+  categories: string[]
+  lettres: string[] // majuscules, dans l'ordre alphabétique
+}
+
+export function defaultPetitBac(): ReglagesPetitBac {
+  return {
+    categories: [
+      'Prénom',
+      'Animal',
+      'Fruit ou légume',
+      'Pays ou ville',
+      'Métier',
+      'Sport',
+      'Vêtement',
+      'Objet de la maison',
+      'Moyen de transport',
+      'Partie du corps',
+      'Chose qui se mange',
+      'Instrument de musique'
+    ],
+    lettres: LETTRES_ALPHABET.filter((l) => !LETTRES_DIFFICILES.includes(l))
+  }
+}
+
+// Une partie de « Petit bac ».
+export interface ReponseBac {
+  categorie: string
+  mot: string // '' = pas de réponse
+  valide: boolean // acceptée à la vérification
+}
+
+export interface ResultatPetitBac {
+  id: string
+  profileId: string
+  jeu: 'petitbac'
+  date: string
+  lettre: string
+  tempsLimite: number // secondes, 0 = sans limite
+  dureeMs: number // temps pour remplir la grille
+  categories: number
+  justes: number // réponses acceptées
+  reponses: ReponseBac[]
+}
+
+export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz | ResultatPetitBac
 export type JeuId = Resultat['jeu']
 
 export interface Settings {
@@ -166,6 +218,7 @@ export interface AppData {
   mots: ListePhrases[] // listes de mots du jeu Mots à retenir
   questionsPerso: QuestionPerso[]
   questionsMasquees: string[] // questions fournies désactivées par l'ergothérapeute
+  petitBac: ReglagesPetitBac
   resultats: Resultat[]
   settings: Settings
 }
@@ -244,6 +297,7 @@ export function defaultAppData(): AppData {
     mots: defaultListesMots(),
     questionsPerso: [],
     questionsMasquees: [],
+    petitBac: defaultPetitBac(),
     resultats: [],
     settings: { codeErgo: '0000', volume: 0.7 }
   }
@@ -353,6 +407,42 @@ function normalizeQuestionPerso(v: unknown): QuestionPerso | null {
   return questionPersoValide(q) ? q : null
 }
 
+// Catégories du petit bac : espaces superflus, lignes vides et doublons retirés.
+export function nettoyerCategories(lignes: unknown[]): string[] {
+  const vues = new Set<string>()
+  return lignes
+    .filter((c): c is string => typeof c === 'string')
+    .map((c) => c.trim().replace(/\s+/g, ' ').slice(0, CATEGORIE_MAX))
+    .filter((c) => {
+      const cle = c.toLocaleLowerCase('fr')
+      if (c === '' || vues.has(cle)) return false
+      vues.add(cle)
+      return true
+    })
+    .slice(0, CATEGORIES_MAX)
+}
+
+// Catégories absentes (ancienne sauvegarde) : celles d'origine. Une liste
+// vide est gardée : l'ergothérapeute a tout supprimé.
+function normalizePetitBac(v: unknown): ReglagesPetitBac {
+  const d = defaultPetitBac()
+  if (!isObj(v)) return d
+  const categories = Array.isArray(v.categories) ? nettoyerCategories(v.categories) : d.categories
+  const lettres = Array.isArray(v.lettres)
+    ? LETTRES_ALPHABET.filter((l) => (v.lettres as unknown[]).some((x) => typeof x === 'string' && x.toUpperCase() === l))
+    : d.lettres
+  return { categories, lettres }
+}
+
+function normalizeReponseBac(v: unknown): ReponseBac | null {
+  if (!isObj(v)) return null
+  return {
+    categorie: texte(v.categorie, CATEGORIE_MAX),
+    mot: texte(v.mot, MOT_BAC_MAX),
+    valide: v.valide === true
+  }
+}
+
 function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null {
   if (!isObj(v) || typeof v.id !== 'string' || typeof v.profileId !== 'string') return null
   if (!profileIds.has(v.profileId) || typeof v.date !== 'string' || Number.isNaN(Date.parse(v.date))) return null
@@ -402,6 +492,21 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       questions,
       justes: Math.min(count(v.justes), questions),
       ratees: (Array.isArray(v.ratees) ? v.ratees : []).filter((x): x is string => typeof x === 'string' && x.length <= 60).slice(0, 100)
+    }
+  }
+  if (v.jeu === 'petitbac') {
+    const categories = count(v.categories)
+    return {
+      ...base,
+      jeu: 'petitbac',
+      lettre: pick(v.lettre, LETTRES_ALPHABET, 'A'),
+      tempsLimite: count(v.tempsLimite),
+      categories,
+      justes: Math.min(count(v.justes), categories),
+      reponses: (Array.isArray(v.reponses) ? v.reponses : [])
+        .map(normalizeReponseBac)
+        .filter((r): r is ReponseBac => r !== null)
+        .slice(0, CATEGORIES_MAX)
     }
   }
   // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.
@@ -460,6 +565,7 @@ export function normalizeAppData(v: unknown): AppData {
     mots,
     questionsPerso,
     questionsMasquees,
+    petitBac: normalizePetitBac(v.petitBac),
     resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,
