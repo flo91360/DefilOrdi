@@ -67,3 +67,6 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
   précédent ; `CHANGELOG.md` (toutes les versions) est joint, fabriqué par
   `scripts/changelog.mjs` à partir des tags : écrire des messages de commit
   lisibles par l'ergothérapeute. PlaniFiKateur archive ses .exe dans Google Drive.
+- Fusion des PR (demandé par le propriétaire du dépôt) : quand la CI d'une PR
+  ouverte par Claude est verte et qu'aucun commentaire de relecture n'attend de
+  réponse, Claude la fusionne lui-même dans main (squash), sans demander.
