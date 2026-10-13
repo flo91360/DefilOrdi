@@ -53,7 +53,7 @@ jobs:
             dist/DefilOrdi-Installation-*.exe
             dist/DefilOrdi-Portable-*.exe
             dist/CHANGELOG.md
-            dist/CHANGELOG.md
+            dist/NOTES.md
           if-no-files-found: error
 
       # Une nouvelle version de package.json arrivée sur main est publiée dans
