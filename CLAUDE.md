@@ -70,8 +70,9 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
   déjà publiée n'est pas remplacée). Elle crée d'abord le tag annoté
   `v<version>`, puis la Release dont les notes listent les commits depuis le tag
   précédent ; `CHANGELOG.md` (toutes les versions) est joint, fabriqué par
-  `scripts/changelog.mjs` à partir des tags : écrire des messages de commit
-  lisibles par l'ergothérapeute. PlaniFiKateur archive ses .exe dans Google Drive.
+  `scripts/changelog.mjs` à partir des tags, puis recopié par la CI à la racine
+  du dépôt sur main (ne pas le modifier à la main) : écrire des messages de
+  commit lisibles par l'ergothérapeute. PlaniFiKateur archive ses .exe dans Google Drive.
 - Fusion des PR (demandé par le propriétaire du dépôt) : quand la CI d'une PR
   ouverte par Claude est verte et qu'aucun commentaire de relecture n'attend de
   réponse, Claude la fusionne lui-même dans main (squash), sans demander.
