@@ -62,4 +62,8 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
 - Les jeux sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
 - Chaque livraison : augmenter `version` dans `package.json` ; la CI publie la
   Release `v<version>` quand une nouvelle version arrive sur main (une version
-  déjà publiée n'est pas remplacée). PlaniFiKateur archive ses .exe dans Google Drive.
+  déjà publiée n'est pas remplacée). Elle crée d'abord le tag annoté
+  `v<version>`, puis la Release dont les notes listent les commits depuis le tag
+  précédent ; `CHANGELOG.md` (toutes les versions) est joint, fabriqué par
+  `scripts/changelog.mjs` à partir des tags : écrire des messages de commit
+  lisibles par l'ergothérapeute. PlaniFiKateur archive ses .exe dans Google Drive.
