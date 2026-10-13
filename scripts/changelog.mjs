@@ -14,6 +14,9 @@ import { join } from 'node:path'
 const dossier = process.argv[2] ?? 'dist'
 const version = JSON.parse(readFileSync('package.json', 'utf8')).version
 const tagCourant = `v${version}`
+// Début du message du commit par lequel la CI met à jour CHANGELOG.md sur main
+// (même texte dans .github/workflows/build-windows.yml).
+const SUJET_COMMIT_JOURNAL = 'Journal des modifications : version '
 
 function git(...args) {
   return execFileSync('git', args, { encoding: 'utf8' }).trim()
@@ -40,6 +43,8 @@ function modifications(debut, fin) {
   const plage = debut ? `${debut}..${fin}` : fin
   return lignes(git('log', '--no-merges', '--format=%s', plage))
     .filter((sujet) => !/^Merge /.test(sujet))
+    // Commit de la CI qui recopie ce journal dans le dépôt : pas une modification.
+    .filter((sujet) => !sujet.startsWith(SUJET_COMMIT_JOURNAL))
     .map((sujet) => `- ${sujet}`)
 }
 
