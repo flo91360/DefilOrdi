@@ -10,10 +10,10 @@ files:
   - package.json
 asarUnpack: []
 win:
+  # Livraison : uniquement l'installeur complet (NSIS hors ligne).
+  # Le portable n'est fabriqué qu'à la demande (npm run dist:portable).
   target:
     - target: nsis
-      arch: [x64]
-    - target: portable
       arch: [x64]
   icon: build/icon.ico
 nsis:

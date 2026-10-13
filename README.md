@@ -6,12 +6,9 @@ ordinateur, à travers un hub de petits jeux et un profil personnalisé par enfa
 
 ## Installer le logiciel (Windows 10 / 11)
 
-Deux versions du programme sont fabriquées automatiquement :
-
-- **`DefilOrdi-Installation-x.y.z.exe`** (recommandé) : installe le logiciel et
-  crée un raccourci sur le bureau. Aucun droit administrateur n'est nécessaire.
-- **`DefilOrdi-Portable-x.y.z.exe`** : se lance directement, sans installation
-  (pratique sur une clé USB). Le démarrage est un peu plus lent.
+Chaque version est livrée sous la forme d'un seul fichier, l'installeur complet
+**`DefilOrdi-Installation-x.y.z.exe`** : il installe le logiciel et crée un
+raccourci sur le bureau. Aucun droit administrateur n'est nécessaire.
 
 Où les trouver sur GitHub : onglet **Releases** pour les versions publiées, ou
 onglet **Actions** → dernier passage de « Windows .exe » → section *Artifacts*.
@@ -139,8 +136,8 @@ npm run dev          # lance l'application Electron en mode développement
 npm run dev:web      # lance seulement l'interface dans un navigateur (données dans localStorage)
 npm run typecheck
 npm test
-npm run dist:win     # fabrique les .exe dans dist/ (sous Linux : nécessite wine 32 bits pour l'installeur)
-npm run dist:portable  # fabrique seulement le .exe portable (fonctionne sous Linux sans wine)
+npm run dist:win     # fabrique l'installeur dans dist/ (sous Linux : nécessite wine 32 bits)
+npm run dist:portable  # essai local uniquement : .exe portable (fonctionne sous Linux sans wine), jamais livré
 ```
 
 ## Archivage Google Drive
