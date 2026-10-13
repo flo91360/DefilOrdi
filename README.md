@@ -106,6 +106,23 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   (Vrai/Faux ou QCM, avec thème, niveau, explication et image facultative),
   et désactiver les questions fournies qui ne conviennent pas.
 
+**Petit bac**
+
+- Une roue tire une lettre au sort ; pour chaque catégorie (Animal, Prénom,
+  Pays ou ville…), l'enfant tape un mot qui commence par cette lettre. Il
+  choisit le nombre de catégories (3 à 10, selon son niveau par défaut) et le
+  temps (sans limite, 1, 2, 3 ou 5 minutes). Entrée passe à la ligne suivante.
+- Le jeu vérifie la première lettre (accents, majuscules et article du début
+  comme « la » ou « l' » ne comptent pas) ; un mot qui ne commence pas par la
+  bonne lettre est signalé en quittant la case.
+- À la fin, on vérifie ensemble : un clic sur un mot le refuse s'il ne va pas
+  dans sa catégorie. Sont mesurés : mots acceptés, temps ; les statistiques
+  montrent les dernières grilles telles que l'enfant les a tapées, et l'export
+  Excel contient toutes les réponses.
+- Espace ergothérapeute, section **Petit bac** : choisir les lettres qui
+  peuvent être tirées (par défaut toutes sauf K, Q, W, X, Y, Z) et écrire la
+  liste des catégories (une par ligne, 30 au plus).
+
 ### Règles de comptage (Dactylo)
 
 - Une frappe = un caractère tapé, erreurs comprises. « ^ puis e » donne « ê » et

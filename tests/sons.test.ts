@@ -104,7 +104,7 @@ describe('Sons du stand de tir (cow-boy)', () => {
   })
 
   it('les autres sons restent valides', () => {
-    for (const id of ['carillon', 'plouf', 'explosion', 'impact', 'ricochet', 'clonk', 'sable', 'inconnu']) playSound(id)
+    for (const id of ['carillon', 'plouf', 'explosion', 'impact', 'ricochet', 'clonk', 'sable', 'tic', 'inconnu']) playSound(id)
     expect(erreurs).toEqual([])
   })
 })

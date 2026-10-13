@@ -233,7 +233,9 @@ const SOUNDS: Record<string, () => void> = {
     ]),
   sable: () => playNoise(0, 0.3, 400, 150, 0.2),
   decompte: () => playNotes([{ freq: 660, start: 0, dur: 0.14, type: 'triangle', gain: 0.18 }]),
-  partez: () => playNotes([{ freq: 990, start: 0, dur: 0.4, type: 'triangle', gain: 0.2 }])
+  partez: () => playNotes([{ freq: 990, start: 0, dur: 0.4, type: 'triangle', gain: 0.2 }]),
+  // Petit bac : la roue des lettres qui tourne
+  tic: () => playNotes([{ freq: 1250, start: 0, dur: 0.05, type: 'triangle', gain: 0.07, attack: 0.004 }])
 }
 
 export function playSound(id: string): void {

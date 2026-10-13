@@ -203,6 +203,23 @@ export function GameArt({ game }: { game: string }) {
           <path d="M79 50l7 7 14-15" fill="none" stroke="var(--tile-ink)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )
+    case 'petitbac':
+      return (
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <rect x="44" y="6" width="70" height="68" rx="8" fill="#ffffff" stroke="var(--tile-ink)" strokeWidth="3" />
+          {[0, 1, 2, 3].map((i) => (
+            <g key={i}>
+              <rect x="51" y={15 + i * 14} width="18" height="5" rx="2.5" fill="var(--tile-ink)" opacity="0.8" />
+              <path d={`M74 ${21 + i * 14} H${i === 3 ? 92 : 106}`} stroke="var(--tile-ink)" strokeWidth="2" opacity="0.35" />
+            </g>
+          ))}
+          <path d="M96 13l3 3 6-6M96 41l3 3 6-6" fill="none" stroke="var(--tile-ink)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="22" cy="40" r="19" fill="var(--tile-ink)" />
+          <text x="22" y="50" textAnchor="middle" fontSize="28" fontWeight="900" fill="#ffffff" fontFamily="inherit">
+            B
+          </text>
+        </svg>
+      )
     default:
       return null
   }

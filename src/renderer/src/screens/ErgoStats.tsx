@@ -1,25 +1,40 @@
 import { useState } from 'react'
-import type { JeuId, Profile, QuestionPerso, Resultat, ResultatCouleurs, ResultatDactylo, ResultatEspace, ResultatMemoire, ResultatQuiz } from '../../../shared/data'
+import type {
+  JeuId,
+  Profile,
+  QuestionPerso,
+  Resultat,
+  ResultatCouleurs,
+  ResultatDactylo,
+  ResultatEspace,
+  ResultatMemoire,
+  ResultatPetitBac,
+  ResultatQuiz,
+  ReponseBac
+} from '../../../shared/data'
 import { api } from '../api'
 import { Avatar } from '../avatar/Avatar'
 import { LineChart, type Point } from '../components/LineChart'
 import { ConfirmDialog } from '../components/Modal'
-import { IconBack, IconDownload, IconTrash } from '../components/Icons'
+import { IconBack, IconCheck, IconDownload, IconTrash } from '../components/Icons'
 import { pourcentage } from '../games/commun'
 import { formatDuree, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
 import { cadence } from '../games/espace/engine'
+import { etatReponse, formatTemps } from '../games/petitbac/engine'
 import { construireBanque } from '../games/quiz/engine'
 import { toucheDe } from '../keyboard/azerty'
 import { couleurChaleur, Keyboard } from '../keyboard/Keyboard'
 
 const NB_PARTIES_CARTE = 10
+const NB_GRILLES = 6
 
 export const NOMS_JEUX: Record<JeuId, string> = {
   dactylo: 'Dactylo',
   couleurs: 'Couleurs piégées',
   memoire: 'Mots à retenir',
   espace: 'Chasse aux lettres',
-  quiz: 'Quiz'
+  quiz: 'Quiz',
+  petitbac: 'Petit bac'
 }
 
 export const MODES_COULEURS_LABELS: Record<ResultatCouleurs['mode'], string> = {
@@ -34,6 +49,7 @@ export function resumePartie(r: Resultat): string {
   if (r.jeu === 'couleurs') return `${r.justes}/${r.manches} justes`
   if (r.jeu === 'memoire') return `${r.trouves}/${r.mots} mots`
   if (r.jeu === 'quiz') return `${r.justes}/${r.questions} bonnes réponses`
+  if (r.jeu === 'petitbac') return `${r.justes}/${r.categories} mots (lettre ${r.lettre})`
   return `${r.detruites} lettres attrapées`
 }
 
@@ -45,6 +61,7 @@ interface Colonne<R> {
   titre: string
   valeur: (r: R) => string | number
   num?: boolean
+  exportSeul?: boolean // trop long pour l'historique : seulement dans l'export Excel
 }
 
 const COLONNES_DACTYLO: Colonne<ResultatDactylo>[] = [
@@ -94,6 +111,19 @@ const COLONNES_QUIZ: Colonne<ResultatQuiz>[] = [
   { titre: 'Durée', valeur: (r) => formatDuree(r.dureeMs), num: true }
 ]
 
+const COLONNES_PETITBAC: Colonne<ResultatPetitBac>[] = [
+  { titre: 'Lettre', valeur: (r) => r.lettre },
+  { titre: 'Mots acceptés', valeur: (r) => `${r.justes} / ${r.categories}`, num: true },
+  { titre: 'Réussite', valeur: (r) => `${pourcentage(r.justes, r.categories)} %`, num: true },
+  { titre: 'Temps', valeur: (r) => formatDuree(r.dureeMs), num: true },
+  { titre: 'Limite', valeur: (r) => formatTemps(r.tempsLimite) },
+  {
+    titre: 'Réponses',
+    valeur: (r) => r.reponses.map((x) => `${x.categorie} : ${x.mot || '—'}${x.mot && !x.valide ? ' (refusé)' : ''}`).join(' ; '),
+    exportSeul: true
+  }
+]
+
 function secondes(ms: number): string {
   return (ms / 1000).toFixed(1).replace('.', ',')
 }
@@ -114,7 +144,8 @@ export function ErgoStats({ profile, resultats, questionsPerso, onSupprimer, onR
     couleurs: siens.filter((r): r is ResultatCouleurs => r.jeu === 'couleurs'),
     memoire: siens.filter((r): r is ResultatMemoire => r.jeu === 'memoire'),
     espace: siens.filter((r): r is ResultatEspace => r.jeu === 'espace'),
-    quiz: siens.filter((r): r is ResultatQuiz => r.jeu === 'quiz')
+    quiz: siens.filter((r): r is ResultatQuiz => r.jeu === 'quiz'),
+    petitbac: siens.filter((r): r is ResultatPetitBac => r.jeu === 'petitbac')
   }
   // Onglet de départ : le jeu de la dernière partie.
   const [jeu, setJeu] = useState<JeuId>(siens[siens.length - 1]?.jeu ?? 'dactylo')
@@ -129,7 +160,9 @@ export function ErgoStats({ profile, resultats, questionsPerso, onSupprimer, onR
             ? versCsv(parJeu.memoire, COLONNES_MEMOIRE)
             : jeu === 'espace'
               ? versCsv(parJeu.espace, COLONNES_ESPACE)
-              : versCsv(parJeu.quiz, COLONNES_QUIZ)
+              : jeu === 'quiz'
+                ? versCsv(parJeu.quiz, COLONNES_QUIZ)
+                : versCsv(parJeu.petitbac, COLONNES_PETITBAC)
     void api.exportCsv(`DefilOrdi-${profile.prenom}-${jeu}.csv`, csv)
   }
 
@@ -173,8 +206,10 @@ export function ErgoStats({ profile, resultats, questionsPerso, onSupprimer, onR
         <StatsMemoire parties={parJeu.memoire} onSupprimer={supprimer} />
       ) : jeu === 'espace' ? (
         <StatsEspace parties={parJeu.espace} onSupprimer={supprimer} />
-      ) : (
+      ) : jeu === 'quiz' ? (
         <StatsQuiz parties={parJeu.quiz} questionsPerso={questionsPerso} onSupprimer={supprimer} />
+      ) : (
+        <StatsPetitBac parties={parJeu.petitbac} onSupprimer={supprimer} />
       )}
 
       {aSupprimer && (
@@ -398,6 +433,81 @@ function StatsQuiz({
   )
 }
 
+// Pourquoi une réponse n'a pas compté (rien pour une case vide).
+function raisonRefus(x: ReponseBac, lettre: string): string {
+  const etat = etatReponse(x.mot, lettre)
+  return etat === 'vide' ? '' : etat === 'ok' ? 'Refusé' : etat === 'court' ? 'Trop court' : 'Autre lettre'
+}
+
+function StatsPetitBac({ parties, onSupprimer }: { parties: ResultatPetitBac[]; onSupprimer: (r: Resultat) => void }) {
+  const derniere = parties[parties.length - 1]
+  const reussite = (r: ResultatPetitBac) => pourcentage(r.justes, r.categories)
+  const totalCategories = parties.reduce((t, r) => t + r.categories, 0)
+  const totalJustes = parties.reduce((t, r) => t + r.justes, 0)
+  const lettre = (r: ResultatPetitBac) => `lettre ${r.lettre}`
+  return (
+    <>
+      <div className="stats-tiles">
+        <Tile valeur={String(parties.length)} label={parties.length > 1 ? 'parties jouées' : 'partie jouée'} detail={`${totalJustes} mot${totalJustes > 1 ? 's' : ''} accepté${totalJustes > 1 ? 's' : ''} au total`} />
+        <Tile valeur={`${derniere.justes} / ${derniere.categories}`} label="mots acceptés" detail={`dernière partie (${lettre(derniere)})`} />
+        <Tile valeur={`${pourcentage(totalJustes, totalCategories)} %`} label="de réussite en tout" detail="sur toutes les parties" />
+      </div>
+      {parties.length > 1 && (
+        <div className="stats-charts">
+          <div className="card">
+            <LineChart titre="Réussite" unite=" %" max={100} points={points(parties, reussite, lettre)} />
+          </div>
+          <div className="card">
+            <LineChart
+              titre="Temps moyen par catégorie (secondes)"
+              points={points(parties, (r) => Math.round(r.dureeMs / Math.max(1, r.categories) / 100) / 10, lettre)}
+            />
+          </div>
+        </div>
+      )}
+      <div className="card">
+        <h2 className="card-title">
+          Dernières grilles <span className="card-title-sub">(mots tels que l’enfant les a tapés)</span>
+        </h2>
+        <div className="bac-stats-grilles">
+          {parties
+            .slice(-NB_GRILLES)
+            .reverse()
+            .map((r) => (
+              <div key={r.id} className="bac-stats-grille">
+                <div className="bac-stats-tete">
+                  <span className="bac-stats-lettre">{r.lettre}</span>
+                  <span>
+                    <strong>
+                      {r.justes} / {r.categories}
+                    </strong>{' '}
+                    <span className="muted">· {dateLongue(r.date)}</span>
+                  </span>
+                </div>
+                <table className="bac-stats-table">
+                  <tbody>
+                    {r.reponses.map((x, i) => (
+                      <tr key={i} className={x.mot && !x.valide ? 'refuse' : undefined}>
+                        <td className="muted">{x.categorie}</td>
+                        <td>
+                          <strong>{x.mot || '—'}</strong>
+                        </td>
+                        <td className="bac-stats-etat">
+                          {x.valide ? <IconCheck size={16} /> : raisonRefus(x, r.lettre)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+        </div>
+      </div>
+      <Historique parties={parties} colonnes={COLONNES_PETITBAC} onSupprimer={onSupprimer} />
+    </>
+  )
+}
+
 function cumulerCompteurs(liste: Record<string, number>[]): Record<string, number> {
   const out: Record<string, number> = {}
   for (const c of liste) for (const [k, n] of Object.entries(c)) out[k] = (out[k] ?? 0) + n
@@ -467,6 +577,7 @@ function Historique<R extends Resultat>({
   colonnes: Colonne<R>[]
   onSupprimer: (r: Resultat) => void
 }) {
+  const visibles = colonnes.filter((c) => !c.exportSeul)
   return (
     <div className="card">
       <h2 className="card-title">Historique</h2>
@@ -474,7 +585,7 @@ function Historique<R extends Resultat>({
         <thead>
           <tr>
             <th>Date</th>
-            {colonnes.map((c) => (
+            {visibles.map((c) => (
               <th key={c.titre} className={c.num ? 'num' : undefined}>
                 {c.titre}
               </th>
@@ -486,7 +597,7 @@ function Historique<R extends Resultat>({
           {[...parties].reverse().map((r) => (
             <tr key={r.id}>
               <td>{dateLongue(r.date)}</td>
-              {colonnes.map((c) => (
+              {visibles.map((c) => (
                 <td key={c.titre} className={c.num ? 'num' : undefined}>
                   {c.valeur(r)}
                 </td>

@@ -9,11 +9,12 @@ import { defaultListes, defaultListesMots } from '../../../shared/phrases'
 import { playSound } from '../sounds'
 import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
+import { PetitBacEditor } from './PetitBacEditor'
 import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
 import { QuizEditor } from './QuizEditor'
 import { Logo } from './ProfilePicker'
 
-type Section = 'patients' | 'phrases' | 'mots' | 'quiz' | 'reglages' | 'sauvegarde'
+type Section = 'patients' | 'phrases' | 'mots' | 'petitbac' | 'quiz' | 'reglages' | 'sauvegarde'
 
 const TEXTES_PHRASES: TextesEditeur = {
   titre: 'Phrases',
@@ -61,6 +62,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
               ['patients', 'Patients'],
               ['phrases', 'Phrases'],
               ['mots', 'Mots'],
+              ['petitbac', 'Petit bac'],
               ['quiz', 'Quiz'],
               ['reglages', 'Réglages'],
               ['sauvegarde', 'Sauvegarde']
@@ -90,6 +92,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
             />
           )}
           {section === 'mots' && <PhrasesEditor textes={TEXTES_MOTS} listes={data.mots} onChange={(mots) => onChange({ ...data, mots })} />}
+          {section === 'petitbac' && <PetitBacEditor reglages={data.petitBac} onChange={(petitBac) => onChange({ ...data, petitBac })} />}
           {section === 'reglages' && <Reglages data={data} onChange={onChange} />}
           {section === 'sauvegarde' && <Sauvegarde data={data} onChange={onChange} />}
         </main>

@@ -34,6 +34,12 @@ export const GAMES: { id: JeuId; titre: string; description: string; disponible:
     titre: 'Quiz de l’ordinateur',
     description: 'Vrai ou faux, QCM et mises en situation sur de vrais écrans.',
     disponible: true
+  },
+  {
+    id: 'petitbac',
+    titre: 'Petit bac',
+    description: 'Une lettre au hasard : trouve un mot pour chaque catégorie.',
+    disponible: true
   }
 ]
 
