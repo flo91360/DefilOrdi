@@ -49,9 +49,11 @@ le code et les commentaires aussi.
 ## Commandes
 
 `npm run typecheck`, `npm test`, `npm run dev:web`, `npm run dist:portable`
-(exe portable, marche sous Linux sans wine), `npm run dist:win` (installeur +
-portable ; l'installeur NSIS a besoin de wine 32 bits sous Linux, il est
-fabriqué par la CI Windows `.github/workflows/build-windows.yml`).
+(exe portable pour essai local, marche sous Linux sans wine, jamais livré),
+`npm run dist:win` (installeur complet seul ; l'installeur NSIS a besoin de
+wine 32 bits sous Linux, il est fabriqué par la CI Windows
+`.github/workflows/build-windows.yml`). Livraison = uniquement
+`DefilOrdi-Installation-<version>.exe` (artefact CI et Release).
 
 ## Règles
 
