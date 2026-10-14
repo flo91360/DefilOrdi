@@ -17,11 +17,26 @@ import {
   motsParMinute,
   nouvellePhrase,
   precision,
+  scorePhrase,
   taper,
   vitesse
 } from './engine'
+import { smileyPrecision, smileyVitesse } from './seuils'
+import { SmileyIcone } from './Smiley'
 
 const NOMBRES = [3, 5, 10]
+
+// Score d'une phrase : affiché pendant la partie et dans l'écran de fin,
+// jamais enregistré dans les statistiques.
+interface ScorePhrase {
+  phrase: string
+  vitesse: number
+  precision: number
+}
+
+function scoreDe(e: EtatPhrase, now: number): ScorePhrase {
+  return { phrase: e.cible, ...scorePhrase(e, now) }
+}
 
 interface Props {
   profile: Profile
@@ -34,7 +49,7 @@ interface Props {
 type Phase =
   | { nom: 'choix' }
   | { nom: 'jeu'; liste: ListePhrases; phrases: string[] }
-  | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean }
+  | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean; scores: ScorePhrase[] }
 
 export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
@@ -54,7 +69,8 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
       else onQuit()
       return
     }
-    const s = cumuler(faites, Date.now())
+    const now = Date.now()
+    const s = cumuler(faites, now)
     const resultat: ResultatDactylo = {
       id: uid(),
       profileId: profile.id,
@@ -65,7 +81,14 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
       ...s
     }
     onResult(resultat)
-    if (complete) setPhase({ nom: 'fin', liste, resultat, record: meilleure > 0 && vitesse(resultat) > meilleure })
+    if (complete)
+      setPhase({
+        nom: 'fin',
+        liste,
+        resultat,
+        record: meilleure > 0 && vitesse(resultat) > meilleure,
+        scores: faites.map((e) => scoreDe(e, now))
+      })
     else onQuit()
   }
 
@@ -86,6 +109,7 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
         profile={profile}
         resultat={phase.resultat}
         record={phase.record}
+        scores={phase.scores}
         onRejouer={() => lancer(phase.liste)}
         onAutre={() => setPhase({ nom: 'choix' })}
         onQuit={onQuit}
@@ -165,6 +189,25 @@ function Choix({
 
 const BRAVOS = ['Bravo !', 'Super !', 'Génial !', 'Bien joué !', 'Excellent !', 'Parfait !']
 
+// Pause après une phrase réussie, le temps de lire son score.
+const PAUSE_SCORE_MS = 2500
+
+// Score d'une phrase : vitesse et précision, chacune avec son smiley.
+function ScoreLigne({ score, profile }: { score: ScorePhrase; profile: Profile }) {
+  return (
+    <span className="score-phrase">
+      <span className="score-item">
+        <strong>{score.vitesse}</strong> frappes/min
+        <SmileyIcone smiley={smileyVitesse(score.vitesse, profile.classe)} quoi="Vitesse" />
+      </span>
+      <span className="score-item">
+        <strong>{score.precision} %</strong> de précision
+        <SmileyIcone smiley={smileyPrecision(score.precision)} quoi="Précision" />
+      </span>
+    </span>
+  )
+}
+
 function Partie({
   profile,
   phrases,
@@ -207,7 +250,7 @@ function Partie({
       setBulle(null)
       if (index + 1 >= phrases.length) onFinRef.current(etatsRef.current)
       else setEtats((e) => [...e, nouvellePhrase(phrases[index + 1])])
-    }, 1100)
+    }, PAUSE_SCORE_MS)
     return () => clearTimeout(t)
   }, [reussie, index, phrases, profile.sonReussite])
 
@@ -254,6 +297,10 @@ function Partie({
   }
 
   const stats = cumuler(etats, now)
+  // Score de la phrase qui vient d'être réussie (affiché dans sa carte), puis
+  // rappel du score de la phrase précédente pendant la suivante.
+  const scoreCourant = reussie ? scoreDe(courant, now) : null
+  const precedente = !reussie && index > 0 ? scoreDe(etats[index - 1], now) : null
   const prochaine = reussie ? null : [...courant.cible][courant.tape.length]
   const ilYaErreur = courant.tape.some((l) => !l.ok)
   const g = prochaine && !ilYaErreur ? geste(prochaine) : null
@@ -309,6 +356,16 @@ function Partie({
             ) : (
               <p className="phrase-aide">{g && (g.etapes.length > 1 || g.etapes[0].length > 1) ? g.aide : '\u00a0'}</p>
             )}
+            {scoreCourant ? (
+              <p className="phrase-score" aria-live="polite">
+                <ScoreLigne score={scoreCourant} profile={profile} />
+              </p>
+            ) : precedente ? (
+              <p className="phrase-score phrase-score-precedente">
+                <span className="score-titre">Phrase précédente :</span>
+                <ScoreLigne score={precedente} profile={profile} />
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -359,6 +416,7 @@ function Fin({
   profile,
   resultat,
   record,
+  scores,
   onRejouer,
   onAutre,
   onQuit
@@ -366,6 +424,7 @@ function Fin({
   profile: Profile
   resultat: ResultatDactylo
   record: boolean
+  scores: ScorePhrase[]
   onRejouer: () => void
   onAutre: () => void
   onQuit: () => void
@@ -405,6 +464,20 @@ function Fin({
           <StatTile value={`${p} %`} label="de précision" detail={`${resultat.erreurs} erreur${resultat.erreurs > 1 ? 's' : ''}`} />
           <StatTile value={formatDuree(resultat.dureeMs)} label="de frappe" detail={`${resultat.phrases} phrase${resultat.phrases > 1 ? 's' : ''}`} />
         </div>
+        {scores.length > 0 && (
+          <div className="fin-phrases">
+            <h3 className="fin-phrases-titre">Phrase par phrase</h3>
+            <ol className="fin-phrases-liste">
+              {scores.map((s, i) => (
+                <li key={i} className="fin-phrase">
+                  <span className="fin-phrase-num">{i + 1}</span>
+                  <span className="fin-phrase-texte">{s.phrase}</span>
+                  <ScoreLigne score={s} profile={profile} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
         {aTravailler.length > 0 && (
           <p className="fin-travail">
             Touches à travailler :{' '}

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { defaultAppData, looksLikeAppData, newProfile, normalizeAppData } from '../src/shared/data'
+import { CLASSES, defaultAppData, looksLikeAppData, newProfile, normalizeAppData } from '../src/shared/data'
+
+const profil = (id: string, prenom: string) => ({ ...newProfile(id, '2026-01-01T00:00:00.000Z', 'CM1'), prenom })
 
 describe('normalizeAppData', () => {
   it('renvoie les valeurs par défaut pour une entrée invalide', () => {
@@ -8,7 +10,7 @@ describe('normalizeAppData', () => {
   })
 
   it('garde un profil valide tel quel', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa', niveau: 3 }
+    const p = { ...profil('a1', 'Léa'), niveau: 3, classe: 'CE2' as const, age: 8 }
     const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '4321', volume: 0.5 } })
     expect(data.profiles).toEqual([p])
     expect(data.settings).toEqual({ codeErgo: '4321', volume: 0.5 })
@@ -17,21 +19,50 @@ describe('normalizeAppData', () => {
   it('remplace les champs invalides et écarte les profils inutilisables', () => {
     const data = normalizeAppData({
       profiles: [
-        { id: 'a', prenom: '  Tom  ', niveau: 9, couleurPrincipale: 'violet', avatar: { coiffure: 'inconnue', style: 'robot' } },
-        { id: 'b', prenom: '   ' },
-        { prenom: 'Sans id' },
-        { id: 'a', prenom: 'Doublon' }
+        { id: 'a', prenom: '  Tom  ', classe: '6ème', niveau: 9, couleurPrincipale: 'violet', avatar: { coiffure: 'inconnue', style: 'robot' } },
+        { id: 'b', prenom: '   ', classe: 'CP' },
+        { prenom: 'Sans id', classe: 'CP' },
+        { id: 'a', prenom: 'Doublon', classe: 'CP' }
       ],
       settings: { codeErgo: '12', volume: 5 }
     })
     expect(data.profiles).toHaveLength(1)
     const tom = data.profiles[0]
     expect(tom.prenom).toBe('Tom')
+    expect(tom.classe).toBe('6ème')
+    expect(tom.age).toBeNull()
     expect(tom.niveau).toBe(1)
-    expect(tom.couleurPrincipale).toBe(newProfile('x', '').couleurPrincipale)
+    expect(tom.couleurPrincipale).toBe(newProfile('x', '', 'CP').couleurPrincipale)
     expect(tom.avatar.style).toBe('robot')
     expect(tom.avatar.coiffure).toBe('courts')
     expect(data.settings).toEqual(defaultAppData().settings)
+  })
+})
+
+describe('classe et âge du profil', () => {
+  it('propose les classes du CP à la Terminale', () => {
+    expect(CLASSES).toEqual(['CP', 'CE1', 'CE2', 'CM1', 'CM2', '6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'])
+  })
+
+  it('supprime les profils sans classe ou avec une classe inconnue, et leurs résultats', () => {
+    const sansClasse = profil('a', 'Léa') as Record<string, unknown>
+    delete sansClasse.classe
+    const date = '2026-02-01T00:00:00.000Z'
+    const data = normalizeAppData({
+      profiles: [sansClasse, { ...profil('b', 'Tom'), classe: 'CE7' }, profil('c', 'Inès')],
+      resultats: [
+        { id: 'r1', profileId: 'a', date, frappes: 10, erreurs: 1 },
+        { id: 'r2', profileId: 'c', date, frappes: 10, erreurs: 1 }
+      ]
+    })
+    expect(data.profiles.map((p) => p.prenom)).toEqual(['Inès'])
+    expect(data.resultats.map((r) => r.id)).toEqual(['r2'])
+  })
+
+  it('garde un âge de 6 à 18 ans, par année', () => {
+    const ages = [5, 6, 12, 18, 19, 8.5, '10']
+    const data = normalizeAppData({ profiles: ages.map((age, i) => ({ ...profil(`p${i}`, 'Léa'), age })) })
+    expect(data.profiles.map((p) => p.age)).toEqual([null, 6, 12, 18, null, null, null])
   })
 })
 
@@ -45,13 +76,13 @@ describe('looksLikeAppData', () => {
 
 describe('migration des données de la version 1', () => {
   it('ajoute les listes d’origine, les réglages Dactylo et un historique vide', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' } as Record<string, unknown>
+    const p = profil('a1', 'Léa') as Record<string, unknown>
     delete p.dactylo
     const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '1234', volume: 0.5 } })
-    expect(data.version).toBe(3)
+    expect(data.version).toBe(4)
     expect(data.listes.length).toBe(4)
     expect(data.resultats).toEqual([])
-    expect(data.profiles[0].dactylo).toEqual(newProfile('x', '').dactylo)
+    expect(data.profiles[0].dactylo).toEqual(newProfile('x', '', 'CP').dactylo)
   })
 
   it('garde une liste vide si l’ergothérapeute a tout supprimé', () => {
@@ -59,7 +90,7 @@ describe('migration des données de la version 1', () => {
   })
 
   it('écarte les résultats d’un profil supprimé', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const p = profil('a1', 'Léa')
     const r = { id: 'r', profileId: 'a1', date: '2026-02-01T00:00:00.000Z', frappes: 10, erreurs: 1, erreursParTouche: { é: 1 } }
     const data = normalizeAppData({ profiles: [p], resultats: [r, { ...r, id: 'r2', profileId: 'autre' }] })
     expect(data.resultats.map((x) => x.id)).toEqual(['r'])
@@ -69,7 +100,7 @@ describe('migration des données de la version 1', () => {
 
 describe('migration vers la version 3', () => {
   it('ajoute les listes de mots et lit les résultats des nouveaux jeux', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const p = profil('a1', 'Léa')
     const date = '2026-02-01T00:00:00.000Z'
     const data = normalizeAppData({
       version: 2,
@@ -79,7 +110,7 @@ describe('migration vers la version 3', () => {
         { id: 'm', profileId: 'a1', date, jeu: 'memoire', listeNom: 'Animaux', mots: 5, trouves: 4, erreurs: 2, dureeMs: 40000 }
       ]
     })
-    expect(data.version).toBe(3)
+    expect(data.version).toBe(4)
     expect(data.mots.length).toBe(4)
     expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5 })
     expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
@@ -102,7 +133,7 @@ describe('questions du quiz de l’ergothérapeute', () => {
 
 describe('Chasse aux lettres', () => {
   it('garde l’aventure choisie et prend la fusée pour les anciennes parties', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const p = profil('a1', 'Léa')
     const base = { profileId: 'a1', date: '2026-02-01T00:00:00.000Z', jeu: 'espace', serieNom: 'Ligne du milieu', dureeMs: 60000, detruites: 12, manquees: 2, erreurs: 1, lettresRatees: { k: 2 } }
     const data = normalizeAppData({
       profiles: [p],

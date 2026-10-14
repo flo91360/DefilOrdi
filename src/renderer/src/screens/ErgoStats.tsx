@@ -18,7 +18,7 @@ import { LineChart, type Point } from '../components/LineChart'
 import { ConfirmDialog } from '../components/Modal'
 import { IconBack, IconCheck, IconDownload, IconTrash } from '../components/Icons'
 import { pourcentage } from '../games/commun'
-import { formatDuree, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
+import { formatDuree, moyennesParJour, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
 import { cadence } from '../games/espace/engine'
 import { etatReponse, formatTemps } from '../games/petitbac/engine'
 import { construireBanque } from '../games/quiz/engine'
@@ -177,7 +177,10 @@ export function ErgoStats({ profile, resultats, questionsPerso, onSupprimer, onR
         <Avatar config={profile.avatar} fond={profile.couleurPrincipale} size={64} zoom />
         <div>
           <h1 className="ergo-title">{profile.prenom}</h1>
-          <p className="stats-sub">Niveau {profile.niveau}</p>
+          <p className="stats-sub">
+            Niveau {profile.niveau} · {profile.classe}
+            {profile.age !== null && ` · ${profile.age} ans`}
+          </p>
         </div>
         {parJeu[jeu].length > 0 && (
           <button className="btn btn-ghost stats-export" onClick={exporter}>
@@ -274,6 +277,8 @@ function StatsDactylo({ parties, onSupprimer }: { parties: ResultatDactylo[]; on
         </div>
       )}
 
+      <MoyennesParJour parties={parties} />
+
       <CarteErreurs
         titre="Erreurs par touche"
         sousTitre={recentes.length < parties.length ? `${recentes.length} dernières parties` : 'toutes les parties'}
@@ -283,6 +288,53 @@ function StatsDactylo({ parties, onSupprimer }: { parties: ResultatDactylo[]; on
 
       <Historique parties={parties} colonnes={COLONNES_DACTYLO} onSupprimer={onSupprimer} />
     </>
+  )
+}
+
+// Dactylo : moyenne de vitesse et de précision par jour d'utilisation, pour
+// voir la progression d'un jour à l'autre (pas dans l'export Excel).
+function MoyennesParJour({ parties }: { parties: ResultatDactylo[] }) {
+  const jours = moyennesParJour(parties)
+  const dateJour = (jour: string) => {
+    const [a, m, j] = jour.split('-').map(Number)
+    return new Date(a, m - 1, j)
+  }
+  const court = (jour: string) => dateJour(jour).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
+  const long = (jour: string) => dateJour(jour).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const pts = (y: (m: (typeof jours)[number]) => number): Point[] =>
+    jours.map((m) => ({ label: `${long(m.jour)} · ${m.parties} partie${m.parties > 1 ? 's' : ''}`, axe: court(m.jour), y: y(m) }))
+  return (
+    <div className="card">
+      <h2 className="card-title">
+        Moyenne par jour <span className="card-title-sub">({jours.length} jour{jours.length > 1 ? 's' : ''} d’utilisation)</span>
+      </h2>
+      {jours.length > 1 && (
+        <div className="stats-charts">
+          <LineChart titre="Vitesse moyenne (frappes justes par minute)" points={pts((m) => m.vitesse)} />
+          <LineChart titre="Précision moyenne" unite=" %" max={100} points={pts((m) => m.precision)} />
+        </div>
+      )}
+      <table className="patients-table history-table stats-jours">
+        <thead>
+          <tr>
+            <th>Jour</th>
+            <th className="num">Parties</th>
+            <th className="num">Frappes/min</th>
+            <th className="num">Précision</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...jours].reverse().map((m) => (
+            <tr key={m.jour}>
+              <td>{long(m.jour)}</td>
+              <td className="num">{m.parties}</td>
+              <td className="num">{m.vitesse}</td>
+              <td className="num">{m.precision} %</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
