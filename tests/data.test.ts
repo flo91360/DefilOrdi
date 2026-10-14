@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { CLASSES, defaultAppData, looksLikeAppData, newProfile, normalizeAppData } from '../src/shared/data'
+import { CLASSES, defaultAppData, defaultProgressionMemoire, looksLikeAppData, newProfile, normalizeAppData } from '../src/shared/data'
+import { defaultPhrasesMemoire } from '../src/shared/phrases'
 
 const profil = (id: string, prenom: string) => ({ ...newProfile(id, '2026-01-01T00:00:00.000Z', 'CM1'), prenom })
 
@@ -114,6 +115,40 @@ describe('migration vers la version 3', () => {
     expect(data.mots.length).toBe(4)
     expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5 })
     expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
+  })
+})
+
+describe('Mots à retenir : progression et phrases', () => {
+  it('ajoute une progression vide aux anciens profils et garde une progression valide', () => {
+    const ancien = profil('a', 'Léa') as Record<string, unknown>
+    delete ancien.memoire
+    const memoire = { progressionId: 'p1', palier: 8, reussites: 2, echecs: 1, listeId: 'mots-2' }
+    const data = normalizeAppData({
+      profiles: [ancien, { ...profil('b', 'Tom'), memoire }, { ...profil('c', 'Inès'), memoire: { ...memoire, palier: 9, reussites: -1 } }]
+    })
+    expect(data.profiles[0].memoire).toEqual(defaultProgressionMemoire())
+    expect(data.profiles[1].memoire).toEqual(memoire)
+    expect(data.profiles[2].memoire).toMatchObject({ palier: 3, reussites: 0, echecs: 1 })
+  })
+
+  it('remet les phrases d’origine aux anciennes sauvegardes et garde une liste vide', () => {
+    expect(normalizeAppData({ profiles: [] }).phrasesMemoire).toEqual(defaultPhrasesMemoire())
+    expect(normalizeAppData({ profiles: [], phrasesMemoire: [] }).phrasesMemoire).toEqual([])
+    expect(normalizeAppData({ profiles: [], phrasesMemoire: ['  Une  phrase. ', '', 3] }).phrasesMemoire).toEqual(['Une phrase.'])
+  })
+
+  it('lit les anciennes parties et les parties avec progression', () => {
+    const date = '2026-02-01T00:00:00.000Z'
+    const base = { profileId: 'a1', date, jeu: 'memoire', listeNom: 'Animaux', mots: 5, trouves: 5, erreurs: 0, dureeMs: 1000 }
+    const data = normalizeAppData({
+      profiles: [profil('a1', 'Léa')],
+      resultats: [
+        { ...base, id: 'ancienne' },
+        { ...base, id: 'nouvelle', progressionId: 'p1', palier: 8, phrase: 'Le chat dort.', reussie: false, palierSuivant: 8 }
+      ]
+    })
+    expect(data.resultats[0]).toMatchObject({ progressionId: '', palier: 0, phrase: '', reussie: true, palierSuivant: 0 })
+    expect(data.resultats[1]).toMatchObject({ progressionId: 'p1', palier: 8, phrase: 'Le chat dort.', reussie: false, palierSuivant: 8 })
   })
 })
 

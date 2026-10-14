@@ -27,6 +27,10 @@ le code et les commentaires aussi.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
+  Mots à retenir : difficulté progressive (paliers 3 à 7 mots puis phrase,
+  `avancerProgression`), progression mémorisée dans `Profile.memoire`, chaque
+  partie porte son `progressionId` ; phrases du palier phrase dans
+  `phrasesMemoire` (éditeur `screens/PhrasesMemoireEditor.tsx`, section Mots).
 - `src/renderer/src/games/espace/` : « Chasse aux lettres » (identifiant `espace`
   conservé), jeu en canvas. `engine.ts` = logique, commune aux aventures
   (testée dans `tests/espace.test.ts`) ; `themes.ts` = les aventures (noms,

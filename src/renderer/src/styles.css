@@ -2288,6 +2288,51 @@ th.num {
   text-align: center;
 }
 
+/* Palier « phrase » : la phrase à retenir, en grand */
+.memoire-phrase {
+  max-width: 1000px;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+  padding: 24px 32px;
+  border-radius: 20px;
+  background: var(--surface, #fff);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* « Reprendre ma partie » sur l'écran de choix */
+.memoire-reprendre {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 8px 0 4px;
+}
+
+.memoire-reprendre-info,
+.memoire-aide {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.memoire-aide {
+  margin: 0 0 12px;
+}
+
+/* Fin de partie : ce qui se passe ensuite (palier) */
+.memoire-progression {
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  margin: 0 0 12px;
+}
+
+.memoire-phrases-editor {
+  margin-top: 24px;
+}
+
 .mots-grille {
   display: flex;
   flex-wrap: wrap;
