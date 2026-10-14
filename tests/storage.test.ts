@@ -17,7 +17,7 @@ afterEach(async () => {
 
 const withProfile = (prenom: string) => ({
   ...defaultAppData(),
-  profiles: [{ ...newProfile(prenom, '2026-01-01T00:00:00.000Z'), prenom }]
+  profiles: [{ ...newProfile(prenom, '2026-01-01T00:00:00.000Z', 'CM1'), prenom }]
 })
 
 describe('Storage', () => {

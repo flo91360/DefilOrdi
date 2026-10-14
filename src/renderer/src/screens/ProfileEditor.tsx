@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import {
+  AGES,
   AVATAR_OPTIONS,
   type AvatarConfig,
+  type Classe,
+  CLASSES,
   COULEURS_PREFEREES,
   newProfile,
   PRENOM_MAX,
@@ -18,6 +21,7 @@ import { uid } from '../uid'
 
 const STEPS = [
   { id: 'prenom', titre: 'Prénom' },
+  { id: 'classe', titre: 'Classe' },
   { id: 'personnage', titre: 'Personnage' },
   { id: 'couleurs', titre: 'Couleurs' },
   { id: 'sons', titre: 'Sons' }
@@ -32,20 +36,27 @@ interface Props {
 }
 
 export function ProfileEditor({ initial, onCancel, onDone }: Props) {
-  const [draft, setDraft] = useState<Profile>(() => initial ?? newProfile(uid(), new Date().toISOString()))
+  // La classe d'un nouveau profil n'est pas choisie d'avance : l'enfant doit
+  // la sélectionner (CP sert seulement à remplir le brouillon).
+  const [draft, setDraft] = useState<Profile>(() => initial ?? newProfile(uid(), new Date().toISOString(), 'CP'))
+  const [classe, setClasse] = useState<Classe | null>(initial?.classe ?? null)
   const [step, setStep] = useState<StepId>('prenom')
   const index = STEPS.findIndex((s) => s.id === step)
   const prenomOk = draft.prenom.trim() !== ''
+  const classeOk = classe !== null
   const isLast = index === STEPS.length - 1
+  // Étapes accessibles : le prénom d'abord, puis la classe, obligatoires.
+  const accessible = (s: StepId) => s === 'prenom' || (prenomOk && (s === 'classe' || classeOk))
+  const peutSuivre = prenomOk && (step === 'prenom' || classeOk)
 
   const set = (patch: Partial<Profile>) => setDraft((d) => ({ ...d, ...patch }))
   const setAvatar = (patch: Partial<AvatarConfig>) => setDraft((d) => ({ ...d, avatar: { ...d.avatar, ...patch } }))
 
   const finish = () => {
-    if (prenomOk) onDone({ ...draft, prenom: draft.prenom.trim() })
+    if (prenomOk && classe) onDone({ ...draft, prenom: draft.prenom.trim(), classe })
   }
   const next = () => {
-    if (!prenomOk) return
+    if (!peutSuivre) return
     if (isLast) finish()
     else setStep(STEPS[index + 1].id)
   }
@@ -60,7 +71,7 @@ export function ProfileEditor({ initial, onCancel, onDone }: Props) {
             <button
               key={s.id}
               className={s.id === step ? 'step active' : i < index ? 'step done' : 'step'}
-              disabled={!prenomOk && s.id !== 'prenom'}
+              disabled={!accessible(s.id)}
               onClick={() => setStep(s.id)}
               aria-current={s.id === step ? 'step' : undefined}
             >
@@ -86,7 +97,10 @@ export function ProfileEditor({ initial, onCancel, onDone }: Props) {
           {step === 'prenom' && (
             <StepPrenom value={draft.prenom} onChange={(prenom) => set({ prenom })} onEnter={next} />
           )}
-          {step === 'personnage' && <StepPersonnage draft={draft} onChange={setAvatar} />}
+          {step === 'classe' && (
+            <StepClasse classe={classe} age={draft.age} onClasse={setClasse} onAge={(age) => set({ age })} />
+          )}
+          {step === 'personnage' &&<StepPersonnage draft={draft} onChange={setAvatar} />}
           {step === 'couleurs' && <StepCouleurs draft={draft} onChange={set} />}
           {step === 'sons' && <StepSons draft={draft} onChange={set} />}
         </section>
@@ -98,11 +112,11 @@ export function ProfileEditor({ initial, onCancel, onDone }: Props) {
         </button>
         <div className="editor-footer-right">
           {initial && !isLast && (
-            <button className="btn btn-soft btn-lg" onClick={finish} disabled={!prenomOk}>
+            <button className="btn btn-soft btn-lg" onClick={finish} disabled={!prenomOk || !classeOk}>
               <IconCheck /> Enregistrer
             </button>
           )}
-          <button className="btn btn-primary btn-lg" onClick={next} disabled={!prenomOk}>
+          <button className="btn btn-primary btn-lg" onClick={next} disabled={!peutSuivre}>
             {isLast ? (
               <>
                 <IconCheck /> {initial ? 'Enregistrer' : 'C’est parti !'}
@@ -136,6 +150,46 @@ function StepPrenom({ value, onChange, onEnter }: { value: string; onChange: (v:
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && onEnter()}
       />
+    </div>
+  )
+}
+
+function StepClasse({
+  classe,
+  age,
+  onClasse,
+  onAge
+}: {
+  classe: Classe | null
+  age: number | null
+  onClasse: (c: Classe) => void
+  onAge: (a: number | null) => void
+}) {
+  return (
+    <div className="step-body">
+      <h2 className="step-title">En quelle classe es-tu ?</h2>
+      <p className="step-help">Choisis ta classe pour continuer.</p>
+      <div className="profil-choix" role="radiogroup" aria-label="Classe">
+        {CLASSES.map((c) => (
+          <button key={c} role="radio" aria-checked={c === classe} className={c === classe ? 'chip selected' : 'chip'} onClick={() => onClasse(c)}>
+            {c}
+          </button>
+        ))}
+      </div>
+      <h3 className="step-subtitle">Quel âge as-tu ?</h3>
+      <div className="profil-choix" role="radiogroup" aria-label="Âge">
+        {AGES.map((a) => (
+          <button
+            key={a}
+            role="radio"
+            aria-checked={a === age}
+            className={a === age ? 'chip selected' : 'chip'}
+            onClick={() => onAge(a === age ? null : a)}
+          >
+            {a} ans
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

@@ -6,7 +6,8 @@ import { defaultListes, defaultListesMots, type ListePhrases } from './phrases'
 
 export type { ListePhrases }
 
-export const DATA_VERSION = 3
+// 4 : classe obligatoire et âge dans le profil.
+export const DATA_VERSION = 4
 
 export type AvatarStyle = 'personnage' | 'robot'
 
@@ -29,10 +30,22 @@ export interface AvatarConfig {
   couleurLed: string
 }
 
+// Classe de l'enfant, du CP à la Terminale : elle fixe les seuils de vitesse
+// du jeu Dactylo (src/renderer/src/games/dactylo/seuils.ts).
+export const CLASSES = ['CP', 'CE1', 'CE2', 'CM1', 'CM2', '6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'] as const
+export type Classe = (typeof CLASSES)[number]
+
+// Âge de l'enfant, simple information (n'intervient dans aucun calcul).
+export const AGE_MIN = 6
+export const AGE_MAX = 18
+export const AGES = Array.from({ length: AGE_MAX - AGE_MIN + 1 }, (_, i) => AGE_MIN + i)
+
 export interface Profile {
   id: string
   prenom: string
   creeLe: string
+  classe: Classe
+  age: number | null // null = non renseigné
   avatar: AvatarConfig
   couleurPrincipale: string
   couleurSecondaire: string
@@ -270,11 +283,13 @@ export function defaultAvatar(): AvatarConfig {
   }
 }
 
-export function newProfile(id: string, creeLe: string): Profile {
+export function newProfile(id: string, creeLe: string, classe: Classe): Profile {
   return {
     id,
     prenom: '',
     creeLe,
+    classe,
+    age: null,
     avatar: defaultAvatar(),
     couleurPrincipale: COULEURS_PREFEREES[7],
     couleurSecondaire: COULEURS_PREFEREES[2],
@@ -327,14 +342,19 @@ function normalizeAvatar(v: unknown): AvatarConfig {
   return out
 }
 
+// Un profil sans prénom ou sans classe est écarté : la classe est obligatoire
+// depuis l'arrivée des seuils de vitesse de Dactylo (les quelques profils
+// créés avant n'en avaient pas et sont supprimés).
 function normalizeProfile(v: unknown): Profile | null {
   if (!isObj(v) || typeof v.id !== 'string' || v.id === '') return null
-  const d = newProfile(v.id, typeof v.creeLe === 'string' ? v.creeLe : new Date(0).toISOString())
+  if (typeof v.classe !== 'string' || !(CLASSES as readonly string[]).includes(v.classe)) return null
+  const d = newProfile(v.id, typeof v.creeLe === 'string' ? v.creeLe : new Date(0).toISOString(), v.classe as Classe)
   const prenom = typeof v.prenom === 'string' ? v.prenom.trim().slice(0, PRENOM_MAX) : ''
   if (prenom === '') return null
   return {
     ...d,
     prenom,
+    age: typeof v.age === 'number' && AGES.includes(v.age) ? v.age : null,
     avatar: normalizeAvatar(v.avatar),
     couleurPrincipale: pick(v.couleurPrincipale, COULEURS_PREFEREES, d.couleurPrincipale),
     couleurSecondaire: pick(v.couleurSecondaire, COULEURS_PREFEREES, d.couleurSecondaire),

@@ -20,7 +20,10 @@ le code et les commentaires aussi.
 - `src/renderer/src/sounds.ts` : sons synthétisés (Web Audio), pas de fichiers.
 - `src/renderer/src/theme.ts` : couleurs de l'enfant en variables CSS.
 - `src/renderer/src/games/dactylo/` : jeu Dactylo ; `engine.ts` contient toute
-  la logique et les règles de comptage (testées dans `tests/engine.test.ts`).
+  la logique et les règles de comptage (testées dans `tests/engine.test.ts`) ;
+  `seuils.ts` réunit dans `SEUILS_DACTYLO` les seuils des smileys du score de
+  chaque phrase (vitesse selon la classe du profil, précision), testés dans
+  `tests/score.test.ts`. Les scores par phrase ne sont pas enregistrés.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.

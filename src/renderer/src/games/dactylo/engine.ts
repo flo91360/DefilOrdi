@@ -132,6 +132,40 @@ export function precision(s: Pick<Stats, 'frappes' | 'erreurs'>): number {
   return Math.round(((s.frappes - s.erreurs) / s.frappes) * 100)
 }
 
+// Score d'une phrase, avec les mêmes règles de comptage que la partie.
+export function scorePhrase(e: EtatPhrase, now: number): { vitesse: number; precision: number } {
+  const s = { dureeMs: dureePhrase(e, now), frappes: e.frappes, erreurs: e.erreurs }
+  return { vitesse: vitesse(s), precision: precision(s) }
+}
+
+export interface MoyenneJour {
+  jour: string // AAAA-MM-JJ, heure locale
+  parties: number
+  vitesse: number
+  precision: number
+}
+
+// Moyennes par jour d'utilisation (statistiques de l'ergothérapeute) : les
+// parties d'un même jour sont cumulées, puis vitesse et précision calculées
+// sur ce total. Jours dans l'ordre chronologique.
+export function moyennesParJour(parties: (Pick<Stats, 'dureeMs' | 'frappes' | 'erreurs'> & { date: string })[]): MoyenneJour[] {
+  const jours = new Map<string, { parties: number; dureeMs: number; frappes: number; erreurs: number }>()
+  for (const p of parties) {
+    const d = new Date(p.date)
+    if (Number.isNaN(d.getTime())) continue
+    const jour = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const t = jours.get(jour) ?? { parties: 0, dureeMs: 0, frappes: 0, erreurs: 0 }
+    t.parties += 1
+    t.dureeMs += p.dureeMs
+    t.frappes += p.frappes
+    t.erreurs += p.erreurs
+    jours.set(jour, t)
+  }
+  return [...jours.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([jour, t]) => ({ jour, parties: t.parties, vitesse: vitesse(t), precision: precision(t) }))
+}
+
 export function cumuler(phrases: EtatPhrase[], now: number): Stats & { erreursParTouche: Record<string, number> } {
   const erreursParTouche: Record<string, number> = {}
   let dureeMs = 0

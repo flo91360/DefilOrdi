@@ -77,7 +77,7 @@ describe('Petit bac : données', () => {
   })
 
   it('lit les résultats du petit bac', () => {
-    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z'), prenom: 'Léa' }
+    const p = { ...newProfile('a1', '2026-01-01T00:00:00.000Z', 'CM1'), prenom: 'Léa' }
     const data = normalizeAppData({
       profiles: [p],
       resultats: [

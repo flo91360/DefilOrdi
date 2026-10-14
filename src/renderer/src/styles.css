@@ -1453,6 +1453,108 @@ h3 {
   color: var(--success);
 }
 
+/* Score d'une phrase (vitesse et précision avec leur smiley) */
+.phrase-score {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink, #2b2220);
+}
+
+.phrase-score-precedente {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.score-titre {
+  font-weight: 800;
+}
+
+.score-phrase {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.score-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.smiley {
+  display: inline-block;
+  flex: none;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.fin-phrases {
+  margin: 24px 0 0;
+  padding: 18px 24px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.fin-phrases-titre {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.fin-phrases-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fin-phrase {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  font-size: 17px;
+}
+
+.fin-phrase-num {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 900;
+}
+
+.fin-phrase-texte {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profil-choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.stats-jours {
+  width: 100%;
+}
+
 .erreur-texte {
   color: var(--danger);
 }
