@@ -1,9 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.2 — 2026-10-14
-<!-- planifikateur:b145c7e9-ab21-48e6-8ceb-06c8bc306917 -->
+## 0.8.2 (2026-10-14)
 
-- **amélioration jeu "mot à retenir"** : « Mots à retenir » a maintenant une difficulté progressive, mémorisée dans le profil de chaque enfant. Je n'ai pas pu lancer la vérification des types, les tests ni le build : le bac à sable bloque toutes les commandes. C'est le worker qui les lancera. **Règles de progression** (écrites dans le moteur `games/memoire/engine.ts`) - Les paliers vont de 3 à 7 mots. Le palier suivant est la phrase, qui remplace l'ancien choix « 8 mots ». - Une partie est réussie quand tous les mots, ou toute la phrase, sont retrouvés. - 3 réussites consécutives font monter d'un palier, quel que soit le nombre de mots de départ. - Un échec fait rejouer au même palier. Un 2e échec consécutif fait descendre d'un palier, même sous le palier de départ, mais jamais sous 3 mots. - Une réussite remet les échecs à zéro, et un échec remet les réussites à zéro. À chaque changement de palier, les deux compteurs repartent à zéro. - Arrêter pendant la recherche des mots compte comme un échec. Arrêter pendant le temps de mémorisation ne compte pas. - Au palier phrase, on reste à la phrase même après d'autres réussites. **Vérification des réponses** - Moins de 5 mots : le mot doit être écrit exactement, accents et majuscules compris. C'est un changement : avant, ils ne comptaient jamais. - De 5 à 7 mots : accents et majuscules ne comptent pas. - Phrase : accents, majuscules et ponctuation ne comptent pas. Elle est réussie seulement si tous les mots sont justes, dans l'ordre et sans mot en trop. Un mot oublié ne décale pas les suivants. L'enfant peut réessayer : les mots bien placés de son meilleur essai s'affichent. - Les sons d'erreur restent ceux choisis par l'enfant, avec le même délai entre deux sons. **Phrases fournies** - 12 phrases de 10 à 12 mots, toutes tapables au clavier AZERTY. - L'ergothérapeute les modifie dans l'espace ergothérapeute, section Mots, sous les listes de mots. Il y a aussi un bouton « Restaurer les phrases d'origine ». - Si la liste est vide, le jeu reprend les phrases d'orig
+- Carte amélioration jeu "mot à retenir" (b145c7e9-ab21-48e6-8ceb-06c8bc306917) (#11)
 
 ## 0.8.1 (2026-10-14)
 
