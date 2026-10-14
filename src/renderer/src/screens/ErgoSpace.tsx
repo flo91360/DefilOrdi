@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { type AppData, isValidCode, NIVEAUX, type OptionsDactylo, type Profile } from '../../../shared/data'
 import { api, isDesktop } from '../api'
 import { Avatar } from '../avatar/Avatar'
@@ -11,6 +11,7 @@ import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
 import { PetitBacEditor } from './PetitBacEditor'
 import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
+import { PhrasesMemoireEditor } from './PhrasesMemoireEditor'
 import { QuizEditor } from './QuizEditor'
 import { Logo } from './ProfilePicker'
 
@@ -25,7 +26,7 @@ const TEXTES_PHRASES: TextesEditeur = {
 
 const TEXTES_MOTS: TextesEditeur = {
   titre: 'Mots',
-  aide: 'Les listes de mots du jeu Mots à retenir. À chaque partie, quelques mots sont tirés au hasard dans la liste choisie : prévoyez-en au moins 8 par liste. Un mot par ligne.',
+  aide: 'Les listes de mots du jeu Mots à retenir. À chaque partie, quelques mots sont tirés au hasard dans la liste choisie : prévoyez-en au moins 7 par liste. Le nombre de mots augmente après 3 réussites et redescend après 2 échecs ; après 7 mots, l’enfant retient une phrase (voir plus bas). Un mot par ligne.',
   element: 'mot',
   origine: defaultListesMots
 }
@@ -91,13 +92,32 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
               onChange={(questionsPerso, questionsMasquees) => onChange({ ...data, questionsPerso, questionsMasquees })}
             />
           )}
-          {section === 'mots' && <PhrasesEditor textes={TEXTES_MOTS} listes={data.mots} onChange={(mots) => onChange({ ...data, mots })} />}
+          {section === 'mots' && <MotsSection data={data} onChange={onChange} />}
           {section === 'petitbac' && <PetitBacEditor reglages={data.petitBac} onChange={(petitBac) => onChange({ ...data, petitBac })} />}
           {section === 'reglages' && <Reglages data={data} onChange={onChange} />}
           {section === 'sauvegarde' && <Sauvegarde data={data} onChange={onChange} />}
         </main>
       </div>
     </div>
+  )
+}
+
+// Section Mots : listes de mots et phrases du palier « phrase ». Les deux
+// éditeurs peuvent enregistrer en même temps (en quittant la section) :
+// chacun part des données les plus récentes.
+function MotsSection({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
+  const dataRef = useRef(data)
+  dataRef.current = data
+  const modifier = (changement: Partial<AppData>) => {
+    const d = { ...dataRef.current, ...changement }
+    dataRef.current = d
+    onChange(d)
+  }
+  return (
+    <>
+      <PhrasesEditor textes={TEXTES_MOTS} listes={data.mots} onChange={(mots) => modifier({ mots })} />
+      <PhrasesMemoireEditor phrases={data.phrasesMemoire} onChange={(phrasesMemoire) => modifier({ phrasesMemoire })} />
+    </>
   )
 }
 

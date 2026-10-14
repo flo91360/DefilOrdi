@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type AppData, type JeuId, type Profile, type Resultat } from '../../shared/data'
+import { type AppData, type JeuId, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
 import { api } from './api'
 import { themeStyle } from './theme'
 import { setVolume } from './sounds'
@@ -69,6 +69,12 @@ export function App() {
     if (d) update({ ...d, resultats: [...d.resultats, r] })
   }
 
+  // Progression de « Mots à retenir », mémorisée dans le profil de l'enfant.
+  const saveProgressionMemoire = (profileId: string, memoire: ProgressionMemoire) => {
+    const d = dataRef.current
+    if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, memoire } : p)) })
+  }
+
   const saveProfile = (p: Profile) => {
     const exists = data.profiles.some((x) => x.id === p.id)
     update({ ...data, profiles: exists ? data.profiles.map((x) => (x.id === p.id ? p : x)) : [...data.profiles, p] })
@@ -105,7 +111,14 @@ export function App() {
         onQuit: () => setScreen({ name: 'hub', profileId: active.id })
       }
       if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} />
-      else if (screen.jeu === 'memoire') content = <Memoire {...commun} listes={data.mots} />
+      else if (screen.jeu === 'memoire') content = (
+          <Memoire
+            {...commun}
+            listes={data.mots}
+            phrases={data.phrasesMemoire}
+            onProgression={(m) => saveProgressionMemoire(active.id, m)}
+          />
+        )
       else if (screen.jeu === 'espace') content = <Espace {...commun} />
       else if (screen.jeu === 'quiz') content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
       else if (screen.jeu === 'petitbac') content = <PetitBac {...commun} reglages={data.petitBac} />

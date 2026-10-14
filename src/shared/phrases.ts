@@ -78,6 +78,25 @@ export function defaultListes(): ListePhrases[] {
   ]
 }
 
+// Phrases du palier « phrase » de « Mots à retenir » : une vraie phrase
+// d'environ 10 mots, à retaper de tête et dans l'ordre.
+export function defaultPhrasesMemoire(): string[] {
+  return [
+    'Le petit chat gris dort au soleil sur le muret.',
+    'Ce matin, ma cousine a mangé deux tartines avec du miel.',
+    'Nous partirons en vacances à la mer au mois de juillet.',
+    'Le chien du voisin aboie très fort quand le facteur passe.',
+    'Mon grand frère joue au football tous les mercredis après midi.',
+    'La maîtresse a lu une histoire de pirates à toute la classe.',
+    'Il faut bien arroser les fleurs du jardin quand il fait chaud.',
+    'Papa prépare une soupe de légumes pour le repas de ce soir.',
+    'Les oiseaux construisent leur nid en haut du grand chêne vert.',
+    'Mamie nous a offert un gros gâteau au chocolat pour la fête.',
+    'Le train pour Paris partira dans dix minutes du quai numéro deux.',
+    'Après la pluie, nous avons sauté dans les flaques avec nos bottes.'
+  ]
+}
+
 // Listes de mots du jeu « Mots à retenir » (même format : un mot par ligne).
 export function defaultListesMots(): ListePhrases[] {
   return [

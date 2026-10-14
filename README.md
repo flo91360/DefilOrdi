@@ -54,11 +54,19 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   10 ou 20 manches ; 4 couleurs au niveau 1, jusqu'à 8 au niveau 4. Sont
   mesurés : bonnes réponses, pièges déjoués (mot et encre différents), temps
   moyen de réponse.
-- **Mots à retenir** : quelques mots s'affichent (3 à 8, selon le niveau par
-  défaut), l'enfant les mémorise puis les retape de tête dans l'ordre qu'il
-  veut. Accents et majuscules ne comptent pas. Sont mesurés : mots retrouvés,
-  mots proposés en trop, temps.
-- Espace ergothérapeute : section **Mots** pour modifier les listes de mots, et
+- **Mots à retenir** : quelques mots s'affichent (3 à 7), l'enfant les
+  mémorise puis les retape de tête dans l'ordre qu'il veut. Moins de 5 mots :
+  ils doivent être écrits exactement ; de 5 à 7 mots, accents et majuscules ne
+  comptent pas. Difficulté progressive : 3 réussites consécutives (tous les
+  mots retrouvés) ajoutent un mot ; un échec fait rejouer au même palier, deux
+  échecs consécutifs retirent un mot (jamais moins de 3) ; les compteurs
+  repartent à zéro à chaque changement de palier. Après 7 mots, l'enfant
+  retient une vraie phrase d'environ 10 mots et la retape entière, dans l'ordre
+  (accents, majuscules et ponctuation tolérés). La progression est mémorisée
+  dans le profil (« Reprendre ma partie ») ; un nouveau départ la remplace,
+  mais toutes les progressions restent dans les statistiques. Sont mesurés :
+  mots retrouvés, mots proposés en trop, temps, palier.
+- Espace ergothérapeute : section **Mots** pour modifier les listes de mots et les phrases à retenir, et
   un onglet par jeu dans les statistiques de chaque enfant (courbes,
   historique, export Excel).
 

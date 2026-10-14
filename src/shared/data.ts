@@ -2,7 +2,7 @@
 // Toute donnée lue (fichier, import de sauvegarde) passe par normalizeAppData :
 // un champ absent ou invalide est remplacé par sa valeur par défaut.
 
-import { defaultListes, defaultListesMots, type ListePhrases } from './phrases'
+import { defaultListes, defaultListesMots, defaultPhrasesMemoire, type ListePhrases } from './phrases'
 
 export type { ListePhrases }
 
@@ -54,6 +54,29 @@ export interface Profile {
   // Réglé par l'ergothérapeute : 1 (débutant) à 4 (expert)
   niveau: number
   dactylo: OptionsDactylo
+  memoire: ProgressionMemoire
+}
+
+// « Mots à retenir » : paliers de difficulté. 3 à 7 = nombre de mots à
+// retenir ; PALIER_PHRASE (à la place de l'ancien palier à 8 mots) = une
+// vraie phrase d'environ 10 mots à retaper dans l'ordre.
+export const PALIER_MIN = 3
+export const PALIER_PHRASE = 8
+export const PALIERS_MEMOIRE = [3, 4, 5, 6, 7, PALIER_PHRASE] as const
+
+// Progression mémorisée dans le profil (bouton « Reprendre ma partie »).
+// Un nouveau départ choisi par l'enfant la remplace ; les parties de
+// l'ancienne progression restent dans l'historique (progressionId).
+export interface ProgressionMemoire {
+  progressionId: string // '' = aucune progression commencée
+  palier: number
+  reussites: number // réussites consécutives au palier courant
+  echecs: number // échecs consécutifs au palier courant
+  listeId: string // liste de mots utilisée, reprise avec la partie
+}
+
+export function defaultProgressionMemoire(): ProgressionMemoire {
+  return { progressionId: '', palier: PALIER_MIN, reussites: 0, echecs: 0, listeId: '' }
 }
 
 // Réglages du jeu de dactylographie, propres à chaque enfant.
@@ -104,10 +127,15 @@ export interface ResultatMemoire {
   jeu: 'memoire'
   date: string
   listeNom: string
-  mots: number // mots à retenir
+  mots: number // mots à retenir (palier phrase : mots de la phrase)
   trouves: number
   erreurs: number // mots proposés qui n'étaient pas dans la liste
   dureeMs: number // temps de rappel
+  progressionId: string // '' = partie jouée avant la difficulté progressive
+  palier: number // 3 à 7 mots, PALIER_PHRASE = phrase ; 0 = inconnu (ancienne partie)
+  phrase: string // phrase à retaper (palier phrase), '' sinon
+  reussie: boolean // tous les mots (ou la phrase) retrouvés
+  palierSuivant: number // palier de la partie suivante (0 = inconnu)
 }
 
 // Une partie de « Chasse aux lettres » (identifiant historique : 'espace').
@@ -229,6 +257,7 @@ export interface AppData {
   profiles: Profile[]
   listes: ListePhrases[] // phrases du jeu Dactylo
   mots: ListePhrases[] // listes de mots du jeu Mots à retenir
+  phrasesMemoire: string[] // phrases du palier « phrase » de Mots à retenir
   questionsPerso: QuestionPerso[]
   questionsMasquees: string[] // questions fournies désactivées par l'ergothérapeute
   petitBac: ReglagesPetitBac
@@ -296,7 +325,8 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
     sonReussite: SONS_REUSSITE[0],
     sonEchec: SONS_ECHEC[0],
     niveau: 1,
-    dactylo: defaultOptionsDactylo()
+    dactylo: defaultOptionsDactylo(),
+    memoire: defaultProgressionMemoire()
   }
 }
 
@@ -310,6 +340,7 @@ export function defaultAppData(): AppData {
     profiles: [],
     listes: defaultListes(),
     mots: defaultListesMots(),
+    phrasesMemoire: defaultPhrasesMemoire(),
     questionsPerso: [],
     questionsMasquees: [],
     petitBac: defaultPetitBac(),
@@ -361,8 +392,33 @@ function normalizeProfile(v: unknown): Profile | null {
     sonReussite: pick(v.sonReussite, SONS_REUSSITE, d.sonReussite),
     sonEchec: pick(v.sonEchec, SONS_ECHEC, d.sonEchec),
     niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
-    dactylo: normalizeOptions(v.dactylo)
+    dactylo: normalizeOptions(v.dactylo),
+    memoire: normalizeProgressionMemoire(v.memoire)
   }
+}
+
+function palierValide(v: unknown): v is number {
+  return typeof v === 'number' && (PALIERS_MEMOIRE as readonly number[]).includes(v)
+}
+
+function normalizeProgressionMemoire(v: unknown): ProgressionMemoire {
+  const d = defaultProgressionMemoire()
+  if (!isObj(v)) return d
+  return {
+    progressionId: typeof v.progressionId === 'string' ? v.progressionId.slice(0, 60) : '',
+    palier: palierValide(v.palier) ? v.palier : d.palier,
+    reussites: count(v.reussites),
+    echecs: count(v.echecs),
+    listeId: typeof v.listeId === 'string' ? v.listeId.slice(0, 60) : ''
+  }
+}
+
+// Phrases du palier « phrase » : une par ligne, espaces superflus retirés.
+export function nettoyerPhrases(lignes: unknown[]): string[] {
+  return lignes
+    .filter((p): p is string => typeof p === 'string')
+    .map((p) => p.trim().replace(/\s+/g, ' ').slice(0, PHRASE_MAX))
+    .filter((p) => p !== '')
 }
 
 function normalizeOptions(v: unknown): OptionsDactylo {
@@ -482,13 +538,19 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
   }
   if (v.jeu === 'memoire') {
     const mots = count(v.mots)
+    const trouves = Math.min(count(v.trouves), mots)
     return {
       ...base,
       jeu: 'memoire',
       listeNom: typeof v.listeNom === 'string' ? v.listeNom.slice(0, NOM_LISTE_MAX) : '',
       mots,
-      trouves: Math.min(count(v.trouves), mots),
-      erreurs: count(v.erreurs)
+      trouves,
+      erreurs: count(v.erreurs),
+      progressionId: typeof v.progressionId === 'string' ? v.progressionId.slice(0, 60) : '',
+      palier: palierValide(v.palier) ? v.palier : 0,
+      phrase: typeof v.phrase === 'string' ? v.phrase.slice(0, PHRASE_MAX) : '',
+      reussie: typeof v.reussie === 'boolean' ? v.reussie : mots > 0 && trouves === mots,
+      palierSuivant: palierValide(v.palierSuivant) ? v.palierSuivant : 0
     }
   }
   if (v.jeu === 'espace') {
@@ -567,6 +629,9 @@ export function normalizeAppData(v: unknown): AppData {
   const mots = Array.isArray(v.mots)
     ? v.mots.map(normalizeListe).filter((l): l is ListePhrases => l !== null)
     : d.mots
+  // Phrases absentes (ancienne sauvegarde) : celles d'origine. Une liste vide
+  // est gardée (le jeu reprend alors les phrases d'origine).
+  const phrasesMemoire = Array.isArray(v.phrasesMemoire) ? nettoyerPhrases(v.phrasesMemoire) : d.phrasesMemoire
   const questionsPerso = (Array.isArray(v.questionsPerso) ? v.questionsPerso : [])
     .map(normalizeQuestionPerso)
     .filter((q): q is QuestionPerso => q !== null)
@@ -583,6 +648,7 @@ export function normalizeAppData(v: unknown): AppData {
     profiles,
     listes,
     mots,
+    phrasesMemoire,
     questionsPerso,
     questionsMasquees,
     petitBac: normalizePetitBac(v.petitBac),
