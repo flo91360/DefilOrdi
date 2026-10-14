@@ -78,8 +78,31 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
   `v<version>`, puis la Release dont les notes listent les commits depuis le tag
   précédent ; `CHANGELOG.md` (toutes les versions) est joint, fabriqué par
   `scripts/changelog.mjs` à partir des tags, puis recopié par la CI à la racine
-  du dépôt sur main (ne pas le modifier à la main) : écrire des messages de
-  commit lisibles par l'ergothérapeute. PlaniFiKateur archive ses .exe dans Google Drive.
+  du dépôt sur main (ne pas le modifier à la main). Le texte de chaque version
+  vient de `changements.md` (voir « Description des changements ») ; à défaut,
+  des sujets de commit. PlaniFiKateur archive ses .exe dans Google Drive.
 - Fusion des PR (demandé par le propriétaire du dépôt) : quand la CI d'une PR
   ouverte par Claude est verte et qu'aucun commentaire de relecture n'attend de
   réponse, Claude la fusionne lui-même dans main (squash), sans demander.
+
+## Description des changements
+
+À chaque livraison, remplacer entièrement le contenu de la section
+`## Prochaine version` de `changements.md` par la description de ce que la
+livraison change. Le numéro de version n'est pas nécessaire (il peut être
+choisi par le worker). Au tag de la version, `scripts/changelog.mjs` lit cette
+section telle qu'elle était à ce tag : elle devient le texte de la version
+dans `CHANGELOG.md` et dans les notes de la Release.
+
+- Lectrice : l'ergothérapeute, non technicienne. Français clair, sans jargon
+  (pas de nom de fichier, de fonction, de CI, de PR, d'identifiant de carte).
+- Une puce par changement visible, qui dit ce qu'elle verra ou pourra faire :
+  « Petit bac : les catégories peuvent être modifiées dans l'espace ergo. »
+  Commencer par le nom du jeu ou de l'écran concerné quand il y en a un.
+- Distinguer si utile nouveautés, améliorations et corrections ; ne jamais
+  reprendre le simple titre de la carte.
+- Changement purement interne (fabrication du .exe, tests…) : une seule puce
+  courte, par exemple « Améliorations internes, sans changement visible. »
+- N'écrire que ce que la livraison change réellement.
+- Corriger une version déjà publiée : ajouter une section `## <version>` (ex.
+  `## 0.8.2`), prioritaire sur le reste ; ne jamais modifier les tags.
