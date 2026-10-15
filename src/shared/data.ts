@@ -118,6 +118,20 @@ export interface ResultatCouleurs {
   dureeMs: number // temps total de réponse
   piegesJustes: number // réponses justes quand le mot et l'encre diffèrent
   pieges: number
+  indices: number // clics sur le bouton Indice pendant la partie (0 pour les anciennes parties)
+}
+
+// Couleurs piégées : bouton Indice, réglé par l'ergothérapeute pour tous les profils.
+export const INDICES_PAR_PARTIE = [0, 1, 2, 3] as const // 0 = bouton supprimé
+export const PROPOSITIONS_DEPART = [2, 3, 4] as const
+
+export interface ReglagesCouleurs {
+  indicesParPartie: number // indices disponibles par partie
+  propositionsDepart: number // propositions du 1er indice, +1 à chaque indice suivant (4 au plus)
+}
+
+export function defaultCouleurs(): ReglagesCouleurs {
+  return { indicesParPartie: 3, propositionsDepart: 2 }
 }
 
 // Une partie de « Mots à retenir ».
@@ -261,6 +275,7 @@ export interface AppData {
   questionsPerso: QuestionPerso[]
   questionsMasquees: string[] // questions fournies désactivées par l'ergothérapeute
   petitBac: ReglagesPetitBac
+  couleurs: ReglagesCouleurs
   resultats: Resultat[]
   settings: Settings
 }
@@ -344,6 +359,7 @@ export function defaultAppData(): AppData {
     questionsPerso: [],
     questionsMasquees: [],
     petitBac: defaultPetitBac(),
+    couleurs: defaultCouleurs(),
     resultats: [],
     settings: { codeErgo: '0000', volume: 0.7 }
   }
@@ -510,6 +526,20 @@ function normalizePetitBac(v: unknown): ReglagesPetitBac {
   return { categories, lettres }
 }
 
+function choix(v: unknown, permis: readonly number[], defaut: number): number {
+  return typeof v === 'number' && permis.includes(v) ? v : defaut
+}
+
+// Réglages absents (ancienne sauvegarde) : bouton Indice disponible.
+function normalizeCouleurs(v: unknown): ReglagesCouleurs {
+  const d = defaultCouleurs()
+  if (!isObj(v)) return d
+  return {
+    indicesParPartie: choix(v.indicesParPartie, INDICES_PAR_PARTIE, d.indicesParPartie),
+    propositionsDepart: choix(v.propositionsDepart, PROPOSITIONS_DEPART, d.propositionsDepart)
+  }
+}
+
 function normalizeReponseBac(v: unknown): ReponseBac | null {
   if (!isObj(v)) return null
   return {
@@ -533,7 +563,8 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       manches,
       justes: Math.min(count(v.justes), manches),
       pieges,
-      piegesJustes: Math.min(count(v.piegesJustes), pieges)
+      piegesJustes: Math.min(count(v.piegesJustes), pieges),
+      indices: count(v.indices)
     }
   }
   if (v.jeu === 'memoire') {
@@ -652,6 +683,7 @@ export function normalizeAppData(v: unknown): AppData {
     questionsPerso,
     questionsMasquees,
     petitBac: normalizePetitBac(v.petitBac),
+    couleurs: normalizeCouleurs(v.couleurs),
     resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,

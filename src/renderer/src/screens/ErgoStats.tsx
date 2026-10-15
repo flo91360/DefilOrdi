@@ -80,7 +80,8 @@ const COLONNES_COULEURS: Colonne<ResultatCouleurs>[] = [
   { titre: 'Justes', valeur: (r) => `${r.justes} / ${r.manches}`, num: true },
   { titre: 'Réussite', valeur: (r) => `${pourcentage(r.justes, r.manches)} %`, num: true },
   { titre: 'Pièges déjoués', valeur: (r) => `${r.piegesJustes} / ${r.pieges}`, num: true },
-  { titre: 'Temps moyen', valeur: (r) => `${secondes(r.dureeMs / Math.max(1, r.manches))} s`, num: true }
+  { titre: 'Temps moyen', valeur: (r) => `${secondes(r.dureeMs / Math.max(1, r.manches))} s`, num: true },
+  { titre: 'Indices', valeur: (r) => r.indices, num: true }
 ]
 
 // Mots à retenir : 3 à 7 mots, ou « Phrase » (PALIER_PHRASE).
@@ -396,12 +397,19 @@ function StatsCouleurs({ parties, onSupprimer }: { parties: ResultatCouleurs[]; 
   const reussite = (r: ResultatCouleurs) => pourcentage(r.justes, r.manches)
   const piegesTotal = parties.reduce((t, r) => t + r.pieges, 0)
   const piegesJustes = parties.reduce((t, r) => t + r.piegesJustes, 0)
+  const indicesTotal = parties.reduce((t, r) => t + r.indices, 0)
+  const partiesAvecIndice = parties.filter((r) => r.indices > 0).length
   return (
     <>
-      <div className="stats-tiles">
+      <div className="stats-tiles stats-tiles-4">
         <Tile valeur={String(parties.length)} label={parties.length > 1 ? 'parties jouées' : 'partie jouée'} detail={`${parties.reduce((t, r) => t + r.manches, 0)} manches au total`} />
         <Tile valeur={`${reussite(derniere)} %`} label="de réussite" detail={`dernière partie (${MODES_COULEURS_LABELS[derniere.mode].toLowerCase()})`} />
         <Tile valeur={`${pourcentage(piegesJustes, piegesTotal)} %`} label="de pièges déjoués" detail="sur toutes les parties" />
+        <Tile
+          valeur={String(derniere.indices)}
+          label={derniere.indices > 1 ? 'indices utilisés' : 'indice utilisé'}
+          detail={`dernière partie · ${indicesTotal} au total, dans ${partiesAvecIndice} partie${partiesAvecIndice > 1 ? 's' : ''} sur ${parties.length}`}
+        />
       </div>
       {parties.length > 1 && (
         <div className="stats-charts">

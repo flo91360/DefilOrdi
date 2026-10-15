@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { normaliserReponse } from '../src/renderer/src/games/commun'
-import { COULEURS, estJuste, estPiege, genererManches } from '../src/renderer/src/games/couleurs/engine'
+import {
+  COULEURS,
+  estJuste,
+  estPiege,
+  genererManches,
+  indiceUtile,
+  nbPropositions,
+  propositionsIndice
+} from '../src/renderer/src/games/couleurs/engine'
 import {
   avancerProgression,
   choisirMots,
@@ -46,6 +54,38 @@ describe('Couleurs piégées', () => {
   it('le mode mélange alterne les consignes', () => {
     const consignes = new Set(genererManches(50, 'melange', COULEURS).map((m) => m.consigne))
     expect(consignes).toEqual(new Set(['mot', 'couleur']))
+  })
+
+  it('l’indice ne sert que si la réponse n’est pas le mot écrit', () => {
+    expect(indiceUtile({ mot: rouge, encre: bleu, consigne: 'couleur' })).toBe(true)
+    expect(indiceUtile({ mot: rouge, encre: bleu, consigne: 'mot' })).toBe(false)
+    expect(indiceUtile({ mot: rouge, encre: rouge, consigne: 'couleur' })).toBe(false)
+  })
+
+  it('chaque indice montre une proposition de plus, 4 au plus', () => {
+    expect([0, 1, 2].map((i) => nbPropositions(2, i))).toEqual([2, 3, 4])
+    expect([0, 1, 2].map((i) => nbPropositions(3, i))).toEqual([3, 4, 4])
+    expect(nbPropositions(4, 0)).toBe(4)
+  })
+
+  it('les propositions contiennent toujours la bonne réponse, sans doublon', () => {
+    const couleurs = COULEURS.slice(0, 4)
+    let piegeVu = false
+    for (let i = 0; i < 200; i++) {
+      const [mot, encre] = [couleurs[i % 4], couleurs[(i + 1 + (i % 3)) % 4]]
+      const n = 2 + (i % 3)
+      const p = propositionsIndice({ mot, encre, consigne: 'couleur' }, n, couleurs)
+      expect(p).toHaveLength(n)
+      expect(p).toContain(encre.nom)
+      expect(new Set(p).size).toBe(n)
+      if (p.includes(mot.nom)) piegeVu = true
+    }
+    expect(piegeVu).toBe(true)
+  })
+
+  it('ne propose pas plus de couleurs que le jeu n’en contient', () => {
+    const p = propositionsIndice({ mot: rouge, encre: bleu, consigne: 'couleur' }, 4, [rouge, bleu])
+    expect(p.sort()).toEqual(['bleu', 'rouge'])
   })
 })
 
