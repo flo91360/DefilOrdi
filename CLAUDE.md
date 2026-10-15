@@ -31,6 +31,10 @@ le code et les commentaires aussi.
   `avancerProgression`), progression mémorisée dans `Profile.memoire`, chaque
   partie porte son `progressionId` ; phrases du palier phrase dans
   `phrasesMemoire` (éditeur `screens/PhrasesMemoireEditor.tsx`, section Mots).
+  `memoire/images.ts` : emoji de chaque mot (`imageDuMot`, dictionnaire
+  intégré + repli pour un mot inconnu, testé dans `tests/images.test.ts`),
+  affiché pendant la mémorisation des paliers 3 à 7 si l'option « Avec
+  images » est choisie avant la partie (état local, non enregistré).
 - `src/renderer/src/games/espace/` : « Chasse aux lettres » (identifiant `espace`
   conservé), jeu en canvas. `engine.ts` = logique, commune aux aventures
   (testée dans `tests/espace.test.ts`) ; `themes.ts` = les aventures (noms,

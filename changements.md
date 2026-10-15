@@ -14,8 +14,16 @@ des changements ».
 
 ## Prochaine version
 
-- Le journal des modifications décrit maintenant aussi toutes les anciennes
-  versions (0.1.0 à 0.8.2) en français clair.
+- Mots à retenir : avant chaque partie, on peut choisir « Avec images » ou
+  « Sans images ». Avec images, une petite image représentant chaque mot
+  s'affiche au-dessus du mot pendant qu'il faut le mémoriser (de 3 à 7 mots).
+  Le choix se fait à chaque partie et n'est pas enregistré dans le profil.
+- Mots à retenir : pas d'image pour la phrase à retenir, ni pendant que
+  l'enfant retape les mots de tête.
+- Espace ergo, section Mots : chaque mot ajouté ou modifié reçoit
+  automatiquement une image, visible sous la liste. Un mot inconnu reçoit tout
+  de même un petit dessin d'aide (étoile, ampoule, smiley…).
+- Les images sont intégrées au logiciel : rien n'est téléchargé.
 
 ## 0.8.2
 

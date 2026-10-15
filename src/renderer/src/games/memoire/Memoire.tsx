@@ -32,10 +32,15 @@ import {
   toleranceAccents,
   verifierPhrase
 } from './engine'
+import { imageDuMot } from './images'
 
 type Palier = (typeof PALIERS_MEMOIRE)[number]
 
 const formatPalier = (p: number) => (estPhrase(p) ? 'Phrase' : String(p))
+
+// Images au-dessus des mots : choisies avant chaque partie, non mémorisées.
+const CHOIX_IMAGES = ['oui', 'non'] as const
+const formatImages = (v: (typeof CHOIX_IMAGES)[number]) => (v === 'oui' ? 'Avec images' : 'Sans images')
 
 interface Props {
   profile: Profile
@@ -66,6 +71,9 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState<Palier>(nombreParNiveau(profile.niveau) as Palier)
   const compteur = useRef(0)
+  // Option choisie avant la partie (pas un réglage du profil) : aide visuelle
+  // pendant la mémorisation des paliers 3 à 7 mots.
+  const [images, setImages] = useState<(typeof CHOIX_IMAGES)[number]>('oui')
 
   const jouables = listes.filter((l) => l.phrases.length > 0)
   const triees = [...jouables].sort(
@@ -140,6 +148,7 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
       mots: phase.mots,
       phrase: phase.phrase,
       palier: phase.etat.palier,
+      images: images === 'oui',
       onFin: (t: boolean[], e: number, d: number, ok: boolean) => terminer(jeu, t, e, d, ok, true),
       onQuitter: (t: boolean[], e: number, d: number) => terminer(jeu, t, e, d, false, false)
     }
@@ -207,6 +216,7 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
     <div className="screen dactylo">
       <GameTopbar titre="Mots à retenir" onBack={onQuit} />
       <main className="choix-main">
+        <Chips label="Images au-dessus des mots" values={CHOIX_IMAGES} value={images} onChange={setImages} format={formatImages} />
         {peutReprendre && (
           <div className="memoire-reprendre">
             <button className="btn btn-primary btn-lg" onClick={reprendre}>
@@ -261,6 +271,7 @@ interface PartieProps {
   mots: string[]
   phrase: string // texte de la phrase (palier phrase), '' sinon
   palier: number
+  images: boolean // une image au-dessus de chaque mot pendant la mémorisation (paliers 3 à 7)
   onFin: (trouves: boolean[], erreurs: number, dureeMs: number, reussie: boolean) => void
   onQuitter: (trouves: boolean[], erreurs: number, dureeMs: number) => void
 }
@@ -296,6 +307,7 @@ function EcranMemoriser({
   titre,
   mots,
   phrase,
+  images,
   reste,
   duree,
   onPret,
@@ -304,6 +316,7 @@ function EcranMemoriser({
   titre: string
   mots: string[]
   phrase: string // '' = liste de mots
+  images: boolean // jamais pour une phrase
   reste: number
   duree: number
   onPret: () => void
@@ -319,7 +332,12 @@ function EcranMemoriser({
         ) : (
           <div className="mots-grille">
             {mots.map((m) => (
-              <span key={m} className="mot-carte visible">
+              <span key={m} className={images ? 'mot-carte visible avec-image' : 'mot-carte visible'}>
+                {images && (
+                  <span className="mot-image" aria-hidden="true">
+                    {imageDuMot(m)}
+                  </span>
+                )}
                 {m}
               </span>
             ))}
@@ -384,7 +402,7 @@ function EnteteRappel({
 }
 
 // Paliers 3 à 7 : les mots sont retapés un par un, dans n'importe quel ordre.
-function Partie({ profile, mots, palier, onFin, onQuitter }: PartieProps) {
+function Partie({ profile, mots, palier, images, onFin, onQuitter }: PartieProps) {
   const { duree, etape, reste, commencerRappel, dureeRappel } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
@@ -432,6 +450,7 @@ function Partie({ profile, mots, palier, onFin, onQuitter }: PartieProps) {
         titre={`Retiens bien ces ${mots.length} mots !`}
         mots={mots}
         phrase=""
+        images={images}
         reste={reste}
         duree={duree}
         onPret={commencerRappel}
@@ -524,6 +543,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
         titre="Retiens bien cette phrase !"
         mots={mots}
         phrase={phrase}
+        images={false}
         reste={reste}
         duree={duree}
         onPret={commencerRappel}

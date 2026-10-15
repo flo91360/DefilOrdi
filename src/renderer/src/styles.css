@@ -2361,6 +2361,18 @@ th.num {
   animation: pop 0.25s ease;
 }
 
+/* Mots à retenir : image au-dessus du mot (option choisie avant la partie). */
+.mot-carte.avec-image {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mot-image {
+  font-size: 52px;
+  line-height: 1.1;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+}
+
 .mot-carte.cache {
   background: var(--surface-2);
   color: #b5b0a3;
@@ -3224,4 +3236,29 @@ label.quiz-ed-item {
   .bac-ed-lettres {
     grid-template-columns: repeat(9, minmax(36px, 1fr));
   }
+}
+
+/* Éditeur des mots : aperçu des images attribuées automatiquement. */
+.mots-apercu {
+  margin-top: 12px;
+}
+
+.mots-apercu-titre {
+  display: block;
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+}
+
+.mots-apercu-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mots-apercu-mot {
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 15px;
 }

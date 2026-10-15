@@ -6,6 +6,7 @@ import { ConfirmDialog, Modal } from '../components/Modal'
 import { FullscreenButton } from '../components/FullscreenButton'
 import { IconBack, IconChart, IconDownload, IconFolder, IconPencil, IconSettings, IconSpeaker, IconTrash, IconUpload } from '../components/Icons'
 import { defaultListes, defaultListesMots } from '../../../shared/phrases'
+import { imageDuMot } from '../games/memoire/images'
 import { playSound } from '../sounds'
 import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
@@ -26,9 +27,10 @@ const TEXTES_PHRASES: TextesEditeur = {
 
 const TEXTES_MOTS: TextesEditeur = {
   titre: 'Mots',
-  aide: 'Les listes de mots du jeu Mots à retenir. À chaque partie, quelques mots sont tirés au hasard dans la liste choisie : prévoyez-en au moins 7 par liste. Le nombre de mots augmente après 3 réussites et redescend après 2 échecs ; après 7 mots, l’enfant retient une phrase (voir plus bas). Un mot par ligne.',
+  aide: 'Les listes de mots du jeu Mots à retenir. À chaque partie, quelques mots sont tirés au hasard dans la liste choisie : prévoyez-en au moins 7 par liste. Le nombre de mots augmente après 3 réussites et redescend après 2 échecs ; après 7 mots, l’enfant retient une phrase (voir plus bas). Un mot par ligne. Chaque mot reçoit automatiquement une petite image, affichée pendant la mémorisation si l’option « Avec images » est choisie avant la partie.',
   element: 'mot',
-  origine: defaultListesMots
+  origine: defaultListesMots,
+  image: imageDuMot
 }
 
 interface Props {
