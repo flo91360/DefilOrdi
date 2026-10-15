@@ -11,6 +11,7 @@ export interface TextesEditeur {
   aide: string
   element: string // « phrase » ou « mot »
   origine: () => ListePhrases[]
+  image?: (ligne: string) => string // image attribuée automatiquement à chaque ligne (Mots à retenir)
 }
 
 interface Props {
@@ -70,7 +71,7 @@ export function PhrasesEditor({ textes, listes, onChange }: Props) {
         </div>
 
         {courante ? (
-          <ListeForm key={courante.id} element={textes.element} liste={courante} onChange={modifier} onSupprimer={() => setASupprimer(courante)} />
+          <ListeForm key={courante.id} element={textes.element} image={textes.image} liste={courante} onChange={modifier} onSupprimer={() => setASupprimer(courante)} />
         ) : (
           <p className="empty">Aucune liste. Créez-en une avec « Nouvelle liste ».</p>
         )}
@@ -117,11 +118,13 @@ export function PhrasesEditor({ textes, listes, onChange }: Props) {
 
 function ListeForm({
   element,
+  image,
   liste,
   onChange,
   onSupprimer
 }: {
   element: string
+  image?: (ligne: string) => string
   liste: ListePhrases
   onChange: (l: ListePhrases) => void
   onSupprimer: () => void
@@ -189,6 +192,22 @@ function ListeForm({
           onBlur={enregistrer}
         />
       </label>
+      {image && nbPhrases > 0 && (
+        <div className="mots-apercu">
+          <span className="mots-apercu-titre">Image attribuée automatiquement à chaque mot (si l’option « Avec images » est choisie avant la partie) :</span>
+          <div className="mots-apercu-liste">
+            {texte
+              .split('\n')
+              .map((p) => p.trim())
+              .filter((p) => p !== '')
+              .map((p, i) => (
+                <span key={`${i}-${p}`} className="mots-apercu-mot">
+                  <span aria-hidden="true">{image(p)}</span> {p}
+                </span>
+              ))}
+          </div>
+        </div>
+      )}
       <p className="ergo-help small">
         Les caractères absents du clavier (œ, « », apostrophe typographique…) sont remplacés automatiquement dans le jeu.
       </p>
