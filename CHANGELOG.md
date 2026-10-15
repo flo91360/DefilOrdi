@@ -1,9 +1,17 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.5 — 2026-10-15
-<!-- planifikateur:08441987-111a-4db2-87e6-98e2eadf3150 -->
+## 0.8.5 (2026-10-15)
 
-- **Mot à retenir** : Dans « Mots à retenir », une petite image peut maintenant s'afficher au-dessus de chaque mot pendant la mémorisation. Typecheck, tests (85 réussis, dont 6 nouveaux) et build passent. Je n'ai pas lancé l'interface pour la voir à l'écran. **Choix avant la partie** - L'écran de choix propose « Avec images » ou « Sans images ». « Avec images » est sélectionné au départ. - Le choix vaut pour la session de jeu en cours, y compris « Reprendre ma partie » et « Continuer ». Il n'est pas enregistré dans le profil de l'enfant, donc aucun champ n'est ajouté aux données. **Où les images apparaissent** - Paliers 3 à 7 mots, pendant la mémorisation : une image au-dessus de chaque mot, si l'option est activée. - Palier phrase : aucune image. - Quand l'enfant retape les mots de tête : aucune image. Les images restent disponibles pour le futur bouton d'indice, qui n'est pas créé ici. **Source des images** - Ce sont des emojis intégrés au logiciel : rien n'est téléchargé, aucune dépendance ajoutée. Le dictionnaire couvre de nombreux thèmes (animaux, nourriture, maison, école, vêtements et corps, métiers, transports, nature et météo, lieux, sports et loisirs, émotions, formes, couleurs). - Les accents, majuscules et pluriels courants ne gênent pas la reconnaissance (« Zèbre », « chevaux », « bateaux »). Pour une expression comme « salle de bain », c'est le premier mot connu qui donne l'image. - Un mot inconnu reçoit quand même un visuel de repli (étoile, ampoule, smiley…), toujours le même pour un mot donné. - Tous les mots des listes d'origine ont une vraie image. **Éditeur (section Mots)** - Un mot ajouté ou modifié reçoit son image automatiquement, sans rien à fournir. - Sous la zone de texte, un aperçu montre l'image attribuée à chaque mot, et le texte d'aide de la section l'explique. **Autres fichiers** - Les nouveaux tests sont dans `tests/images.test.ts`. Ils vérifient : les mots d'origine ont tous une image, des thèmes variés donnent des images différentes, les accents et pluri
+- Mots à retenir : avant chaque partie, on peut choisir « Avec images » ou
+  « Sans images ». Avec images, une petite image représentant chaque mot
+  s'affiche au-dessus du mot pendant qu'il faut le mémoriser (de 3 à 7 mots).
+  Le choix se fait à chaque partie et n'est pas enregistré dans le profil.
+- Mots à retenir : pas d'image pour la phrase à retenir, ni pendant que
+  l'enfant retape les mots de tête.
+- Espace ergo, section Mots : chaque mot ajouté ou modifié reçoit
+  automatiquement une image, visible sous la liste. Un mot inconnu reçoit tout
+  de même un petit dessin d'aide (étoile, ampoule, smiley…).
+- Les images sont intégrées au logiciel : rien n'est téléchargé.
 
 ## 0.8.4 (2026-10-14)
 
