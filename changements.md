@@ -5,10 +5,29 @@ Ce fichier est lu par scripts/changelog.mjs pour fabriquer CHANGELOG.md et les
 notes de chaque Release. Règles de rédaction : voir CLAUDE.md, « Description
 des changements ».
 
-- « ## Prochaine version » : à remplacer entièrement à chaque livraison par ce
-  que la livraison change (ne pas y laisser le texte de la livraison
-  précédente : il est déjà conservé dans le tag de sa version).
-- « ## <version> » (ex. « ## 0.8.2 ») : texte d'une version déjà publiée,
+- « ## Prochaine version
+
+- Couleurs piégées : nouveau bouton « Indice ». Quand l'enfant doit écrire
+  la couleur de l'encre, il peut cliquer dessus s'il bloque : quelques
+  couleurs s'affichent, dont toujours la bonne réponse (le mot piège peut
+  aussi y figurer). L'enfant doit quand même taper sa réponse au clavier. Les
+  propositions restent affichées jusqu'à la fin du mot.
+- Couleurs piégées : le bouton n'apparaît pas quand il faut écrire le mot,
+  puisqu'il est déjà affiché à l'écran.
+- Couleurs piégées : 3 indices au plus par partie. Le premier montre 2
+  propositions, le deuxième 3 et le troisième 4. Sans indice, le jeu se
+  déroule comme avant.
+- Espace ergo, Réglages : on peut choisir le nombre d'indices par partie
+  (de 0, ce qui retire le bouton, à 3) et le nombre de propositions du
+  premier indice (2, 3 ou 4). Ce réglage vaut pour tous les enfants.
+- Statistiques de Couleurs piégées : le nombre d'indices utilisés est
+  indiqué pour chaque partie et dans l'export Excel. Il vaut 0 pour les
+  parties jouées avant cette version.
+- Couleurs piégées : tous les textes du jeu sont nettement plus grands (mot
+  en couleur, consignes, réponse, boutons, écran de fin…). Le mot en couleur
+  s'adapte à la largeur de l'écran pour ne jamais déborder.
+
+## 0.8.2 ») : texte d'une version déjà publiée,
   prioritaire sur tout le reste ; sert à corriger une version passée.
 -->
 

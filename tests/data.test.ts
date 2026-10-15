@@ -113,7 +113,7 @@ describe('migration vers la version 3', () => {
     })
     expect(data.version).toBe(4)
     expect(data.mots.length).toBe(4)
-    expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5 })
+    expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5, indices: 0 })
     expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
   })
 })
@@ -180,5 +180,31 @@ describe('Chasse aux lettres', () => {
       ]
     })
     expect(data.resultats.map((r) => (r.jeu === 'espace' ? r.theme : null))).toEqual(['espace', 'western', 'ocean', 'espace'])
+  })
+})
+
+describe('Couleurs piégées : réglages du bouton Indice', () => {
+  it('donne 3 indices et 2 propositions par défaut, y compris aux anciennes sauvegardes', () => {
+    expect(normalizeAppData({ version: 4, profiles: [] }).couleurs).toEqual({ indicesParPartie: 3, propositionsDepart: 2 })
+  })
+
+  it('garde un réglage valide et corrige un réglage invalide', () => {
+    expect(normalizeAppData({ profiles: [], couleurs: { indicesParPartie: 0, propositionsDepart: 4 } }).couleurs).toEqual({
+      indicesParPartie: 0,
+      propositionsDepart: 4
+    })
+    expect(normalizeAppData({ profiles: [], couleurs: { indicesParPartie: 7, propositionsDepart: 1 } }).couleurs).toEqual({
+      indicesParPartie: 3,
+      propositionsDepart: 2
+    })
+  })
+
+  it('lit le nombre d’indices utilisés dans une partie', () => {
+    const date = '2026-02-01T00:00:00.000Z'
+    const data = normalizeAppData({
+      profiles: [profil('a1', 'Léa')],
+      resultats: [{ id: 'c', profileId: 'a1', date, jeu: 'couleurs', mode: 'couleur', manches: 10, justes: 8, pieges: 7, piegesJustes: 5, dureeMs: 1, indices: 2 }]
+    })
+    expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', indices: 2 })
   })
 })

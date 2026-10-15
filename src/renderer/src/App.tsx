@@ -122,7 +122,7 @@ export function App() {
       else if (screen.jeu === 'espace') content = <Espace {...commun} />
       else if (screen.jeu === 'quiz') content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
       else if (screen.jeu === 'petitbac') content = <PetitBac {...commun} reglages={data.petitBac} />
-      else content = <Couleurs {...commun} />
+      else content = <Couleurs {...commun} reglages={data.couleurs} />
       break
     }
       break

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ModeCouleurs, Profile, Resultat, ResultatCouleurs } from '../../../../shared/data'
+import type { ModeCouleurs, Profile, ReglagesCouleurs, Resultat, ResultatCouleurs } from '../../../../shared/data'
 import { Avatar } from '../../avatar/Avatar'
 import { IconBack, IconCheck } from '../../components/Icons'
 import { playSound } from '../../sounds'
@@ -7,7 +7,18 @@ import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
-import { couleursPourNiveau, estJuste, estPiege, genererManches, type Manche, reponseAttendue } from './engine'
+import {
+  type Couleur,
+  couleursPourNiveau,
+  estJuste,
+  estPiege,
+  genererManches,
+  indiceUtile,
+  type Manche,
+  nbPropositions,
+  propositionsIndice,
+  reponseAttendue
+} from './engine'
 
 const NB_MANCHES = [10, 20] as const
 
@@ -20,6 +31,7 @@ const MODES: { id: ModeCouleurs; titre: string; consigne: string; niveauMin: num
 interface Props {
   profile: Profile
   resultats: Resultat[]
+  reglages: ReglagesCouleurs
   onResult: (r: ResultatCouleurs) => void
   onQuit: () => void
 }
@@ -29,7 +41,7 @@ type Phase =
   | { nom: 'jeu'; mode: ModeCouleurs; manches: Manche[] }
   | { nom: 'fin'; mode: ModeCouleurs; resultat: ResultatCouleurs; record: boolean }
 
-export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
+export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nb, setNb] = useState<(typeof NB_MANCHES)[number]>(10)
   const couleurs = couleursPourNiveau(profile.niveau)
@@ -49,7 +61,8 @@ export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
       justes: reponses.filter((x) => x.juste).length,
       dureeMs: reponses.reduce((t, x) => t + x.dureeMs, 0),
       pieges: reponses.filter((x) => estPiege(x.manche)).length,
-      piegesJustes: reponses.filter((x) => x.juste && estPiege(x.manche)).length
+      piegesJustes: reponses.filter((x) => x.juste && estPiege(x.manche)).length,
+      indices: reponses.filter((x) => x.indice).length
     }
     onResult(r)
     if (!complete) return onQuit()
@@ -62,7 +75,8 @@ export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
       <Partie
         profile={profile}
         manches={phase.manches}
-        reponsesPossibles={couleurs.map((c) => c.nom)}
+        couleurs={couleurs}
+        reglages={reglages}
         onFin={(rep) => terminer(phase.mode, rep, true)}
         onQuitter={(rep) => terminer(phase.mode, rep, false)}
       />
@@ -73,7 +87,7 @@ export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
     const r = phase.resultat
     const p = pourcentage(r.justes, r.manches)
     return (
-      <div className="screen dactylo">
+      <div className="screen dactylo couleurs-jeu">
         <GameTopbar titre="Couleurs piégées" />
         <main className="fin-main">
           <FinHero
@@ -93,6 +107,13 @@ export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
               label="par réponse en moyenne"
               detail={`${formatDuree(r.dureeMs)} au total`}
             />
+            {r.indices > 0 && (
+              <StatTile
+                value={String(r.indices)}
+                label={r.indices > 1 ? 'indices utilisés' : 'indice utilisé'}
+                detail="pour t’aider à trouver"
+              />
+            )}
           </div>
           <div className="fin-actions">
             <button className="btn btn-ghost btn-lg" onClick={onQuit}>
@@ -111,7 +132,7 @@ export function Couleurs({ profile, resultats, onResult, onQuit }: Props) {
   }
 
   return (
-    <div className="screen dactylo">
+    <div className="screen dactylo couleurs-jeu">
       <GameTopbar titre="Couleurs piégées" onBack={onQuit} />
       <main className="choix-main">
         <h2 className="choix-title">Que dois-tu écrire ?</h2>
@@ -149,23 +170,28 @@ interface Reponse {
   saisie: string
   juste: boolean
   dureeMs: number
+  indice: boolean // bouton Indice utilisé pour ce mot
 }
 
 function Partie({
   profile,
   manches,
-  reponsesPossibles,
+  couleurs,
+  reglages,
   onFin,
   onQuitter
 }: {
   profile: Profile
   manches: Manche[]
-  reponsesPossibles: string[]
+  couleurs: Couleur[]
+  reglages: ReglagesCouleurs
   onFin: (r: Reponse[]) => void
   onQuitter: (r: Reponse[]) => void
 }) {
   const [reponses, setReponses] = useState<Reponse[]>([])
   const [retour, setRetour] = useState<Reponse | null>(null)
+  // Propositions de l'indice du mot en cours (null = pas d'indice demandé).
+  const [propositions, setPropositions] = useState<string[] | null>(null)
   const debut = useRef(Date.now())
   const index = reponses.length
   const manche = manches[Math.min(index, manches.length - 1)]
@@ -179,7 +205,7 @@ function Partie({
   const valider = (saisie: string) => {
     if (retour) return
     const juste = estJuste(manche, saisie)
-    const r: Reponse = { manche, saisie, juste, dureeMs: Date.now() - debut.current }
+    const r: Reponse = { manche, saisie, juste, dureeMs: Date.now() - debut.current, indice: propositions !== null }
     playSound(juste ? profile.sonReussite : profile.dactylo.sonErreur ? profile.sonEchec : 'aucun')
     setRetour(r)
     setReponses((all) => [...all, r])
@@ -191,6 +217,7 @@ function Partie({
     const t = setTimeout(
       () => {
         setRetour(null)
+        setPropositions(null)
         debut.current = Date.now()
         if (reponsesRef.current.length >= manches.length) onFinRef.current(reponsesRef.current)
       },
@@ -201,9 +228,21 @@ function Partie({
 
   const justes = reponses.filter((r) => r.juste).length
   const consigneMot = affichee.consigne === 'mot'
+  const reponsesPossibles = couleurs.map((c) => c.nom)
+
+  // Bouton Indice : limité par partie (réglage de l'ergothérapeute), inutile
+  // quand la réponse est le mot déjà écrit à l'écran.
+  const indicesUtilises = reponses.filter((r) => r.indice).length + (propositions && !retour ? 1 : 0)
+  const indicesRestants = Math.max(0, reglages.indicesParPartie - indicesUtilises)
+  const montrerBoutonIndice = reglages.indicesParPartie > 0 && !retour && propositions === null && indiceUtile(manche)
+  const demanderIndice = () => {
+    if (retour || propositions !== null || indicesRestants === 0 || !indiceUtile(manche)) return
+    const n = nbPropositions(reglages.propositionsDepart, indicesUtilises)
+    setPropositions(propositionsIndice(manche, n, couleurs))
+  }
 
   return (
-    <div className="screen dactylo">
+    <div className="screen dactylo couleurs-jeu">
       <header className="topbar">
         <button className="btn btn-ghost" onClick={() => onQuitter(reponsesRef.current)}>
           <IconBack /> Arrêter
@@ -251,6 +290,32 @@ function Partie({
             </span>
           </div>
           <div className="stroop-spacer" />
+        </div>
+
+        <div className="indice-zone">
+          {propositions && (!retour || retour.indice) ? (
+            <div className="indice-propositions" aria-live="polite">
+              <span className="indice-titre">C’est peut-être :</span>
+              {propositions.map((p) => (
+                <span key={p} className="indice-mot">
+                  {p}
+                </span>
+              ))}
+            </div>
+          ) : montrerBoutonIndice ? (
+            <button
+              type="button"
+              className="btn btn-soft indice-bouton"
+              onClick={demanderIndice}
+              disabled={indicesRestants === 0}
+              title={indicesRestants === 0 ? 'Plus d’indice pour cette partie' : undefined}
+            >
+              💡 Indice{' '}
+              <span className="indice-reste">
+                {indicesRestants === 0 ? '(plus d’indice, tu vas y arriver !)' : `(${indicesRestants} restant${indicesRestants > 1 ? 's' : ''})`}
+              </span>
+            </button>
+          ) : null}
         </div>
 
         <div className="reponse-zone">

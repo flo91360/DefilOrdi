@@ -1,5 +1,13 @@
 import { useRef, useState } from 'react'
-import { type AppData, isValidCode, NIVEAUX, type OptionsDactylo, type Profile } from '../../../shared/data'
+import {
+  type AppData,
+  INDICES_PAR_PARTIE,
+  isValidCode,
+  NIVEAUX,
+  type OptionsDactylo,
+  type Profile,
+  PROPOSITIONS_DEPART
+} from '../../../shared/data'
 import { api, isDesktop } from '../api'
 import { Avatar } from '../avatar/Avatar'
 import { ConfirmDialog, Modal } from '../components/Modal'
@@ -287,6 +295,8 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
         </div>
       </div>
 
+      <ReglagesIndice data={data} onChange={onChange} />
+
       <div className="card">
         <h2 className="card-title">Code de l’espace ergothérapeute</h2>
         {data.settings.codeErgo === '0000' && (
@@ -315,6 +325,61 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
         {message && <p className={message.ok ? 'success' : 'error'}>{message.text}</p>}
       </div>
     </section>
+  )
+}
+
+// Couleurs piégées : bouton Indice, même réglage pour tous les enfants.
+function ReglagesIndice({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
+  const r = data.couleurs
+  const maj = (changement: Partial<AppData['couleurs']>) => onChange({ ...data, couleurs: { ...r, ...changement } })
+  const progression = Array.from({ length: r.indicesParPartie }, (_, i) => Math.min(4, r.propositionsDepart + i))
+  return (
+    <div className="card">
+      <h2 className="card-title">Couleurs piégées : bouton Indice</h2>
+      <p className="ergo-help">
+        Quand l’enfant doit écrire la couleur de l’encre, le bouton Indice affiche quelques couleurs, dont toujours la
+        bonne réponse (le mot piège peut en faire partie). L’enfant tape toujours sa réponse au clavier. Ce réglage
+        s’applique à tous les enfants.
+      </p>
+      <div className="code-row">
+        <label>
+          Indices par partie
+          <select
+            className="select"
+            value={r.indicesParPartie}
+            onChange={(e) => maj({ indicesParPartie: Number(e.target.value) })}
+          >
+            {INDICES_PAR_PARTIE.map((n) => (
+              <option key={n} value={n}>
+                {n === 0 ? 'Aucun (bouton retiré)' : n === 1 ? '1 indice' : `${n} indices`}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Propositions au premier indice
+          <select
+            className="select"
+            value={r.propositionsDepart}
+            disabled={r.indicesParPartie === 0}
+            onChange={(e) => maj({ propositionsDepart: Number(e.target.value) })}
+          >
+            {PROPOSITIONS_DEPART.map((n) => (
+              <option key={n} value={n}>
+                {n} propositions
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p className="muted">
+        {r.indicesParPartie === 0
+          ? 'Le bouton Indice n’apparaît plus dans le jeu.'
+          : `Chaque indice montre une proposition de plus que le précédent (4 au plus) : ${progression
+              .map((n, i) => `${i + 1}${i === 0 ? 'er' : 'e'} indice = ${n}`)
+              .join(', ')}.`}
+      </p>
+    </div>
   )
 }
 

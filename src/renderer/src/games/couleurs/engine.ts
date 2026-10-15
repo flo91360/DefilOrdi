@@ -71,3 +71,39 @@ export function genererManches(
   }
   return out
 }
+
+// ---------- Bouton Indice ----------
+// L'indice affiche quelques couleurs, dont toujours la bonne réponse ; le mot
+// piège peut en faire partie. L'enfant tape toujours sa réponse au clavier.
+
+// Inutile quand la réponse attendue est le mot déjà écrit à l'écran.
+export function indiceUtile(m: Manche): boolean {
+  return reponseAttendue(m) !== m.mot.nom
+}
+
+// Le premier indice de la partie montre `depart` propositions, chaque indice
+// suivant une de plus, sans dépasser 4.
+export function nbPropositions(depart: number, indicesDejaUtilises: number): number {
+  return Math.min(4, Math.max(2, depart) + Math.max(0, indicesDejaUtilises))
+}
+
+export function propositionsIndice(
+  m: Manche,
+  n: number,
+  couleurs: Couleur[],
+  random: () => number = Math.random
+): string[] {
+  const bonne = reponseAttendue(m)
+  const autres = couleurs.map((c) => c.nom).filter((nom, i, t) => nom !== bonne && t.indexOf(nom) === i)
+  melanger(autres, random)
+  const out = [bonne, ...autres.slice(0, Math.max(1, Math.min(4, n)) - 1)]
+  return melanger(out, random)
+}
+
+function melanger<T>(t: T[], random: () => number): T[] {
+  for (let i = t.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1))
+    ;[t[i], t[j]] = [t[j], t[i]]
+  }
+  return t
+}
