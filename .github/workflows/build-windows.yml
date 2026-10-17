@@ -33,6 +33,13 @@ jobs:
           node-version: 22
           cache: npm
 
+      # Une PR qui change la version doit décrire ses changements dans
+      # changements.md, sinon le journal reprendrait le titre de la carte.
+      - name: Vérifier la description des changements
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: node scripts/verifier-changements.mjs "origin/${{ github.base_ref }}"
+
       - run: npm ci
       - run: npm run typecheck
       - run: npm test

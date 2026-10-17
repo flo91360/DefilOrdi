@@ -5,7 +5,99 @@ Ce fichier est lu par scripts/changelog.mjs pour fabriquer CHANGELOG.md et les
 notes de chaque Release. Règles de rédaction : voir CLAUDE.md, « Description
 des changements ».
 
-- « ## Prochaine version
+- Section « Prochaine version » : à remplacer entièrement à chaque livraison
+  par la description de ce qu'elle change.
+- Section portant un numéro de version (ex. « 0.8.2 ») : texte d'une version
+  déjà publiée, prioritaire sur tout le reste ; sert à corriger une version
+  passée.
+-->
+
+## Prochaine version
+
+- Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et
+  0.8.12 à 0.8.16 décrivent maintenant ce qui a vraiment changé, au lieu de
+  reprendre le titre de la carte.
+- Améliorations internes : une nouvelle version ne peut plus être livrée
+  sans sa description pour le journal.
+
+## 0.8.16
+
+- Dactylo : un message prévient l'enfant quand les majuscules sont
+  verrouillées (touche Verr. Maj) et disparaît dès qu'il les enlève.
+- Dactylo : nouvelles médailles. Une partie de 5 phrases réussie avec une
+  vitesse et une précision moyennes au niveau étoile rapporte une médaille :
+  chocolat, bronze, argent ou or selon le niveau de la liste jouée. La
+  vitesse attendue dépend de la classe de l'enfant.
+- La médaille gagnée s'affiche sur l'écran de fin et rejoint le coffre à
+  médailles de l'enfant, ouvert depuis la page des jeux.
+- Espace ergo : un bouton « Médailles » montre, pour chaque enfant, les
+  médailles gagnées et leur date.
+
+## 0.8.15
+
+- Profil de l'enfant : nouvelle étape « Lettres » pour choisir la police où
+  il voit le mieux les lettres (Verdana, Arial, Calibri ou Comic Sans MS),
+  avec un aperçu des lettres J, L, I, l, T et F. Verdana est choisie pour les
+  profils existants.
+- Chasse aux lettres : les lettres qui tombent utilisent cette police, dans
+  les trois aventures.
+
+## 0.8.14
+
+- Clavier à l'écran : il est maintenant masqué par défaut, pour les nouveaux
+  profils comme pour les profils existants. Il peut être réactivé pour chaque
+  enfant dans ses réglages.
+- Chasse aux lettres : quand le clavier est activé pour l'enfant, on choisit
+  avant chaque partie « Avec le clavier » ou « Sans le clavier ». Quand il
+  est désactivé, il n'est pas proposé pendant la partie non plus.
+
+## 0.8.13
+
+- Page des jeux : nouvel ordre des jeux. Chasse aux lettres, Mots à retenir,
+  Couleurs piégées, Petit bac, Dactylo, puis Quiz de l'ordinateur.
+
+## 0.8.12
+
+- Mots à retenir : nouveau bouton « Indice » quand il ne reste qu'un mot à
+  retrouver (paliers de 3 à 7 mots). Il montre l'image du mot quand elle
+  existe, sa première lettre et son nombre de lettres, sans jamais donner le
+  mot entier.
+- Un seul indice par partie, sans effet sur le score ni sur la progression.
+
+## 0.8.11
+
+- Mots à retenir : nouvelle option « Aide dys », à choisir avant la partie
+  (pour les paliers de 3 à 7 mots). Quand l'enfant tape un mot qu'il a bien
+  retenu mais mal écrit, ce n'est pas compté comme une erreur tout de suite :
+  trois orthographes s'affichent et il choisit la bonne. S'il se trompe de
+  choix, l'erreur est comptée et il peut réessayer.
+- Sans l'option, le jeu se déroule exactement comme avant.
+
+## 0.8.10
+
+- Quiz, mise en situation « Supprime le fichier brouillon.txt » : on peut
+  aussi faire un clic droit sur le fichier puis choisir « Supprimer » dans
+  le menu. L'ancienne façon (sélectionner le fichier puis cliquer sur la
+  corbeille) reste acceptée.
+
+## 0.8.9
+
+- Chasse aux lettres, Plongée sous-marine : le sous-marin est maintenant en
+  haut de l'écran, son rayon vise vers le bas et les objets remontent du
+  fond. Les poissons vont plus vite que les autres objets.
+
+## 0.8.7
+
+- Couleurs piégées : nouvelle case « Entraînement à la souris », à cocher
+  avant la partie (modes « La couleur » et « Les deux »). Pour donner la
+  couleur de l'encre, l'enfant clique sur le bon nom de couleur au lieu de
+  le taper.
+- On choisit le clic à travailler : clic gauche (par défaut), clic droit ou
+  double clic. Les autres clics sont ignorés. Ce choix n'est pas enregistré.
+- Couleurs piégées : le message après une erreur dit « Tu as répondu » au
+  lieu de « Tu as écrit ».
+
+## 0.8.6
 
 - Couleurs piégées : nouveau bouton « Indice ». Quand l'enfant doit écrire
   la couleur de l'encre, il peut cliquer dessus s'il bloque : quelques
@@ -26,19 +118,6 @@ des changements ».
 - Couleurs piégées : tous les textes du jeu sont nettement plus grands (mot
   en couleur, consignes, réponse, boutons, écran de fin…). Le mot en couleur
   s'adapte à la largeur de l'écran pour ne jamais déborder.
-
-## 0.8.2 ») : texte d'une version déjà publiée,
-  prioritaire sur tout le reste ; sert à corriger une version passée.
--->
-
-## Prochaine version
-
-- Mots à retenir : nouvelle option « Aide dys », à choisir avant la partie
-  (pour les paliers de 3 à 7 mots). Quand l'enfant tape un mot qu'il a bien
-  retenu mais mal écrit, ce n'est pas compté comme une erreur tout de suite :
-  trois orthographes s'affichent et il choisit la bonne. S'il se trompe de
-  choix, l'erreur est comptée et il peut réessayer.
-- Sans l'option, le jeu se déroule exactement comme avant.
 
 ## 0.8.2
 
