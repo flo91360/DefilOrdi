@@ -30,7 +30,10 @@ le code et les commentaires aussi.
   Couleurs piégées : bouton Indice (`indiceUtile`, `nbPropositions`,
   `propositionsIndice`), réglé pour tous les profils par `couleurs` dans les
   données (section Réglages de l'espace ergo) ; textes agrandis via la classe
-  `couleurs-jeu`.
+  `couleurs-jeu`. Entraînement à la souris (choisi avant la partie, état local,
+  modes « La couleur » et « Les deux ») : les manches « couleur de l'encre »
+  se répondent en cliquant (`reponseALaSouris`, `clicValide`) ; gauche par défaut,
+  droit ou double clic au choix, les autres clics sont ignorés.
   Mots à retenir : difficulté progressive (paliers 3 à 7 mots puis phrase,
   `avancerProgression`), progression mémorisée dans `Profile.memoire`, chaque
   partie porte son `progressionId` ; phrases du palier phrase dans
