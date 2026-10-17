@@ -127,3 +127,8 @@ dans `CHANGELOG.md` et dans les notes de la Release.
 - N'écrire que ce que la livraison change réellement.
 - Corriger une version déjà publiée : ajouter une section `## <version>` (ex.
   `## 0.8.2`), prioritaire sur le reste ; ne jamais modifier les tags.
+- Sur une PR, la CI échoue si `version` change dans `package.json` sans que
+  la section `## Prochaine version` (ou `## <version>`) de `changements.md`
+  change (`scripts/verifier-changements.mjs`). `AGENTS.md` renvoie à ce
+  fichier pour les agents qui ne lisent pas `CLAUDE.md` (Codex, utilisé par
+  PlaniFiKateur).
