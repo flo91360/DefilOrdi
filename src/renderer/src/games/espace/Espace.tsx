@@ -32,7 +32,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
   const [duree, setDuree] = useState<(typeof DUREES)[number]>(60)
 
   const lancer = (theme: ThemeJeu, serie: Serie) =>
-    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau } })
+    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, vitesseObjet: theme.vitesseObjet } })
 
   const terminer = (theme: ThemeJeu, reglages: Reglages, e: Etat, complete: boolean) => {
     if (e.detruites + e.manquees + e.erreurs === 0) return complete ? setPhase({ nom: 'lettres', theme }) : onQuit()

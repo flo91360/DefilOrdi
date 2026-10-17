@@ -3,6 +3,8 @@
 // basse portant ce caractère. Une lettre qui touche le sol est « manquée » (pas de game over :
 // la partie dure le temps choisi).
 //
+// `y` est la progression de la lettre : 0 au départ, 1 à l'arrivée (sol, ou sous-marin
+// en haut de l'écran dans l'aventure sous-marine, où les objets remontent).
 // Les positions sont en proportions de l'écran (0 à 1) pour que la logique ne
 // dépende pas de la taille de la fenêtre.
 
@@ -29,6 +31,8 @@ export interface Reglages {
   serie: Serie
   dureeS: number
   niveau: number
+  // Facteur de vitesse propre à chaque objet (ex. poissons plus rapides), selon son identifiant.
+  vitesseObjet?: (id: number) => number
 }
 
 export interface Lettre {
@@ -111,7 +115,8 @@ export function avancer(e: Etat, dt: number, r: Reglages, random: () => number =
   // Le temps restant doit laisser à la lettre le temps de tomber à moitié.
   const chute = (CHUTE_S[r.niveau] ?? 8) / acc
   while (temps >= prochaine && lettres.length < MAX_A_L_ECRAN && r.dureeS - temps > chute / 2) {
-    const lettre: Lettre = { id: ++compteur, char: choisirLettre(etat, r, random), x: choisirX(etat, random), y: 0, vitesse: 1 / chute }
+    const id = ++compteur
+    const lettre: Lettre = { id, char: choisirLettre(etat, r, random), x: choisirX(etat, random), y: 0, vitesse: (r.vitesseObjet?.(id) ?? 1) / chute }
     lettres = [...lettres, lettre]
     etat = { ...etat, lettres }
     prochaine += (INTERVALLE_S[r.niveau] ?? 2) / acc

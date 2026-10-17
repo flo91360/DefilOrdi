@@ -1,6 +1,7 @@
-// Décor « Plongée sous-marine » : poissons, coquillages et trésors
-// descendent vers le fond ; le sous-marin les récupère avec son rayon
-// tracteur avant qu'ils ne s'enfoncent dans le sable.
+// Décor « Plongée sous-marine » : le sous-marin est en haut de l'écran ;
+// poissons, coquillages et trésors remontent depuis le fond et il les aspire
+// avec son rayon tracteur (dirigé vers le bas) avant qu'ils ne l'atteignent.
+// Dans le moteur, `y` est la progression de l'objet : 0 au fond, 1 au sous-marin.
 
 import { darken, lighten } from '../../../color'
 import { playSound } from '../../../sounds'
@@ -24,6 +25,13 @@ interface PetitPoisson {
   taille: number
 }
 
+// Les poissons remontent plus vite que les autres objets.
+export const VITESSE_POISSON = 1.6
+export function vitesseObjetOcean(id: number): number {
+  const o = OBJETS[id % OBJETS.length]
+  return o === 'clown' || o === 'bleu' || o === 'jaune' ? VITESSE_POISSON : 1
+}
+
 export class Ocean extends SceneTheme {
   private sousMarinX = -1
   private cibleX = -1
@@ -45,8 +53,11 @@ export class Ocean extends SceneTheme {
   }
 
   position(l: Lettre) {
-    const base = super.position(l)
     const R = this.rayon()
+    const m0 = this.marge()
+    const depart = this.h - this.hauteurSol() + R * 0.2
+    const arrivee = this.sousMarinY() + this.dimensions().L * 0.42 * 0.5 + R * 0.9
+    const base = { x: m0 + l.x * (this.w - 2 * m0), y: depart + Math.min(1, l.y) * (arrivee - depart) }
     // Les poissons nagent de gauche à droite ; les autres objets ondulent un peu.
     const amplitude = this.estPoisson(this.objet(l)) ? R * 0.9 : R * 0.25
     const dx = Math.sin(this.t * 1.1 + l.id * 2.3) * amplitude
@@ -523,10 +534,10 @@ export class Ocean extends SceneTheme {
       this.dessinerObjet(ctx, o, R, 1, this.t)
       ctx.restore()
     } else if (f.type === 'enfoui') {
-      // L'objet s'enfonce dans le sable
+      // L'objet, arrivé en haut sans avoir été attrapé, s'estompe
       ctx.save()
       ctx.globalAlpha = 1 - k
-      ctx.translate(f.x, this.h - this.hauteurSol() + R * 0.3 + k * R)
+      ctx.translate(f.x, f.y - k * R * 0.6)
       this.dessinerObjet(ctx, o, R, 1, this.t)
       ctx.restore()
       ctx.globalAlpha = 1
@@ -539,13 +550,19 @@ export class Ocean extends SceneTheme {
     const sol = this.hauteurSol()
     const L = Math.max(140, sol * 1.75)
     const x = this.sousMarinX < 0 ? this.w / 2 : this.sousMarinX
-    const y = this.h - sol * 0.68 + Math.sin(this.t * 1.6) * 4
+    const y = this.sousMarinY() + Math.sin(this.t * 1.6) * 4
     return { L, x, y }
+  }
+
+  // Le sous-marin est en haut, assez bas pour que son périscope reste visible.
+  private sousMarinY() {
+    const L = Math.max(140, this.hauteurSol() * 1.75)
+    return L * 0.42 * 1.3 + 10
   }
 
   private emetteur() {
     const { L, x, y } = this.dimensions()
-    return { x: x + this.direction * L * 0.12, y: y - L * 0.42 * 0.55 }
+    return { x: x + this.direction * L * 0.12, y: y + L * 0.42 * 0.55 }
   }
 
   protected dessinerEffets(ctx: CanvasRenderingContext2D) {
@@ -568,7 +585,7 @@ export class Ocean extends SceneTheme {
       ctx.lineTo(f.x - Math.cos(ang) * R, f.y - Math.sin(ang) * R)
       ctx.closePath()
       ctx.fill()
-      // Anneaux qui descendent le long du rayon
+      // Anneaux qui remontent le long du rayon
       ctx.strokeStyle = `rgba(255, 255, 255, ${0.6 * a})`
       ctx.lineWidth = 2
       for (let i = 0; i < 3; i++) {
@@ -649,7 +666,7 @@ export class Ocean extends SceneTheme {
     // Émetteur du rayon tracteur
     ctx.fillStyle = '#ffe066'
     ctx.beginPath()
-    ctx.ellipse(L * 0.12, -H * 0.5, L * 0.06, H * 0.1, 0, Math.PI, Math.PI * 2)
+    ctx.ellipse(L * 0.12, H * 0.5, L * 0.06, H * 0.1, 0, 0, Math.PI)
     ctx.fill()
     ctx.strokeStyle = '#f59f00'
     ctx.stroke()
@@ -738,29 +755,26 @@ export class Ocean extends SceneTheme {
 
   rater() {
     const { L, x, y } = this.dimensions()
-    this.gerbe(x + this.direction * L * 0.1, y - L * 0.2, 12, {
+    this.gerbe(x + this.direction * L * 0.1, y + L * 0.25, 12, {
       forme: 'bulle',
       couleurs: ['rgba(255,255,255,0.7)'],
       vitesse: [40, 120],
       vie: [0.6, 1.1],
       taille: [3, 7],
-      angle: [-Math.PI * 0.85, -Math.PI * 0.15]
+      angle: [Math.PI * 0.15, Math.PI * 0.85]
     })
     this.secousse = 2
   }
 
   auSol(l: Lettre) {
     const p = this.position(l)
-    const ySable = this.h - this.hauteurSol()
     this.fantomes.push({ lettre: l, x: p.x, y: p.y, age: 0, duree: 0.8, type: 'enfoui' })
-    this.gerbe(p.x, ySable + 6, 14, {
-      forme: 'fumee',
-      couleurs: ['rgba(232, 209, 153, 0.95)'],
-      vitesse: [20, 80],
-      vie: [0.5, 1],
-      taille: [8, 16],
-      angle: [-Math.PI, 0],
-      frein: 1.5
+    this.gerbe(p.x, p.y, 10, {
+      forme: 'bulle',
+      couleurs: ['rgba(255,255,255,0.7)'],
+      vitesse: [30, 90],
+      vie: [0.6, 1.1],
+      taille: [3, 6]
     })
   }
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { vitesseObjetOcean } from '../src/renderer/src/games/espace/scenes/Ocean'
 import { avancer, cadence, type Etat, nouvelEtat, type Reglages, SERIES, tirer } from '../src/renderer/src/games/espace/engine'
 
 const reglages = (serieId = 'milieu', niveau = 1, dureeS = 60): Reglages => ({
@@ -12,6 +13,18 @@ function jouer(e: Etat, r: Reglages, secondes: number): Etat {
   for (let t = 0; t < secondes; t += 0.05) etat = avancer(etat, 0.05, r).etat
   return etat
 }
+
+describe('Plongée sous-marine : vitesses', () => {
+  it('les poissons montent plus vite que les autres objets', () => {
+    const r = { ...reglages(), vitesseObjet: vitesseObjetOcean }
+    const e = jouer(nouvelEtat(), r, 9)
+    const vit = new Map(e.lettres.map((l) => [l.id, l.vitesse]))
+    const poissons = [...vit].filter(([id]) => vitesseObjetOcean(id) > 1).map(([, v]) => v)
+    const autres = [...vit].filter(([id]) => vitesseObjetOcean(id) === 1).map(([, v]) => v)
+    expect(vit.size).toBeGreaterThan(0)
+    for (const p of poissons) for (const a of autres) expect(p).toBeGreaterThan(a)
+  })
+})
 
 describe('Chasse aux lettres (moteur)', () => {
   it('fait apparaître des lettres de la série, différentes entre elles', () => {

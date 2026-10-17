@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.8 — 2026-10-17
+<!-- planifikateur:63a80af8-fc84-4400-90e9-433980fd1cc8 -->
+
+- **Amélioration chasse aux lettres SOUS-MARIN** : Dans « Plongée sous-marine », le sous-marin est maintenant en haut de l'écran et les objets remontent depuis le fond (le sable). Le typecheck, les tests (95) et le build passent. Je n'ai pas lancé le jeu à l'écran, donc le rendu reste à vérifier à l'œil. - **Sous-marin et rayon** : le sous-marin (scènes/Ocean.ts) a son périscope visible. L'émetteur est sous la coque et le rayon part vers le bas. Quand un objet est aspiré, il remonte le long du rayon. - **Objets non attrapés** : arrivé en haut, l'objet s'estompe avec quelques bulles. Il compte comme « Perdu », sans game over. - **Moteur** : j'ai gardé la logique de `engine.ts`, où `y` est devenu une progression (0 au fond, 1 au sous-marin). L'objet visé reste donc le plus avancé, soit le plus proche du sous-marin, sans rien changer pour les autres aventures. - **Vitesses** : les poissons vont 1,6 fois plus vite que les autres objets. Cela s'ajoute à la vitesse du niveau et à l'accélération pendant la partie. - **Textes** : j'ai adapté la description et le message de fin de l'aventure. - **Test** : un test vérifie que les poissons ont une vitesse supérieure à celle des autres objets (tests/espace.test.ts). - **Aventures non touchées** : Mission spatiale et Stand de tir sont inchangées, de même que les statistiques, les records, la pause, le décompte et le clavier.
+
 ## 0.8.7 (2026-10-17)
 
 - Carte Amélioration compréhension couleurs piégées (7ac00861-ded1-4ff3-af38-7d79b9fda221) (#16)
