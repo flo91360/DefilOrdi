@@ -567,8 +567,18 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
             </div>
           )
         })()}
-        <button className="btn btn-soft" onClick={() => finir(trouves, erreurs, dureeRappel())}>
-          Je ne me souviens plus des autres
+        <button
+          className="btn btn-soft"
+          onClick={() => {
+            // Aucun mot trouvé : on donne d'abord un indice au lieu d'arrêter la partie.
+            if (!trouves.some(Boolean) && indice === null && mots.length > 0) {
+              setIndice(0)
+              return
+            }
+            finir(trouves, erreurs, dureeRappel())
+          }}
+        >
+          {trouves.some(Boolean) ? 'Je ne me souviens plus des autres' : 'Je ne me souviens plus'}
         </button>
       </main>
     </div>
@@ -583,6 +593,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux'; texte: string } | null>(null)
+  const [indice, setIndice] = useState(false) // indice donné quand rien n'est trouvé
   const sonErreur = useSonErreur(profile)
   const fini = useRef(false)
 
@@ -656,7 +667,28 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
             {message ? message.texte : 'Tape la phrase entière, dans l’ordre. Les accents, les majuscules et la ponctuation ne comptent pas.'}
           </p>
         </div>
-        <button className="btn btn-soft" onClick={() => finir(trouves, erreurs, dureeRappel(), false)}>
+        {indice && mots.length > 0 && (
+          <div className="indice-zone">
+            <div className="indice-propositions" aria-live="polite">
+              <span className="indice-titre">Un petit coup de pouce : la phrase commence par</span>
+              <span className="indice-mot">{indiceMot(mots[0]).masque}</span>
+              <span className="indice-titre">
+                ({mots.length} mot{mots.length > 1 ? 's' : ''})
+              </span>
+            </div>
+          </div>
+        )}
+        <button
+          className="btn btn-soft"
+          onClick={() => {
+            // Aucun mot trouvé : on donne d'abord un indice au lieu d'arrêter la partie.
+            if (!trouves.some(Boolean) && !indice && mots.length > 0) {
+              setIndice(true)
+              return
+            }
+            finir(trouves, erreurs, dureeRappel(), false)
+          }}
+        >
           Je ne me souviens plus
         </button>
       </main>

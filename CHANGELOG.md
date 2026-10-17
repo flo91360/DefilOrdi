@@ -1,9 +1,9 @@
 # Journal des modifications de DefilOrdi
 
 ## 0.8.20 — 2026-10-18
-<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+<!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
 
-- **amélioration quizz sur les mise en situation** : Les mises en situation du quiz peuvent maintenant se valider aussi par un raccourci clavier. La validation par clic n'a pas changé. Le typecheck et les tests passent (137). Je n'ai pas lancé le build et je n'ai pas testé la frappe au clavier dans l'interface. - **Champ ajouté :** `QuestionSituation` a un champ optionnel `raccourci` (par exemple `Ctrl+S`). `Situation`, dans `Quiz.tsx`, écoute le clavier quand ce champ existe. Ctrl+lettre valide la question comme une réussite sans erreur, et seulement si Alt et Maj ne sont pas enfoncés. - **Message de fin :** après la réponse, la zone de retour affiche « Ça peut aussi se faire avec Ctrl+X. ». Rien n'apparaît dans l'énoncé ni dans l'écran de la scène avant la réponse. J'ai retiré des explications la phrase « Raccourci : … » pour éviter un doublon avec ce message. - **Questions concernées :** - txt-gras : Ctrl+G - txt-centrer : Ctrl+E - txt-annuler : Ctrl+Z - txt-enregistrer : Ctrl+S - txt-nouveau : Ctrl+N - **Copier, coller, couper, tout sélectionner :** la banque n'a aucune mise en situation pour ces actions. Les questions de copier-coller sont des QCM avec visuel, que je n'ai pas touchées, car la carte limite le périmètre aux mises en situation. Si l'on ajoute une telle mise en situation plus tard, il suffira de renseigner `raccourci: 'Ctrl+C'` (ou V, X, A). - **Test ajouté :** `tests/quiz.test.tsx` vérifie les raccourcis déclarés et qu'aucun énoncé ne contient « Ctrl ».
+- **mot à retenir** : J'ai résolu le conflit dans changements.md, sans marqueur restant. La section « Prochaine version » garde la puce sur Mots à retenir (indice quand aucun mot n'est trouvé, la partie ne s'arrête plus) et les puces sur Couleurs piégées venues de main. Je n'ai pas touché au code du jeu ni à CHANGELOG.md, et je n'ai lancé aucun test.
 
 ## 0.8.19 (2026-10-18)
 
