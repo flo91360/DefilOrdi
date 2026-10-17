@@ -367,8 +367,12 @@ function Situation({
 
   const clic = (zone: string) => {
     if (fini) return
+    // Un clic droit n'est une erreur que s'il est attendu à ce moment-là :
+    // sinon il est simplement ignoré (le menu du navigateur est déjà bloqué).
+    if (zone.endsWith('@droit') && !e.cibles.some((c) => c.endsWith('@droit'))) return
     if (e.cibles.includes(zone)) {
-      if (e.ouvre) setMenu(e.ouvre)
+      const ouvre = e.ouvrePar?.[zone] ?? e.ouvre
+      if (ouvre) setMenu(ouvre)
       setErreurs(0)
       setMessage(null)
       if (etape + 1 >= q.etapes.length) {

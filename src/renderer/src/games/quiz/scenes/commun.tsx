@@ -8,7 +8,7 @@ export const LARGEUR = 960
 export const HAUTEUR = 540
 
 interface ContexteZones {
-  onZone?: (id: string) => void
+  onZone?: (id: string) => void // un clic droit est signalé par « id@droit »
   surligne?: string | null // zone entourée (questions avec visuel)
   indice?: string | null // zone qui clignote (aide après deux erreurs)
   interactive: boolean
@@ -45,6 +45,11 @@ export function Zone({
       onClick={(e) => {
         e.stopPropagation()
         if (interactive) onZone?.(id)
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (interactive) onZone?.(`${id}@droit`)
       }}
     >
       {children}

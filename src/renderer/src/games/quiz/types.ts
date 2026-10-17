@@ -40,10 +40,13 @@ export interface QuestionChoix extends Base {
 }
 
 // Une étape : cliquer sur une des zones `cibles` ; `ouvre` est le menu qui
-// s'affiche ensuite (l'écran évolue au fil des étapes).
+// s'affiche ensuite. Une cible « id@droit » est un clic droit sur la zone `id` (l'écran évolue au fil des étapes).
 export interface Etape {
   cibles: string[]
   ouvre?: string
+  // menu à afficher selon la zone choisie, quand elle diffère de `ouvre`
+  // (ex. clic droit : « fichier@droit » ouvre le menu contextuel)
+  ouvrePar?: Record<string, string>
   aide: string // indice donné après deux erreurs
 }
 
