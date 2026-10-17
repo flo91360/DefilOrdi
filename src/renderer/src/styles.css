@@ -3576,3 +3576,45 @@ label.quiz-ed-item {
 .police-option.selected { border-color: var(--c1, #4f6bd9); box-shadow: 0 0 0 3px rgba(79, 107, 217, 0.25); }
 .police-apercu { font-size: 44px; font-weight: 700; letter-spacing: 0.12em; color: #222; }
 .police-nom { font-size: 16px; color: #555; }
+
+/* Dactylo : phrase personnelle après une médaille */
+.phrase-perso {
+  margin: 18px auto 0;
+  max-width: 640px;
+  padding: 18px 22px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.phrase-perso p { margin: 0; }
+.phrase-perso-regle { font-weight: 700; }
+.phrase-perso-alerte {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff4e5;
+  color: #6b3d00;
+}
+.phrase-perso-alerte ul { margin: 6px 0; padding-left: 20px; }
+.phrase-perso-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.stat-smiley { margin-left: 10px; vertical-align: middle; }
+.score-erreurs { font-weight: 700; }
+.ergo-badge-notif {
+  margin-left: 8px;
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--danger, #e2504c);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+.phrases-enfants-liste { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.phrase-enfant { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.phrase-enfant .input { flex: 1 1 320px; }
+.phrase-enfant-meta { flex: 1 1 100%; }
+.phrase-enfant-motifs { flex: 1 1 100%; margin: 0; padding-left: 20px; color: #6b3d00; }
+.ergo-subtitle { margin: 22px 0 10px; font-size: 20px; font-weight: 900; }

@@ -33,10 +33,13 @@ export function GameTopbar({
   )
 }
 
-export function StatTile({ value, label, detail }: { value: string; label: string; detail: string }) {
+export function StatTile({ value, label, detail, smiley }: { value: string; label: string; detail: string; smiley?: ReactNode }) {
   return (
     <div className="stat-tile">
-      <span className="stat-value">{value}</span>
+      <span className="stat-value">
+        {value}
+        {smiley && <span className="stat-smiley">{smiley}</span>}
+      </span>
       <span className="stat-label">{label}</span>
       <span className="stat-detail">{detail}</span>
     </div>
