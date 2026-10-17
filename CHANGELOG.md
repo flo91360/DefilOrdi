@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.20 — 2026-10-18
+<!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
+
+- **mot à retenir** : J'ai résolu le conflit dans changements.md, sans marqueur restant. La section « Prochaine version » garde la puce sur Mots à retenir (indice quand aucun mot n'est trouvé, la partie ne s'arrête plus) et les puces sur Couleurs piégées venues de main. Je n'ai pas touché au code du jeu ni à CHANGELOG.md, et je n'ai lancé aucun test.
+
 ## 0.8.19 (2026-10-18)
 
 - Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
