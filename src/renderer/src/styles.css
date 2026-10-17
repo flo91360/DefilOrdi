@@ -3504,3 +3504,17 @@ label.quiz-ed-item {
     opacity: 0;
   }
 }
+
+/* Aide dys : trois orthographes à choisir */
+.choix-orthographe {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.mot-option {
+  font-size: 30px;
+  font-weight: 900;
+  min-width: 170px;
+}
