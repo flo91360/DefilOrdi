@@ -3,7 +3,7 @@
 ## 0.8.19 — 2026-10-18
 <!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
 
-- **mot à retenir** : Mots à retenir : quand aucun mot n'est trouvé, « Je ne me souviens plus » donne d'abord un indice au lieu d'arrêter la partie. Pour les paliers 3 à 7 mots, le jeu réutilise l'indice existant (première lettre, nombre de lettres, image si connue) sur le premier mot. Pour le palier phrase, il affiche la première lettre du premier mot et le nombre de mots. Un second clic termine la partie. Dès qu'un mot est trouvé, le bouton garde son rôle actuel. Le typecheck, les tests et le build ont réussi lors de la livraison précédente (PR 29). Je n'ai pas lancé de partie dans l'interface.
+- **mot à retenir** : J'ai corrigé l'échec de la CI : la section « Prochaine version » de changements.md n'avait pas été réécrite. Elle décrit maintenant la correction pour l'ergothérapeute : dans Mots à retenir, « Je ne me souviens plus » sans aucun mot trouvé donne un indice et la partie continue. Je n'ai pas relancé la CI ni les tests, et je n'ai pas touché au code du jeu.
 
 ## 0.8.18 (2026-10-18)
 
