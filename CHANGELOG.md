@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.9 — 2026-10-17
+<!-- planifikateur:63a80af8-fc84-4400-90e9-433980fd1cc8 -->
+
+- **Amélioration chasse aux lettres SOUS-MARIN** : J'ai résolu les conflits de fusion avec main dans Espace.tsx, engine.ts et tests/espace.test.ts. Il ne reste aucun marqueur de conflit. Le typecheck et les 109 tests passent; je n'ai pas relancé le build. Les nouveautés de main sont conservées (modes Chrono, 3 vies et Pièges et cadeaux, lettres simultanées, paliers). La vitesse relative par objet est greffée par-dessus: les poissons de « Plongée sous-marine » montent 1,6 fois plus vite que les autres objets. L'aventure garde son principe: sous-marin en haut, objets qui remontent du fond, rayon dirigé vers le bas.
+
 ## 0.8.8 — 2026-10-17
 <!-- planifikateur:e11bf219-0793-4d5d-b2e8-ac5407ee9dc7 -->
 
