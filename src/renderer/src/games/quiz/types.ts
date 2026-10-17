@@ -54,6 +54,8 @@ export interface QuestionSituation extends Base {
   type: 'situation'
   scene: SceneId
   menuDepart?: string
+  // Raccourci clavier (ex. « Ctrl+S ») qui valide aussi la question ; annoncé seulement après la réponse
+  raccourci?: string
   etapes: Etape[]
 }
 

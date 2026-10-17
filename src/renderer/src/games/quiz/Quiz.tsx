@@ -242,6 +242,7 @@ function Partie({
                 {corrigee.juste ? 'Bonne réponse !' : q.type === 'situation' ? 'Tu y es arrivé, avec un peu d’aide !' : 'Pas tout à fait…'}
               </strong>
               <p>{q.explication}</p>
+              {q.type === 'situation' && q.raccourci && <p className="quiz-raccourci">Ça peut aussi se faire avec {q.raccourci}.</p>}
             </div>
             <button className="btn btn-primary btn-lg" onClick={suivante} autoFocus>
               {reponses.length >= questions.length ? 'Voir mon score' : 'Question suivante'}
@@ -364,6 +365,23 @@ function Situation({
   const [message, setMessage] = useState<string | null>(null)
   const dernierSon = useRef(0)
   const e = q.etapes[Math.min(etape, q.etapes.length - 1)]
+
+  // Raccourci clavier : valide l'action demandée, en plus du clic
+  const finRef = useRef(onFin)
+  finRef.current = onFin
+  const raccourciTouche = q.raccourci?.split('+').pop()?.toLowerCase()
+  useEffect(() => {
+    if (!raccourciTouche || fini) return
+    const onKey = (ev: KeyboardEvent) => {
+      if (!(ev.ctrlKey || ev.metaKey) || ev.altKey || ev.shiftKey || ev.key.toLowerCase() !== raccourciTouche) return
+      ev.preventDefault()
+      setEtape(q.etapes.length)
+      setMessage(null)
+      finRef.current(true)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [raccourciTouche, fini, q.etapes.length])
 
   const clic = (zone: string) => {
     if (fini) return
