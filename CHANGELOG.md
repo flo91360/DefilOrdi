@@ -1,14 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.11 — 2026-10-17
-<!-- planifikateur:72c19cab-4c5a-4b54-8a1c-1a5826c38147 -->
+## 0.8.10 (2026-10-17)
 
-- **Ajout d'une aide orthographique dans le jeu « Mots à retenir »** : J'ai ajouté l'option « Aide dys » à l'écran de choix de « Mots à retenir ». C'est un sélecteur « Sans aide dys / Aide dys activée », comme l'option « Images », et il est désactivé par défaut. Le typecheck et les 112 tests passent. Je n'ai pas lancé le build, ni essayé l'écran dans un navigateur. - **Erreur de saisie :** avec l'option activée, une saisie fausse mais proche d'un mot pas encore trouvé n'est pas comptée comme une erreur. Trois orthographes s'affichent, dont une seule juste, et l'enfant clique sur la bonne. - **Choix juste :** le mot est validé. - **Choix faux :** une erreur est comptée et l'enfant peut réessayer. - **Saisie sans rapport avec un mot restant :** le comportement est inchangé, l'erreur est comptée. - **Option désactivée :** le jeu se déroule comme avant. - **Orthographes proposées :** les deux fausses sont fabriquées à partir de confusions courantes (an/en, s/ss, é/è, lettres inversées ou doublées…). Elles sont toujours distinctes du mot juste, y compris avec la tolérance aux accents des paliers 5 à 7. - **Palier « phrase » :** l'aide n'y est pas active, seulement pour les paliers de 3 à 7 mots. - **Seuil de proximité :** pour décider qu'une saisie est « proche », j'ai pris une distance d'au plus un tiers de la longueur du mot (au moins 1). C'est un choix de ma part, à ajuster si besoin. - **Tests :** j'ai ajouté des tests dans `tests/jeux.test.ts`. - **Changements :** j'ai mis à jour `changements.md`, section « Prochaine version ». Le choix « case à cocher ou bouton » restait à préciser dans la carte. J'ai pris le sélecteur existant pour rester cohérent avec le reste de l'écran.
-
-## 0.8.10 — 2026-10-17
-<!-- planifikateur:54486b12-c2a5-455a-b912-b76709103401 -->
-
-- **Amélioration sur certaine mise en situation** : Aucune modification supplémentaire : la suppression par clic droit est déjà dans la branche et dans la PR n°19, et je n'ai rien changé à ce tour. Dans « Supprime le fichier brouillon.txt », un clic droit sur le fichier ouvre un menu contextuel simulé, et « Supprimer » valide l'étape. L'ancien chemin (sélectionner le fichier, puis cliquer sur la corbeille) reste accepté : j'ai choisi d'ajouter la méthode plutôt que de remplacer l'ancienne, faute de précision dans la carte. L'indice après deux erreurs et la règle « juste seulement sans mauvais clic » sont inchangés. Les tests du quiz vérifient que chaque zone attendue existe, quel que soit le chemin pris.
+- Amélioration sur certaine mise en situation (#19)
 
 ## 0.8.9 (2026-10-17)
 
