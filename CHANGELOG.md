@@ -1,9 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.14 — 2026-10-17
-<!-- planifikateur:bfea0f26-a487-4dc7-a1ad-b1ee849aec56 -->
+## 0.8.14 (2026-10-17)
 
-- **dans le jeu chasse aux lettres** : Le clavier à l'écran est maintenant masqué par défaut, et Chasse aux lettres propose de le retirer avant la partie. Le typecheck et les tests passent (117 tests). Je n'ai pas lancé `npm run build` : il fait partie des commandes que le worker exécute. Je n'ai pas non plus essayé l'écran dans l'application. - **Nouveaux profils** : le réglage « afficher le clavier » est désactivé à la création. - **Profils existants** : j'ai fait passer `DATA_VERSION` à 5. `normalizeAppData` met le clavier à « masqué » pour les données de version inférieure à 5. Après cette migration, la valeur choisie par l'ergothérapeute dans les Réglages est conservée. - **Chasse aux lettres, avant la partie** : l'écran « Quelles lettres vont tomber ? » affiche un choix « Avec le clavier / Sans le clavier », seulement si le réglage du profil est activé. Il est sur « avec » par défaut. Le choix reste local à l'écran de jeu et n'est pas enregistré dans le profil. Il est remis sur « avec » à la fin de chaque partie. - **Réglage désactivé** : l'option n'est pas proposée et le clavier n'est pas affiché. J'ai aussi masqué le bouton « Clavier : affiché/masqué » de la barre de jeu dans ce cas. Sans cela, l'enfant pouvait activer le clavier malgré le réglage de l'ergothérapeute. - **Autres jeux** : Dactylo et les autres jeux ne sont pas modifiés. - **Tests** : j'ai mis à jour les tests qui attendaient la version 4 et ajouté trois tests sur le clavier masqué par défaut, la migration et la conservation du réglage après migration. Le code est dans `src/shared/data.ts` et `src/renderer/src/games/espace/Espace.tsx`.
+- Carte dans le jeu chasse aux lettres (bfea0f26-a487-4dc7-a1ad-b1ee849aec56) (#23)
 
 ## 0.8.13 (2026-10-17)
 
