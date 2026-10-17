@@ -19,6 +19,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { lireSections } from './sections.mjs'
 
 const dossier = process.argv[2] ?? 'dist'
 const version = JSON.parse(readFileSync('package.json', 'utf8')).version
@@ -35,29 +36,6 @@ function git(...args) {
 
 function lignes(texte) {
   return texte.split('\n').map((l) => l.trim()).filter(Boolean)
-}
-
-// Découpe changements.md en sections « ## titre » -> texte (commentaires HTML
-// retirés). Les titres sont mis en minuscules.
-function lireSections(texte) {
-  const sections = new Map()
-  let titre
-  let corps = []
-  const fermer = () => {
-    if (titre !== undefined) sections.set(titre, corps.join('\n').trim())
-  }
-  for (const ligne of texte.replace(/<!--[\s\S]*?-->/g, '').replace(/\r/g, '').split('\n')) {
-    const m = /^##\s+(.+?)\s*$/.exec(ligne)
-    if (m) {
-      fermer()
-      titre = m[1].toLowerCase()
-      corps = []
-    } else if (titre !== undefined) {
-      corps.push(ligne)
-    }
-  }
-  fermer()
-  return sections
 }
 
 // changements.md tel qu'il était à une référence git (undefined = fichier courant).
