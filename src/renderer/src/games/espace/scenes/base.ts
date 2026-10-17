@@ -153,6 +153,63 @@ export abstract class SceneTheme {
   protected dessinerFantome(_ctx: CanvasRenderingContext2D, _f: Fantome): void {}
   protected mettreAJour(_dt: number, _lettres: Lettre[]): void {}
 
+  // Pièges (à ne pas taper) et cadeaux (vies à récupérer) du mode « Pièges et
+  // cadeaux » : dessinés de la même façon dans tous les décors, pour qu'on les
+  // reconnaisse partout. Piège = bulle sombre barrée de rouge ; cadeau = bulle
+  // dorée avec un cœur.
+  private dessinerSpecial(ctx: CanvasRenderingContext2D, l: Lettre, x: number, y: number) {
+    const R = this.rayon() * 0.95
+    const piege = l.type === 'piege'
+    const pulse = 1 + Math.sin(this.t * 5 + l.id) * 0.05
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.scale(pulse, pulse)
+    const halo = ctx.createRadialGradient(0, 0, R * 0.6, 0, 0, R * 1.5)
+    halo.addColorStop(0, piege ? 'rgba(239,68,68,0.45)' : 'rgba(250,204,21,0.55)')
+    halo.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = halo
+    ctx.beginPath()
+    ctx.arc(0, 0, R * 1.5, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = piege ? '#2b1020' : '#fff4c2'
+    ctx.strokeStyle = piege ? '#ef4444' : '#f59e0b'
+    ctx.lineWidth = Math.max(3, R * 0.12)
+    ctx.beginPath()
+    if (piege) {
+      // étoile à pointes : pas de contact à faire
+      const n = 10
+      for (let i = 0; i < n * 2; i++) {
+        const a = (i * Math.PI) / n - Math.PI / 2
+        const r = i % 2 === 0 ? R : R * 0.78
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r)
+      }
+      ctx.closePath()
+    } else ctx.arc(0, 0, R, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+    lettreContour(ctx, l.char, 0, R * 0.05, R * 1.05, piege ? '#fecaca' : '#7c2d12', piege ? '#2b1020' : '#fff4c2')
+    // marque : croix rouge pour le piège, cœur pour le cadeau
+    if (piege) {
+      ctx.globalAlpha = 0.55
+      ctx.strokeStyle = '#ef4444'
+      ctx.lineWidth = Math.max(4, R * 0.14)
+      ctx.lineCap = 'round'
+      ctx.beginPath()
+      ctx.moveTo(-R * 0.55, -R * 0.55)
+      ctx.lineTo(R * 0.55, R * 0.55)
+      ctx.moveTo(R * 0.55, -R * 0.55)
+      ctx.lineTo(-R * 0.55, R * 0.55)
+      ctx.stroke()
+    } else {
+      ctx.font = `900 ${Math.round(R * 0.8)}px ${POLICE}`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#ef4444'
+      ctx.fillText('♥', R * 0.78, -R * 0.78)
+    }
+    ctx.restore()
+  }
+
   // ---------- Boucle ----------
 
   avancer(dt: number, lettres: Lettre[]) {
@@ -191,7 +248,8 @@ export abstract class SceneTheme {
     this.dessinerDecor(ctx)
     for (const l of lettres) {
       const p = this.position(l)
-      this.dessinerLettre(ctx, l, p.x, p.y, l.id === visee)
+      if (l.type) this.dessinerSpecial(ctx, l, p.x, p.y)
+      else this.dessinerLettre(ctx, l, p.x, p.y, l.id === visee)
     }
     for (const f of this.fantomes) this.dessinerFantome(ctx, f)
     this.dessinerEffets(ctx)

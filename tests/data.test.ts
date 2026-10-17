@@ -208,3 +208,18 @@ describe('Couleurs piégées : réglages du bouton Indice', () => {
     expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', indices: 2 })
   })
 })
+
+describe('Chasse aux lettres : anciens résultats', () => {
+  it('donne des valeurs par défaut (chrono) aux parties d’avant les nouveaux modes', () => {
+    const date = '2026-02-01T00:00:00.000Z'
+    const ancien = { id: 'e', profileId: 'a1', date, jeu: 'espace', theme: 'ocean', serieNom: 'Majuscules', dureeMs: 60000, detruites: 20, manquees: 2, erreurs: 1, lettresRatees: {} }
+    const data = normalizeAppData({
+      profiles: [profil('a1', 'Léa')],
+      resultats: [ancien, { ...ancien, id: 'f', mode: 'pieges', pieges: 3, cadeaux: 1, palier: 2 }, { ...ancien, id: 'g', mode: 'inconnu' }]
+    })
+    expect(data.resultats[0]).toMatchObject({ mode: 'chrono', pieges: 0, cadeaux: 0, palier: 0 })
+    expect(data.resultats[1]).toMatchObject({ mode: 'pieges', pieges: 3, cadeaux: 1, palier: 2 })
+    expect(data.resultats[2]).toMatchObject({ mode: 'chrono' })
+  })
+})
+

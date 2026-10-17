@@ -49,7 +49,10 @@ le code et les commentaires aussi.
   `SceneTheme`, particules, fond mis en cache), `Spatial.ts` (fusée),
   `Western.ts` (cow-boy), `Ocean.ts` (sous-marin). Ajouter une aventure =
   l'ajouter à `THEMES_CHASSE` (`src/shared/data.ts`), à `THEMES_JEU` et écrire
-  sa scène.
+  sa scène. Modes (`ModeChasse` : chrono, vies, pieges) et paliers (8 réussites
+  d'affilée : vitesse puis lettres doubles) dans `engine.ts` ; pièges et
+  cadeaux = `Lettre.type`, dessinés par `SceneTheme.dessinerSpecial`. Les
+  records sont séparés par série, aventure et mode (`mesureRecord`).
 - `src/renderer/src/games/quiz/` : quiz. `questions.ts` = banque de questions
   (identifiants stables, utilisés dans les statistiques) ; `scenes/` = faux
   écrans cliquables, chaque élément est une `Zone` nommée. `tests/quiz.test.tsx`

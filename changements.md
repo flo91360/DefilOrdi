@@ -33,16 +33,29 @@ des changements ».
 
 ## Prochaine version
 
-- Mots à retenir : avant chaque partie, on peut choisir « Avec images » ou
-  « Sans images ». Avec images, une petite image représentant chaque mot
-  s'affiche au-dessus du mot pendant qu'il faut le mémoriser (de 3 à 7 mots).
-  Le choix se fait à chaque partie et n'est pas enregistré dans le profil.
-- Mots à retenir : pas d'image pour la phrase à retenir, ni pendant que
-  l'enfant retape les mots de tête.
-- Espace ergo, section Mots : chaque mot ajouté ou modifié reçoit
-  automatiquement une image, visible sous la liste. Un mot inconnu reçoit tout
-  de même un petit dessin d'aide (étoile, ampoule, smiley…).
-- Les images sont intégrées au logiciel : rien n'est téléchargé.
+- Chasse aux lettres (les trois aventures) : pendant la partie, un bouton
+  permet d'afficher ou de masquer le clavier à l'écran. Au départ, il suit le
+  réglage de l'enfant, et ce choix ne vaut que pour la partie en cours.
+- Chasse aux lettres : trois nouveaux niveaux de lettres. Niveau 5 :
+  minuscules et majuscules. Niveau 6 : majuscules et lettres accentuées.
+  Niveau 7 : tout mélangé (minuscules, majuscules, accents).
+- Chasse aux lettres : après 8 lettres réussies de suite sans erreur, le jeu
+  va plus vite ; après 8 autres, deux lettres tombent en même temps. Une
+  erreur remet seulement le compte des 8 lettres à zéro, le palier atteint
+  est conservé. Un message encourageant s'affiche à chaque palier.
+- Chasse aux lettres : nouveau mode « 3 vies », sans durée. Une faute ou une
+  lettre tombée fait perdre une vie ; la partie s'arrête à zéro vie et le jeu
+  devient plus difficile à chaque palier.
+- Chasse aux lettres : nouveau mode « Pièges et cadeaux », comme le mode 3
+  vies avec en plus des pièges à ne pas taper (en taper un fait perdre une
+  vie, les laisser tomber ne coûte rien) et des cadeaux dorés à taper pour
+  regagner une vie (5 vies au maximum).
+- Les sons d'erreur restent doux. Les records sont comptés séparément pour
+  chaque mode, en plus de la série de lettres et de l'aventure : lettres par
+  minute en mode chrono, nombre de lettres attrapées dans les modes à vies.
+- Statistiques de Chasse aux lettres : le mode, les pièges tapés, les cadeaux
+  et le palier atteint sont indiqués (et dans l'export Excel). Les parties
+  jouées avant cette version comptent comme des parties chrono.
 
 ## 0.8.2
 
