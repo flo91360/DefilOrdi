@@ -20,7 +20,7 @@ import { ConfirmDialog } from '../components/Modal'
 import { IconBack, IconCheck, IconDownload, IconTrash } from '../components/Icons'
 import { pourcentage } from '../games/commun'
 import { formatDuree, moyennesParJour, motsParMinute, precision, vitesse } from '../games/dactylo/engine'
-import { cadence } from '../games/espace/engine'
+import { cadence, mesureRecord, NOMS_MODES } from '../games/espace/engine'
 import { etatReponse, formatTemps } from '../games/petitbac/engine'
 import { construireBanque } from '../games/quiz/engine'
 import { toucheDe } from '../keyboard/azerty'
@@ -150,12 +150,16 @@ const NOMS_AVENTURES: Record<ResultatEspace['theme'], string> = { espace: 'Fusé
 
 const COLONNES_ESPACE: Colonne<ResultatEspace>[] = [
   { titre: 'Aventure', valeur: (r) => NOMS_AVENTURES[r.theme] },
+  { titre: 'Mode', valeur: (r) => NOMS_MODES[r.mode] },
   { titre: 'Lettres', valeur: (r) => r.serieNom },
   { titre: 'Durée', valeur: (r) => formatDuree(r.dureeMs), num: true },
   { titre: 'Attrapées', valeur: (r) => r.detruites, num: true },
   { titre: 'Par minute', valeur: (r) => cadence(r.detruites, r.dureeMs), num: true },
   { titre: 'Lettres justes', valeur: (r) => `${tirsReussis(r)} %`, num: true },
-  { titre: 'Tombées', valeur: (r) => r.manquees, num: true }
+  { titre: 'Tombées', valeur: (r) => r.manquees, num: true },
+  { titre: 'Pièges tapés', valeur: (r) => (r.mode === 'pieges' ? r.pieges : ''), num: true },
+  { titre: 'Cadeaux', valeur: (r) => (r.mode === 'pieges' ? r.cadeaux : ''), num: true },
+  { titre: 'Palier', valeur: (r) => (r.mode === 'chrono' ? '' : r.palier + 1), num: true }
 ]
 
 const COLONNES_QUIZ: Colonne<ResultatQuiz>[] = [
@@ -514,7 +518,8 @@ function StatsMemoire({
 function StatsEspace({ parties, onSupprimer }: { parties: ResultatEspace[]; onSupprimer: (r: Resultat) => void }) {
   const derniere = parties[parties.length - 1]
   const recentes = parties.slice(-NB_PARTIES_CARTE)
-  const meilleur = Math.max(...parties.map((r) => cadence(r.detruites, r.dureeMs)))
+  // Records séparés par mode : en chrono, lettres par minute ; sinon lettres attrapées.
+  const meilleur = Math.max(...parties.filter((r) => r.mode === derniere.mode).map((r) => mesureRecord(r.mode, r.detruites, r.dureeMs)))
   return (
     <>
       <div className="stats-tiles">
@@ -523,13 +528,17 @@ function StatsEspace({ parties, onSupprimer }: { parties: ResultatEspace[]; onSu
           label={parties.length > 1 ? 'parties jouées' : 'partie jouée'}
           detail={`${parties.reduce((t, r) => t + r.detruites, 0)} lettres attrapées au total`}
         />
-        <Tile valeur={String(cadence(derniere.detruites, derniere.dureeMs))} label="lettres attrapées/min" detail={`dernière partie · record ${meilleur}`} />
+        <Tile
+          valeur={String(derniere.mode === 'chrono' ? cadence(derniere.detruites, derniere.dureeMs) : derniere.detruites)}
+          label={derniere.mode === 'chrono' ? 'lettres attrapées/min' : 'lettres attrapées'}
+          detail={`dernière partie (${NOMS_MODES[derniere.mode]}) · record ${meilleur}`}
+        />
         <Tile valeur={`${tirsReussis(derniere)} %`} label="de lettres justes" detail={`dernière partie · ${derniere.manquees} tombées`} />
       </div>
       {parties.length > 1 && (
         <div className="stats-charts">
           <div className="card">
-            <LineChart titre="Lettres attrapées par minute" points={points(parties, (r) => cadence(r.detruites, r.dureeMs), (r) => `${NOMS_AVENTURES[r.theme]} · ${r.serieNom}`)} />
+            <LineChart titre="Lettres attrapées par minute" points={points(parties, (r) => cadence(r.detruites, r.dureeMs), (r) => `${NOMS_AVENTURES[r.theme]} · ${NOMS_MODES[r.mode]} · ${r.serieNom}`)} />
           </div>
           <div className="card">
             <LineChart titre="Lettres justes" unite=" %" max={100} points={points(parties, tirsReussis, (r) => `${NOMS_AVENTURES[r.theme]} · ${r.serieNom}`)} />

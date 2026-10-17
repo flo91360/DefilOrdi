@@ -3458,3 +3458,49 @@ label.quiz-ed-item {
 .entrainement-case { font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .choix-couleurs { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .choix-couleur { font-size: 1.4em; padding: 14px 28px; text-transform: capitalize; }
+
+/* Chasse aux lettres : vies et messages de palier */
+.espace-vies {
+  display: inline-flex;
+  gap: 2px;
+  letter-spacing: 0;
+}
+
+.espace-vies .vie {
+  color: #ff6b81;
+}
+
+.espace-vies .vie-perdue {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.espace-annonce {
+  position: absolute;
+  top: 14%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: clamp(28px, 6vh, 56px);
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.25), 0 0 30px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  animation: annonce 1.8s ease-out forwards;
+}
+
+@keyframes annonce {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  15% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
