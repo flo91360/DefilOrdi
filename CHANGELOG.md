@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.15 — 2026-10-17
+<!-- planifikateur:cbda4775-a2ef-4b8e-a99f-e9acd0a98ec9 -->
+
+- **dans chasse au lettres** : J'ai résolu le conflit de fusion dans `tests/data.test.ts` en gardant les deux blocs de tests : ceux de la police des lettres et ceux du clavier à l'écran masqué par défaut venus de main. Il ne reste aucun marqueur de conflit. Le typecheck passe et les 119 tests réussissent. Je n'ai pas relancé `npm run build`. Le reste de la fonctionnalité est inchangé : réglage de police dans le profil avec Verdana par défaut, étape « Lettres » avec aperçu J L I l T F, et police du profil utilisée dans les trois aventures de la Chasse aux lettres.
+
 ## 0.8.14 — 2026-10-17
 <!-- planifikateur:bfea0f26-a487-4dc7-a1ad-b1ee849aec56 -->
 
