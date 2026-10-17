@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.21 — 2026-10-18
+<!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
+
+- **quizz à améliorer** : Aucune modification supplémentaire n'était nécessaire. Le thème « Points reliés » est déjà livré dans la PR #30, et les vérifications locales (typecheck, tests, build) ont réussi à la dernière livraison. Le document de relecture reste `points-relies-actions.md` (9 logiciels, 26 actions). Reste à confirmer avec la personne si « Exchange » et « PDF X-Change Editor » sont bien deux entrées distinctes.
+
 ## 0.8.20 (2026-10-18)
 
 - Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
