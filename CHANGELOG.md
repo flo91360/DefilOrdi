@@ -1,9 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.16 — 2026-10-17
-<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
+## 0.8.16 (2026-10-17)
 
-- **dans dactylo** : Aucune nouvelle demande de modification dans ce tour : la fonctionnalité est déjà en place et je n'ai rien changé. L'avertissement Verr. Maj s'affiche pendant une partie de Dactylo et disparaît quand on le désactive. Les parties de 5 phrases au niveau étoile en vitesse (selon la classe) et en précision donnent une médaille (chocolat, bronze, argent ou or selon le niveau de la liste jouée). Elle s'affiche sur l'écran de fin et s'ajoute au coffre du profil (Profile.medailles), doublons compris. Le coffre est accessible depuis le hub. L'espace ergothérapeute affiche les médailles de chaque enfant en lecture seule.
+- dans dactylo (#25)
 
 ## 0.8.15 (2026-10-17)
 
