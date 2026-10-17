@@ -14,13 +14,13 @@ des changements ».
 
 ## Prochaine version
 
-- Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
-- Dactylo : dans le récapitulatif, la meilleure vitesse de frappe de la série est en gras.
-- Dactylo : les grandes cartes de moyennes (vitesse et précision) affichent aussi le smiley correspondant.
-- Dactylo : après une médaille, l'enfant peut écrire sa propre phrase (une phrase par médaille). Le logiciel lui rappelle la règle du niveau, dont le nombre maximal de mots : niveau 1, 6 mots sans accent, majuscule ni ponctuation ; niveau 2, 10 mots, une majuscule au début et au plus un signe de ponctuation ; niveau 3, 14 mots, au plus 3 signes ; niveau 4, sans maximum.
-- Dactylo : la phrase est vérifiée sans connexion Internet (règles du niveau, caractères du clavier, orthographe). Si elle est refusée, l'enfant est averti avec douceur et peut la corriger. Le correcteur connaît les mots courants et ceux de vos listes de phrases : un mot rare peut être signalé à tort, vous pouvez alors valider la phrase.
-- Dactylo : une phrase acceptée rejoint les phrases du niveau et peut être tirée pour tous les enfants.
-- Espace ergo : nouvelle section « Phrases des enfants ». Les phrases refusées y apparaissent comme une notification (pastille rouge sur la section) ; vous pouvez les corriger, les valider, changer leur niveau ou les supprimer, ainsi que les phrases déjà ajoutées.
+- Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
+- Couleurs piégées : nouveau 4e mode, « Couleurs piégées timer ». Il fonctionne comme « Les deux » (le mot ou la couleur de l'encre), mais contre la montre : l'enfant choisit 1, 2 ou 3 minutes et réussit un maximum de manches. Le temps restant s'affiche en haut de l'écran.
+- Couleurs piégées timer : à la fin du temps, le score est le nombre de bonnes réponses. Une erreur n'est pas comptée et n'entraîne aucune autre pénalité.
+- Couleurs piégées timer : le bouton « Indice » reste disponible, à raison d'un indice par minute (2 indices pour une partie de 2 minutes). Si le nombre d'indices est réglé à 0 dans l'espace ergo, le bouton reste retiré.
+- Couleurs piégées timer : l'écran de fin annonce un nouveau record quand l'enfant bat son meilleur score pour la même durée.
+- Statistiques de Couleurs piégées : les parties chronométrées s'affichent sous la forme « Couleurs piégées timer », durée en minutes et nombre de bonnes réponses. Un encadré « Records » donne le meilleur score pour chaque durée. L'export Excel contient les mêmes informations.
+- Couleurs piégées, modes « Les deux » et timer : la consigne (écrire le mot ou la couleur de l'encre) est tirée au hasard à chaque manche, pour que l'enfant ne puisse pas deviner la suite.
 
 ## 0.8.16
 

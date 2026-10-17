@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.19 — 2026-10-18
+<!-- planifikateur:99fd6661-c6fc-40b1-9cca-0290f7a6c275 -->
+
+- **dans le jeu couleur piégée** : J'ai corrigé l'échec de la CI : la section « Prochaine version » de changements.md n'avait pas été réécrite pour la version 0.8.19. Elle décrit maintenant, pour l'ergothérapeute, ce que cette livraison change dans Couleurs piégées. Cette description reprend les réponses possibles masquées hors indice, le mode timer (1, 2 ou 3 minutes, score égal aux bonnes réponses, un indice par minute), les records et les statistiques, et le tirage au hasard des consignes. Le script de vérification des changements passe en local. Je n'ai pas modifié le code du jeu et je n'ai pas relancé le typecheck, les tests ni le build. CHANGELOG.md n'a pas été touché.
+
 ## 0.8.18 (2026-10-18)
 
 - Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
