@@ -1228,3 +1228,106 @@
 .visuel-scene {
   max-width: min(52%, calc((100vh - 340px) * 16 / 9));
 }
+
+/* Points reliés */
+.relier-consigne {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+.relier-compte {
+  margin-left: 8px;
+  color: var(--ink-2);
+  font-size: 16px;
+}
+.relier-colonnes {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 24px;
+  align-items: start;
+}
+.relier-colonne {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.relier-colonne h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--ink-2);
+}
+.relier-action,
+.relier-logiciel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: 10px 18px;
+  border-radius: 16px;
+  border: 3px solid var(--line);
+  background: var(--surface);
+  font-size: 20px;
+  font-weight: 800;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.relier-logiciel {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+}
+.relier-logiciel small {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.relier-action:hover:not(:disabled),
+.relier-logiciel:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.relier-action.reliee {
+  background: var(--accent-soft);
+}
+.relier-action.choisie {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.relier-lien {
+  font-size: 17px;
+  color: var(--accent-ink);
+}
+.relier-action.juste {
+  border-color: var(--success);
+}
+.relier-action.fausse {
+  border-color: var(--danger);
+}
+.relier-bonne {
+  font-size: 16px;
+  color: var(--danger);
+}
+.relier-nb {
+  min-width: 28px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  text-align: center;
+  font-size: 16px;
+}
+.relier-verifier {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+.relier-action:disabled,
+.relier-logiciel:disabled {
+  cursor: default;
+}
+.relier-logiciel:disabled:not(:has(.relier-nb)) {
+  opacity: 0.75;
+}

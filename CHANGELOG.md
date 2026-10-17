@@ -1,9 +1,9 @@
 # Journal des modifications de DefilOrdi
 
 ## 0.8.21 — 2026-10-18
-<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+<!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
 
-- **amélioration quizz sur les mise en situation** : J'ai corrigé l'échec du contrôle GitHub. La section « Prochaine version » de `changements.md` n'avait pas été réécrite pour cette livraison. Je l'ai remplacée par deux puces rédigées pour l'ergothérapeute : la validation par raccourci clavier (Ctrl+G, Ctrl+E, Ctrl+Z, Ctrl+S, Ctrl+N) en plus du clic, et le message « Ça peut aussi se faire avec … » affiché seulement après la réponse. Le code du quiz n'a pas changé. Je n'ai relancé ni les tests ni le contrôle, le worker s'en charge.
+- **quizz à améliorer** : Aucune modification supplémentaire n'était nécessaire. Le thème « Points reliés » est déjà livré dans la PR #30, et les vérifications locales (typecheck, tests, build) ont réussi à la dernière livraison. Le document de relecture reste `points-relies-actions.md` (9 logiciels, 26 actions). Reste à confirmer avec la personne si « Exchange » et « PDF X-Change Editor » sont bien deux entrées distinctes.
 
 ## 0.8.20 (2026-10-18)
 
