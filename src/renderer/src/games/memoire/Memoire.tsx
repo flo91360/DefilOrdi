@@ -25,8 +25,10 @@ import {
   ECHECS_POUR_DESCENDRE,
   estPhrase,
   libellePalier,
+  motProche,
   motsDePhrase,
   nombreParNiveau,
+  orthographesPossibles,
   proposer,
   REUSSITES_POUR_MONTER,
   toleranceAccents,
@@ -41,6 +43,10 @@ const formatPalier = (p: number) => (estPhrase(p) ? 'Phrase' : String(p))
 // Images au-dessus des mots : choisies avant chaque partie, non mémorisées.
 const CHOIX_IMAGES = ['oui', 'non'] as const
 const formatImages = (v: (typeof CHOIX_IMAGES)[number]) => (v === 'oui' ? 'Avec images' : 'Sans images')
+
+// Aide dys : choisie avant chaque partie, non mémorisée.
+const CHOIX_AIDE = ['non', 'oui'] as const
+const formatAide = (v: (typeof CHOIX_AIDE)[number]) => (v === 'oui' ? 'Aide dys activée' : 'Sans aide dys')
 
 interface Props {
   profile: Profile
@@ -74,6 +80,8 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
   // Option choisie avant la partie (pas un réglage du profil) : aide visuelle
   // pendant la mémorisation des paliers 3 à 7 mots.
   const [images, setImages] = useState<(typeof CHOIX_IMAGES)[number]>('oui')
+  // Aide dys : après une faute proche d'un mot, l'enfant choisit entre 3 orthographes.
+  const [aideDys, setAideDys] = useState<(typeof CHOIX_AIDE)[number]>('non')
 
   const jouables = listes.filter((l) => l.phrases.length > 0)
   const triees = [...jouables].sort(
@@ -149,6 +157,7 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
       phrase: phase.phrase,
       palier: phase.etat.palier,
       images: images === 'oui',
+      aideDys: aideDys === 'oui',
       onFin: (t: boolean[], e: number, d: number, ok: boolean) => terminer(jeu, t, e, d, ok, true),
       onQuitter: (t: boolean[], e: number, d: number) => terminer(jeu, t, e, d, false, false)
     }
@@ -217,6 +226,10 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
       <GameTopbar titre="Mots à retenir" onBack={onQuit} />
       <main className="choix-main">
         <Chips label="Images au-dessus des mots" values={CHOIX_IMAGES} value={images} onChange={setImages} format={formatImages} />
+        <Chips label="Aide dys" values={CHOIX_AIDE} value={aideDys} onChange={setAideDys} format={formatAide} />
+        {aideDys === 'oui' && (
+          <p className="memoire-aide">Si tu fais une faute d’orthographe, tu choisis la bonne écriture parmi 3 propositions.</p>
+        )}
         {peutReprendre && (
           <div className="memoire-reprendre">
             <button className="btn btn-primary btn-lg" onClick={reprendre}>
@@ -272,6 +285,7 @@ interface PartieProps {
   phrase: string // texte de la phrase (palier phrase), '' sinon
   palier: number
   images: boolean // une image au-dessus de chaque mot pendant la mémorisation (paliers 3 à 7)
+  aideDys: boolean // paliers 3 à 7 : 3 orthographes proposées après une faute proche d'un mot
   onFin: (trouves: boolean[], erreurs: number, dureeMs: number, reussie: boolean) => void
   onQuitter: (trouves: boolean[], erreurs: number, dureeMs: number) => void
 }
@@ -402,12 +416,14 @@ function EnteteRappel({
 }
 
 // Paliers 3 à 7 : les mots sont retapés un par un, dans n'importe quel ordre.
-function Partie({ profile, mots, palier, images, onFin, onQuitter }: PartieProps) {
+function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: PartieProps) {
   const { duree, etape, reste, commencerRappel, dureeRappel } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux' | 'info'; texte: string } | null>(null)
   const [dernier, setDernier] = useState<number | null>(null)
+  // Aide dys : mot visé et orthographes proposées en attendant le choix.
+  const [choix, setChoix] = useState<{ index: number; options: string[] } | null>(null)
   const sonErreur = useSonErreur(profile)
   const fini = useRef(false)
 
@@ -417,19 +433,39 @@ function Partie({ profile, mots, palier, images, onFin, onQuitter }: PartieProps
     onFin(t, e, d, t.length > 0 && t.every(Boolean))
   }
 
+  const trouver = (index: number) => {
+    const t = trouves.map((x, i) => x || i === index)
+    setTrouves(t)
+    setDernier(index)
+    setMessage({ type: 'juste', texte: `Oui ! « ${mots[index]} »` })
+    playSound(profile.sonReussite)
+    if (t.every(Boolean)) {
+      const d = dureeRappel()
+      setTimeout(() => finir(t, erreurs, d), 900)
+    }
+  }
+
+  const choisir = (option: string) => {
+    if (fini.current || !choix) return
+    const { index } = choix
+    setChoix(null)
+    if (option === mots[index]) return trouver(index)
+    setErreurs((e) => e + 1)
+    setMessage({ type: 'faux', texte: `Ce n’était pas la bonne orthographe de « ${option} ». Tu peux réessayer.` })
+    sonErreur()
+  }
+
   const valider = (saisie: string) => {
     if (fini.current) return
     const p = proposer(mots, trouves, saisie, palier)
+    if (p.type !== 'trouve') setChoix(null)
     if (p.type === 'trouve') {
-      const t = trouves.map((x, i) => x || i === p.index)
-      setTrouves(t)
-      setDernier(p.index)
-      setMessage({ type: 'juste', texte: `Oui ! « ${mots[p.index]} »` })
-      playSound(profile.sonReussite)
-      if (t.every(Boolean)) {
-        const d = dureeRappel()
-        setTimeout(() => finir(t, erreurs, d), 900)
-      }
+      trouver(p.index)
+    } else if (p.type === 'absent' && aideDys && motProche(mots, trouves, saisie) !== null) {
+      // Mot bien mémorisé mais mal écrit : pas d'erreur tout de suite.
+      const index = motProche(mots, trouves, saisie) as number
+      setChoix({ index, options: orthographesPossibles(mots[index], palier) })
+      setMessage({ type: 'info', texte: 'Presque ! Quelle est la bonne orthographe ?' })
     } else if (p.type === 'deja') {
       setMessage({ type: 'info', texte: `Tu as déjà trouvé « ${mots[p.index]} ».` })
     } else if (p.type === 'absent') {
@@ -486,6 +522,15 @@ function Partie({ profile, mots, palier, images, onFin, onQuitter }: PartieProps
                 : 'L’ordre n’a pas d’importance. Écris chaque mot exactement comme il était.'}
           </p>
         </div>
+        {choix && (
+          <div className="choix-orthographe" role="group" aria-label="Choisis la bonne orthographe">
+            {choix.options.map((o) => (
+              <button key={o} className="btn btn-soft btn-lg mot-option" onClick={() => choisir(o)}>
+                {o}
+              </button>
+            ))}
+          </div>
+        )}
         <button className="btn btn-soft" onClick={() => finir(trouves, erreurs, dureeRappel())}>
           Je ne me souviens plus des autres
         </button>

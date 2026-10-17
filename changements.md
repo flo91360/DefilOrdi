@@ -33,29 +33,12 @@ des changements ».
 
 ## Prochaine version
 
-- Chasse aux lettres (les trois aventures) : pendant la partie, un bouton
-  permet d'afficher ou de masquer le clavier à l'écran. Au départ, il suit le
-  réglage de l'enfant, et ce choix ne vaut que pour la partie en cours.
-- Chasse aux lettres : trois nouveaux niveaux de lettres. Niveau 5 :
-  minuscules et majuscules. Niveau 6 : majuscules et lettres accentuées.
-  Niveau 7 : tout mélangé (minuscules, majuscules, accents).
-- Chasse aux lettres : après 8 lettres réussies de suite sans erreur, le jeu
-  va plus vite ; après 8 autres, deux lettres tombent en même temps. Une
-  erreur remet seulement le compte des 8 lettres à zéro, le palier atteint
-  est conservé. Un message encourageant s'affiche à chaque palier.
-- Chasse aux lettres : nouveau mode « 3 vies », sans durée. Une faute ou une
-  lettre tombée fait perdre une vie ; la partie s'arrête à zéro vie et le jeu
-  devient plus difficile à chaque palier.
-- Chasse aux lettres : nouveau mode « Pièges et cadeaux », comme le mode 3
-  vies avec en plus des pièges à ne pas taper (en taper un fait perdre une
-  vie, les laisser tomber ne coûte rien) et des cadeaux dorés à taper pour
-  regagner une vie (5 vies au maximum).
-- Les sons d'erreur restent doux. Les records sont comptés séparément pour
-  chaque mode, en plus de la série de lettres et de l'aventure : lettres par
-  minute en mode chrono, nombre de lettres attrapées dans les modes à vies.
-- Statistiques de Chasse aux lettres : le mode, les pièges tapés, les cadeaux
-  et le palier atteint sont indiqués (et dans l'export Excel). Les parties
-  jouées avant cette version comptent comme des parties chrono.
+- Mots à retenir : nouvelle option « Aide dys », à choisir avant la partie
+  (pour les paliers de 3 à 7 mots). Quand l'enfant tape un mot qu'il a bien
+  retenu mais mal écrit, ce n'est pas compté comme une erreur tout de suite :
+  trois orthographes s'affichent et il choisit la bonne. S'il se trompe de
+  choix, l'erreur est comptée et il peut réessayer.
+- Sans l'option, le jeu se déroule exactement comme avant.
 
 ## 0.8.2
 

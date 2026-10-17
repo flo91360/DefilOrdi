@@ -149,3 +149,88 @@ export function verifierPhrase(attendus: string[], saisie: string): Verification
   const justes = lcs[0][0]
   return { trouves, enTrop: m - justes, reussie: n > 0 && justes === n && m === n }
 }
+
+// --- Aide dys (paliers 3 à 7) --------------------------------------------------
+
+function distance(a: string, b: string): number {
+  let prec = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prec[j] + 1, cur[j - 1] + 1, prec[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+    }
+    prec = cur
+  }
+  return prec[b.length]
+}
+
+// Avec l'aide dys, une saisie « absente » proche d'un mot pas encore trouvé
+// est probablement une faute d'orthographe sur un mot bien mémorisé : renvoie
+// l'index de ce mot (le plus proche), sinon null.
+export function motProche(mots: string[], trouves: boolean[], saisie: string): number | null {
+  const s = normaliserReponse(saisie)
+  if (s === '') return null
+  let meilleur: number | null = null
+  let dist = Infinity
+  mots.forEach((m, i) => {
+    if (trouves[i]) return
+    const k = normaliserReponse(m)
+    const d = distance(s, k)
+    if (d <= Math.max(1, Math.ceil(k.length / 3)) && d < dist) {
+      dist = d
+      meilleur = i
+    }
+  })
+  return meilleur
+}
+
+// Confusions fréquentes à l'écrit (dysorthographie).
+const CONFUSIONS: [string, string][] = [
+  ['ou', 'u'], ['u', 'ou'], ['eau', 'o'], ['o', 'eau'], ['au', 'o'], ['an', 'en'], ['en', 'an'], ['in', 'ain'],
+  ['ain', 'in'], ['ein', 'in'], ['on', 'om'], ['ph', 'f'], ['f', 'ph'], ['qu', 'k'], ['c', 'qu'], ['ç', 's'],
+  ['s', 'ss'], ['ss', 's'], ['é', 'è'], ['è', 'é'], ['ê', 'e'], ['ai', 'é'], ['ei', 'ai'], ['er', 'é'], ['g', 'j'],
+  ['j', 'g'], ['b', 'd'], ['d', 'b'], ['p', 'q'], ['m', 'n'], ['oi', 'wa'], ['ch', 'sh']
+]
+
+function variantes(mot: string): string[] {
+  const out: string[] = []
+  for (const [de, vers] of CONFUSIONS) {
+    let i = mot.indexOf(de)
+    while (i !== -1) {
+      out.push(mot.slice(0, i) + vers + mot.slice(i + de.length))
+      i = mot.indexOf(de, i + 1)
+    }
+  }
+  for (let i = 0; i < mot.length - 1; i++) {
+    if (mot[i] !== mot[i + 1]) out.push(mot.slice(0, i) + mot[i + 1] + mot[i] + mot.slice(i + 2)) // lettres inversées
+    if (mot[i] === mot[i + 1]) out.push(mot.slice(0, i) + mot.slice(i + 1)) // double lettre simplifiée
+    else if (/[bcdfgklmnprstvz]/i.test(mot[i])) out.push(mot.slice(0, i + 1) + mot[i] + mot.slice(i + 1)) // lettre doublée
+  }
+  for (let i = 1; i < mot.length - 1; i++) out.push(mot.slice(0, i) + mot.slice(i + 1)) // lettre oubliée
+  out.push(mot + 'e', mot + 's')
+  return out
+}
+
+// Trois orthographes du mot, dans un ordre mélangé : le mot juste et deux
+// fausses, toutes différentes une fois comparées comme le fait le jeu.
+export function orthographesPossibles(mot: string, palier: number, random: () => number = Math.random): string[] {
+  const vus = new Set([cleMot(mot, palier)])
+  const fausses: string[] = []
+  for (const v of melanger(variantes(mot), random)) {
+    const k = cleMot(v, palier)
+    if (v.trim() === '' || vus.has(k)) continue
+    vus.add(k)
+    fausses.push(v)
+    if (fausses.length === 2) break
+  }
+  // Mot très court : à défaut de variante, on complète avec des lettres en trop.
+  for (const fin of ['x', 'z', 'h']) {
+    if (fausses.length === 2) break
+    const v = mot + fin
+    if (!vus.has(cleMot(v, palier))) {
+      vus.add(cleMot(v, palier))
+      fausses.push(v)
+    }
+  }
+  return melanger([mot, ...fausses], random)
+}

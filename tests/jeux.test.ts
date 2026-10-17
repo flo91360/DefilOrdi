@@ -17,7 +17,9 @@ import {
   choisirPhrase,
   departProgression,
   estPhrase,
+  motProche,
   motsDePhrase,
+  orthographesPossibles,
   proposer,
   verifierPhrase
 } from '../src/renderer/src/games/memoire/engine'
@@ -216,5 +218,26 @@ describe('Couleurs piégées : entraînement à la souris', () => {
     expect(clicValide('droit', 'click')).toBe(false)
     expect(clicValide('double', 'dblclick')).toBe(true)
     expect(clicValide('double', 'click')).toBe(false)
+  })
+})
+
+describe('Mots à retenir : aide dys', () => {
+  it('repère le mot mal écrit le plus proche, parmi les mots non trouvés', () => {
+    const mots = ['maison', 'bateau', 'chat']
+    expect(motProche(mots, [false, false, false], 'maizon')).toBe(0)
+    expect(motProche(mots, [true, false, false], 'maizon')).toBeNull()
+    expect(motProche(mots, [false, false, false], 'xylophone')).toBeNull()
+    expect(motProche(mots, [false, false, false], '  ')).toBeNull()
+  })
+
+  it('propose trois orthographes différentes dont une seule juste', () => {
+    for (const palier of [3, 5]) {
+      for (const mot of ['maison', 'bateau', 'chat', 'ami', 'a']) {
+        const o = orthographesPossibles(mot, palier)
+        expect(o).toHaveLength(3)
+        expect(new Set(o.map((x) => normaliserReponse(palier >= 5 ? x : x.toLowerCase()))).size).toBe(3)
+        expect(o.filter((x) => x === mot)).toHaveLength(1)
+      }
+    }
   })
 })
