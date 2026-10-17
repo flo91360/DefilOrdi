@@ -1,14 +1,19 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.22 — 2026-10-18
-<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+## 0.8.21 (2026-10-18)
 
-- **amélioration quizz sur les mise en situation** : J'ai résolu les deux conflits de fusion avec main, sans laisser de marqueur. Le typecheck et les tests passent (141) ; je n'ai pas relancé le build. - **Description des changements :** dans `changements.md`, mes deux puces sur les raccourcis du quiz s'ajoutent aux puces venues de main (Points reliés, Mots à retenir, Couleurs piégées). - **Message de correction du quiz :** dans `Quiz.tsx`, le texte de correction de main (`corrigee.detail ?? q.explication`) est conservé. Il est suivi, pour les mises en situation qui ont un raccourci, de « Ça peut aussi se faire avec Ctrl+X ».
-
-## 0.8.21 — 2026-10-18
-<!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
-
-- **quizz à améliorer** : Aucune modification supplémentaire n'était nécessaire. Le thème « Points reliés » est déjà livré dans la PR #30, et les vérifications locales (typecheck, tests, build) ont réussi à la dernière livraison. Le document de relecture reste `points-relies-actions.md` (9 logiciels, 26 actions). Reste à confirmer avec la personne si « Exchange » et « PDF X-Change Editor » sont bien deux entrées distinctes.
+- Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
+- Points reliés : la vérification se fait seulement une fois les 10 liaisons faites, avec la correction des erreurs. La partie n'est réussie qu'avec 10 liaisons justes sur 10.
+- Points reliés : les 10 actions sont tirées au hasard dans une liste de 26 actions, pour que les parties varient. La liste est fournie dans un document à relire (docs/points-relies-actions.md).
+- Quiz, « Tout mélanger » : le thème « Points reliés » peut apparaître, au plus une fois par partie.
+- Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
+- Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
+- Couleurs piégées : nouveau 4e mode, « Couleurs piégées timer ». Il fonctionne comme « Les deux » (le mot ou la couleur de l'encre), mais contre la montre : l'enfant choisit 1, 2 ou 3 minutes et réussit un maximum de manches. Le temps restant s'affiche en haut de l'écran.
+- Couleurs piégées timer : à la fin du temps, le score est le nombre de bonnes réponses. Une erreur n'est pas comptée et n'entraîne aucune autre pénalité.
+- Couleurs piégées timer : le bouton « Indice » reste disponible, à raison d'un indice par minute (2 indices pour une partie de 2 minutes). Si le nombre d'indices est réglé à 0 dans l'espace ergo, le bouton reste retiré.
+- Couleurs piégées timer : l'écran de fin annonce un nouveau record quand l'enfant bat son meilleur score pour la même durée.
+- Statistiques de Couleurs piégées : les parties chronométrées s'affichent sous la forme « Couleurs piégées timer », durée en minutes et nombre de bonnes réponses. Un encadré « Records » donne le meilleur score pour chaque durée. L'export Excel contient les mêmes informations.
+- Couleurs piégées, modes « Les deux » et timer : la consigne (écrire le mot ou la couleur de l'encre) est tirée au hasard à chaque manche, pour que l'enfant ne puisse pas deviner la suite.
 
 ## 0.8.20 (2026-10-18)
 
