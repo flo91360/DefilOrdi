@@ -136,3 +136,15 @@ export function defaultListesMots(): ListePhrases[] {
     }
   ]
 }
+
+// Listes jouées dans Dactylo : chaque liste reçoit les phrases validées des
+// enfants qui ont le même niveau, pour qu'elles soient tirées au hasard.
+export function listesAvecPhrasesEnfants(
+  listes: ListePhrases[],
+  phrasesEnfants: { texte: string; niveau: number; statut: string }[]
+): ListePhrases[] {
+  return listes.map((l) => {
+    const en = phrasesEnfants.filter((p) => p.statut === 'valide' && p.niveau === l.niveau && !l.phrases.includes(p.texte))
+    return en.length === 0 ? l : { ...l, phrases: [...l.phrases, ...en.map((p) => p.texte)] }
+  })
+}

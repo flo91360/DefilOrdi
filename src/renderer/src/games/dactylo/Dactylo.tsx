@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { ListePhrases, Profile, Resultat, ResultatDactylo } from '../../../../shared/data'
+import type { ListePhrases, PhraseEnfant, Profile, Resultat, ResultatDactylo } from '../../../../shared/data'
 import { Avatar } from '../../avatar/Avatar'
 import { FullscreenButton } from '../../components/FullscreenButton'
 import { IconBack, IconCheck } from '../../components/Icons'
@@ -24,6 +24,7 @@ import {
 import { MedailleIcone } from '../../components/Medailles'
 import { medailleGagnee, NOMS_MEDAILLES, smileyPrecision, smileyVitesse } from './seuils'
 import { SmileyIcone } from './Smiley'
+import { PhrasePerso } from './PhrasePerso'
 
 const NOMBRES = [3, 5, 10]
 
@@ -33,10 +34,11 @@ interface ScorePhrase {
   phrase: string
   vitesse: number
   precision: number
+  erreurs: number
 }
 
 function scoreDe(e: EtatPhrase, now: number): ScorePhrase {
-  return { phrase: e.cible, ...scorePhrase(e, now) }
+  return { phrase: e.cible, erreurs: e.erreurs, ...scorePhrase(e, now) }
 }
 
 interface Props {
@@ -45,6 +47,7 @@ interface Props {
   resultats: Resultat[]
   onResult: (r: ResultatDactylo) => void
   onMedaille: (niveau: number) => void
+  onPhrase: (p: PhraseEnfant) => void
   onQuit: () => void
 }
 
@@ -53,7 +56,7 @@ type Phase =
   | { nom: 'jeu'; liste: ListePhrases; phrases: string[] }
   | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean; scores: ScorePhrase[]; medaille: number | null }
 
-export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onQuit }: Props) {
+export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onPhrase, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState(5)
 
@@ -117,6 +120,8 @@ export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onQu
         record={phase.record}
         scores={phase.scores}
         medaille={phase.medaille}
+        motsConnus={listes.flatMap((l) => l.phrases)}
+        onPhrase={onPhrase}
         onRejouer={() => lancer(phase.liste)}
         onAutre={() => setPhase({ nom: 'choix' })}
         onQuit={onQuit}
@@ -199,18 +204,40 @@ const BRAVOS = ['Bravo !', 'Super !', 'Génial !', 'Bien joué !', 'Excellent !'
 // Pause après une phrase réussie, le temps de lire son score.
 const PAUSE_SCORE_MS = 2500
 
-// Score d'une phrase : vitesse et précision, chacune avec son smiley.
-function ScoreLigne({ score, profile }: { score: ScorePhrase; profile: Profile }) {
+// Score d'une phrase : vitesse et précision, chacune avec son smiley. Le
+// nombre d'erreurs (option de l'ergothérapeute) n'apparaît qu'à la fin de la
+// phrase. `recap` : récapitulatif final, où seule la meilleure vitesse est en
+// gras (`meilleure`).
+function ScoreLigne({
+  score,
+  profile,
+  erreurs = false,
+  recap = false,
+  meilleure = false
+}: {
+  score: ScorePhrase
+  profile: Profile
+  erreurs?: boolean
+  recap?: boolean
+  meilleure?: boolean
+}) {
+  const vitesseTxt = recap ? meilleure ? <strong>{score.vitesse}</strong> : <span>{score.vitesse}</span> : <strong>{score.vitesse}</strong>
+  const precisionTxt = recap ? <span>{score.precision} %</span> : <strong>{score.precision} %</strong>
   return (
     <span className="score-phrase">
       <span className="score-item">
-        <strong>{score.vitesse}</strong> frappes/min
+        {vitesseTxt} frappes/min
         <SmileyIcone smiley={smileyVitesse(score.vitesse, profile.classe)} quoi="Vitesse" />
       </span>
       <span className="score-item">
-        <strong>{score.precision} %</strong> de précision
+        {precisionTxt} de précision
         <SmileyIcone smiley={smileyPrecision(score.precision)} quoi="Précision" />
       </span>
+      {erreurs && profile.dactylo.afficherErreurs && (
+        <span className="score-item score-erreurs">
+          {score.erreurs === 0 ? 'Aucune erreur' : `${score.erreurs} erreur${score.erreurs > 1 ? 's' : ''}`}
+        </span>
+      )}
     </span>
   )
 }
@@ -384,7 +411,7 @@ function Partie({
             )}
             {scoreCourant ? (
               <p className="phrase-score" aria-live="polite">
-                <ScoreLigne score={scoreCourant} profile={profile} />
+                <ScoreLigne score={scoreCourant} profile={profile} erreurs />
               </p>
             ) : precedente ? (
               <p className="phrase-score phrase-score-precedente">
@@ -444,6 +471,8 @@ function Fin({
   record,
   scores,
   medaille,
+  motsConnus,
+  onPhrase,
   onRejouer,
   onAutre,
   onQuit
@@ -453,6 +482,8 @@ function Fin({
   record: boolean
   scores: ScorePhrase[]
   medaille: number | null
+  motsConnus: string[]
+  onPhrase: (p: PhraseEnfant) => void
   onRejouer: () => void
   onAutre: () => void
   onQuit: () => void
@@ -462,6 +493,7 @@ function Fin({
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
     .map(([c]) => (c === ' ' ? 'Espace' : c))
+  const meilleureVitesse = Math.max(...scores.map((s) => s.vitesse))
   const message = p >= 95 ? 'Quelle précision, bravo !' : p >= 85 ? 'Très bon travail !' : 'Bien joué, continue comme ça !'
 
   useEffect(() => {
@@ -496,9 +528,14 @@ function Fin({
             </div>
           </div>
         )}
+        {medaille !== null && <PhrasePerso profile={profile} niveau={medaille} motsConnus={motsConnus} onPhrase={onPhrase} />}
         <div className="fin-stats">
-          <StatTile value={String(vitesse(resultat))} label="frappes par minute" detail={`${motsParMinute(resultat)} mots/min`} />
-          <StatTile value={`${p} %`} label="de précision" detail={`${resultat.erreurs} erreur${resultat.erreurs > 1 ? 's' : ''}`} />
+          <StatTile value={String(vitesse(resultat))} label="frappes par minute" detail={`${motsParMinute(resultat)} mots/min`}
+            smiley={<SmileyIcone smiley={smileyVitesse(vitesse(resultat), profile.classe)} quoi="Vitesse moyenne" size={40} />}
+          />
+          <StatTile value={`${p} %`} label="de précision" detail={profile.dactylo.afficherErreurs ? `${resultat.erreurs} erreur${resultat.erreurs > 1 ? 's' : ''}` : `${resultat.frappes} frappes`}
+            smiley={<SmileyIcone smiley={smileyPrecision(p)} quoi="Précision moyenne" size={40} />}
+          />
           <StatTile value={formatDuree(resultat.dureeMs)} label="de frappe" detail={`${resultat.phrases} phrase${resultat.phrases > 1 ? 's' : ''}`} />
         </div>
         {scores.length > 0 && (
@@ -509,7 +546,7 @@ function Fin({
                 <li key={i} className="fin-phrase">
                   <span className="fin-phrase-num">{i + 1}</span>
                   <span className="fin-phrase-texte">{s.phrase}</span>
-                  <ScoreLigne score={s} profile={profile} />
+                  <ScoreLigne score={s} profile={profile} erreurs recap meilleure={s.vitesse === meilleureVitesse} />
                 </li>
               ))}
             </ol>

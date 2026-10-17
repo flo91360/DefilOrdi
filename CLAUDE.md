@@ -24,6 +24,13 @@ le code et les commentaires aussi.
   `seuils.ts` réunit dans `SEUILS_DACTYLO` les seuils des smileys du score de
   chaque phrase (vitesse selon la classe du profil, précision), testés dans
   `tests/score.test.ts`. Les scores par phrase ne sont pas enregistrés.
+- Phrases personnelles de Dactylo (proposées après une médaille) : règles par
+  niveau dans `src/shared/regles.ts`, correcteur hors ligne (lexique intégré +
+  mots des listes) dans `src/shared/orthographe.ts`, tests dans
+  `tests/regles.test.ts`. Stockées dans `phrasesEnfants` (statut `a_verifier` =
+  notification pour l'ergo, section « Phrases des enfants »), fusionnées aux
+  listes du même niveau par `listesAvecPhrasesEnfants`. Option
+  `afficherErreurs` des réglages Dactylo de l'enfant.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.

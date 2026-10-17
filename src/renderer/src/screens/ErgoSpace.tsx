@@ -22,10 +22,11 @@ import { PetitBacEditor } from './PetitBacEditor'
 import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
 import { PhrasesMemoireEditor } from './PhrasesMemoireEditor'
 import { QuizEditor } from './QuizEditor'
+import { PhrasesEnfantsEditor } from './PhrasesEnfantsEditor'
 import { ListeMedailles } from '../components/Medailles'
 import { Logo } from './ProfilePicker'
 
-type Section = 'patients' | 'phrases' | 'mots' | 'petitbac' | 'quiz' | 'reglages' | 'sauvegarde'
+type Section = 'patients' | 'phrases' | 'enfants' | 'mots' | 'petitbac' | 'quiz' | 'reglages' | 'sauvegarde'
 
 const TEXTES_PHRASES: TextesEditeur = {
   titre: 'Phrases',
@@ -53,6 +54,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
   const [section, setSection] = useState<Section>('patients')
   // Recliquer sur une section la remet à zéro (ex. retour à la liste des patients).
   const [visite, setVisite] = useState(0)
+  const aVerifier = data.phrasesEnfants.filter((p) => p.statut === 'a_verifier').length
 
   return (
     <div className="screen ergo">
@@ -73,6 +75,7 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
             [
               ['patients', 'Patients'],
               ['phrases', 'Phrases'],
+              ['enfants', 'Phrases des enfants'],
               ['mots', 'Mots'],
               ['petitbac', 'Petit bac'],
               ['quiz', 'Quiz'],
@@ -86,6 +89,11 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
               }}
             >
               {label}
+              {id === 'enfants' && aVerifier > 0 && (
+                <span className="ergo-badge-notif" aria-label={`${aVerifier} phrase${aVerifier > 1 ? 's' : ''} à vérifier`}>
+                  {aVerifier}
+                </span>
+              )}
             </button>
           ))}
           <p className="ergo-version">Version {__APP_VERSION__}</p>
@@ -95,6 +103,12 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
           {section === 'patients' && <Patients data={data} onChange={onChange} onEditProfile={onEditProfile} />}
           {section === 'phrases' && (
             <PhrasesEditor textes={TEXTES_PHRASES} listes={data.listes} onChange={(listes) => onChange({ ...data, listes })} />
+          )}
+          {section === 'enfants' && (
+            <PhrasesEnfantsEditor
+              phrases={data.phrasesEnfants}
+              onChange={(phrasesEnfants) => onChange({ ...data, phrasesEnfants })}
+            />
           )}
           {section === 'quiz' && (
             <QuizEditor
@@ -470,7 +484,12 @@ const OPTIONS: { key: keyof OptionsDactylo; titre: string; detail: string }[] = 
     detail: 'L’enfant doit taper la bonne lettre pour avancer. Sinon, il doit effacer ses erreurs avec ⌫.'
   },
   { key: 'clavier', titre: 'Afficher le clavier à l’écran', detail: 'Avec la touche à taper et les couleurs des doigts.' },
-  { key: 'sonErreur', titre: 'Son à chaque erreur', detail: 'Le son d’erreur choisi par l’enfant.' }
+  { key: 'sonErreur', titre: 'Son à chaque erreur', detail: 'Le son d’erreur choisi par l’enfant.' },
+  {
+    key: 'afficherErreurs',
+    titre: 'Afficher le nombre d’erreurs',
+    detail: 'À la fin de chaque phrase et dans le récapitulatif. À désactiver si le nombre d’erreurs met l’enfant sous pression ou le rend trop perfectionniste.'
+  }
 ]
 
 function OptionsModal({
