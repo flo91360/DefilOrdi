@@ -1,14 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.16 — 2026-10-17
-<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
+## 0.8.15 (2026-10-17)
 
-- **dans dactylo** : Conflit de fusion résolu dans styles.css : les styles de l'avertissement Verr. Maj, des médailles et du coffre sont conservés, ainsi que les styles de choix de police venus de main. Aucun marqueur de conflit ne reste. Le code de la fonctionnalité est inchangé.
-
-## 0.8.15 — 2026-10-17
-<!-- planifikateur:cbda4775-a2ef-4b8e-a99f-e9acd0a98ec9 -->
-
-- **dans chasse au lettres** : Aucun changement n'était nécessaire à cette reprise : la carte n'apporte aucune nouvelle demande, et je n'ai relancé ni les tests ni le build. La fonctionnalité est déjà livrée dans la PR 24. Chaque profil a un réglage de police (Verdana, Arial, Calibri ou Comic Sans MS), avec Verdana par défaut pour les profils existants. L'étape « Lettres » de l'éditeur de profil le propose à la création et à la modification, avec un aperçu J L I l T F. Les lettres de la Chasse aux lettres utilisent cette police dans les trois aventures. Le clavier à l'écran et les autres jeux sont inchangés. À la dernière vérification du worker, le typecheck, les tests et le build passaient.
+- dans chasse au lettres (#24)
 
 ## 0.8.14 (2026-10-17)
 
