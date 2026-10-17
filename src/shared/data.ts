@@ -7,7 +7,8 @@ import { defaultListes, defaultListesMots, defaultPhrasesMemoire, type ListePhra
 export type { ListePhrases }
 
 // 4 : classe obligatoire et âge dans le profil.
-export const DATA_VERSION = 4
+// 5 : clavier à l'écran masqué par défaut (les profils plus anciens passent à « masqué »).
+export const DATA_VERSION = 5
 
 export type AvatarStyle = 'personnage' | 'robot'
 
@@ -353,7 +354,7 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
 }
 
 export function defaultOptionsDactylo(): OptionsDactylo {
-  return { accents: true, majuscules: true, bloquer: true, clavier: true, sonErreur: true }
+  return { accents: true, majuscules: true, bloquer: true, clavier: false, sonErreur: true }
 }
 
 export function defaultAppData(): AppData {
@@ -399,7 +400,7 @@ function normalizeAvatar(v: unknown): AvatarConfig {
 // Un profil sans prénom ou sans classe est écarté : la classe est obligatoire
 // depuis l'arrivée des seuils de vitesse de Dactylo (les quelques profils
 // créés avant n'en avaient pas et sont supprimés).
-function normalizeProfile(v: unknown): Profile | null {
+function normalizeProfile(v: unknown, clavierMasque = false): Profile | null {
   if (!isObj(v) || typeof v.id !== 'string' || v.id === '') return null
   if (typeof v.classe !== 'string' || !(CLASSES as readonly string[]).includes(v.classe)) return null
   const d = newProfile(v.id, typeof v.creeLe === 'string' ? v.creeLe : new Date(0).toISOString(), v.classe as Classe)
@@ -415,7 +416,7 @@ function normalizeProfile(v: unknown): Profile | null {
     sonReussite: pick(v.sonReussite, SONS_REUSSITE, d.sonReussite),
     sonEchec: pick(v.sonEchec, SONS_ECHEC, d.sonEchec),
     niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
-    dactylo: normalizeOptions(v.dactylo),
+    dactylo: clavierMasque ? { ...normalizeOptions(v.dactylo), clavier: false } : normalizeOptions(v.dactylo),
     memoire: normalizeProgressionMemoire(v.memoire)
   }
 }
@@ -656,8 +657,10 @@ export function normalizeAppData(v: unknown): AppData {
   if (!isObj(v)) return d
   const seen = new Set<string>()
   const profiles: Profile[] = []
+  // Migration vers la version 5 : clavier masqué pour les profils existants.
+  const ancien = typeof v.version !== 'number' || v.version < 5
   for (const raw of Array.isArray(v.profiles) ? v.profiles : []) {
-    const p = normalizeProfile(raw)
+    const p = normalizeProfile(raw, ancien)
     if (p && !seen.has(p.id)) {
       seen.add(p.id)
       profiles.push(p)
