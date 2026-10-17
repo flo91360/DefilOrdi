@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.19 — 2026-10-18
+<!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
+
+- **mot à retenir** : Mots à retenir : si aucun mot n'est trouvé, « Je ne me souviens plus » donne d'abord un indice au lieu d'arrêter la partie. Pour les paliers 3 à 7 mots, le jeu réutilise l'indice existant (première lettre, nombre de lettres, image si connue) sur le premier mot. Pour le palier phrase, il affiche la première lettre du premier mot et le nombre de mots. Un second clic termine la partie. Dès qu'un mot est trouvé, le bouton garde son rôle actuel. Le typecheck passe. Je n'ai lancé ni les tests, ni le build, ni la partie dans l'interface.
+
 ## 0.8.18 — 2026-10-18
 <!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
 
