@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.22 — 2026-10-18
+<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+
+- **amélioration quizz sur les mise en situation** : Je n'ai rien modifié ce tour-ci. Le travail est déjà dans le dépôt (PR n°31) et je n'ai trouvé aucun marqueur de conflit. Le worker n'a transmis aucune nouvelle erreur. Les mises en situation du quiz se valident par clic ou par raccourci clavier : - Gras : Ctrl+G - Centrer : Ctrl+E - Annuler : Ctrl+Z - Enregistrer : Ctrl+S - Nouveau document : Ctrl+N Après la réponse, le message de correction ajoute « Ça peut aussi se faire avec Ctrl+X » (avec le raccourci de la question). Rien n'est affiché avant la réponse. La validation par clic n'a pas changé. Copier, Coller, Couper et Tout sélectionner n'ont pas de mise en situation dans la banque : ce sont des QCM, hors du périmètre de la carte. Il suffira de renseigner `raccourci` si on en ajoute.
+
 ## 0.8.21 (2026-10-18)
 
 - Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
