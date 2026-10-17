@@ -3519,6 +3519,58 @@ label.quiz-ed-item {
   min-width: 170px;
 }
 
+/* Avertissement Verr. Maj (Dactylo) */
+.caps-alerte {
+  margin: 8px auto 0;
+  padding: 10px 20px;
+  max-width: 900px;
+  border-radius: 14px;
+  background: #fff3cd;
+  border: 3px solid #f08a2c;
+  color: #7a3e00;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+.caps-alerte span { font-size: 1.6rem; margin-right: 6px; }
+
+/* Médailles et coffre */
+.fin-medaille {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin: 8px 0;
+  padding: 12px 20px;
+  border-radius: 16px;
+  background: #fff8e1;
+  border: 2px solid #f3c33c;
+}
+.fin-medaille p { margin: 2px 0 0; }
+.coffre-bouton {
+  position: relative;
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+.coffre-bouton:hover { transform: scale(1.08); }
+.coffre-nombre {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 24px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: #4f6bd9;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+.medailles-liste { list-style: none; margin: 0 0 12px; padding: 0; max-height: 50vh; overflow: auto; }
+.medaille-ligne { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid #0001; }
+
 .police-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .police-option { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px; border-radius: 16px; border: 3px solid #d7dbe4; background: #fff; cursor: pointer; }
 .police-option.selected { border-color: var(--c1, #4f6bd9); box-shadow: 0 0 0 3px rgba(79, 107, 217, 0.25); }

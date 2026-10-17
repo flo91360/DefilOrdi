@@ -21,7 +21,8 @@ import {
   taper,
   vitesse
 } from './engine'
-import { smileyPrecision, smileyVitesse } from './seuils'
+import { MedailleIcone } from '../../components/Medailles'
+import { medailleGagnee, NOMS_MEDAILLES, smileyPrecision, smileyVitesse } from './seuils'
 import { SmileyIcone } from './Smiley'
 
 const NOMBRES = [3, 5, 10]
@@ -43,15 +44,16 @@ interface Props {
   listes: ListePhrases[]
   resultats: Resultat[]
   onResult: (r: ResultatDactylo) => void
+  onMedaille: (niveau: number) => void
   onQuit: () => void
 }
 
 type Phase =
   | { nom: 'choix' }
   | { nom: 'jeu'; liste: ListePhrases; phrases: string[] }
-  | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean; scores: ScorePhrase[] }
+  | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean; scores: ScorePhrase[]; medaille: number | null }
 
-export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props) {
+export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState(5)
 
@@ -81,13 +83,17 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
       ...s
     }
     onResult(resultat)
+    const scores = faites.map((e) => scoreDe(e, now))
+    const medaille = complete ? medailleGagnee(scores, profile.classe, liste.niveau) : null
+    if (medaille !== null) onMedaille(medaille)
     if (complete)
       setPhase({
         nom: 'fin',
         liste,
         resultat,
         record: meilleure > 0 && vitesse(resultat) > meilleure,
-        scores: faites.map((e) => scoreDe(e, now))
+        scores,
+        medaille
       })
     else onQuit()
   }
@@ -110,6 +116,7 @@ export function Dactylo({ profile, listes, resultats, onResult, onQuit }: Props)
         resultat={phase.resultat}
         record={phase.record}
         scores={phase.scores}
+        medaille={phase.medaille}
         onRejouer={() => lancer(phase.liste)}
         onAutre={() => setPhase({ nom: 'choix' })}
         onQuit={onQuit}
@@ -224,6 +231,7 @@ function Partie({
   const [now, setNow] = useState(() => Date.now())
   const [secousse, setSecousse] = useState(0)
   const [bulle, setBulle] = useState<string | null>(null)
+  const [majVerrouillees, setMajVerrouillees] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const dernierSonErreur = useRef(0)
   const etatsRef = useRef(etats)
@@ -287,6 +295,19 @@ function Partie({
     saisir(v)
   }
 
+  // Verr. Maj : l'état est relu à chaque touche (appui ou relâchement).
+  useEffect(() => {
+    const lire = (e: KeyboardEvent) => {
+      if (typeof e.getModifierState === 'function') setMajVerrouillees(e.getModifierState('CapsLock'))
+    }
+    window.addEventListener('keydown', lire)
+    window.addEventListener('keyup', lire)
+    return () => {
+      window.removeEventListener('keydown', lire)
+      window.removeEventListener('keyup', lire)
+    }
+  }, [])
+
   const onKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     if (ev.key === 'Backspace') {
       ev.preventDefault()
@@ -326,6 +347,11 @@ function Partie({
         </div>
       </header>
 
+      {majVerrouillees && (
+        <div className="caps-alerte" role="alert">
+          <span aria-hidden="true">⇧</span> Attention, les majuscules sont verrouillées ! Appuie sur la touche Verr. Maj pour les enlever.
+        </div>
+      )}
       <main className="partie-main">
         <div className="partie-top">
           <div className="partie-avatar">
@@ -417,6 +443,7 @@ function Fin({
   resultat,
   record,
   scores,
+  medaille,
   onRejouer,
   onAutre,
   onQuit
@@ -425,6 +452,7 @@ function Fin({
   resultat: ResultatDactylo
   record: boolean
   scores: ScorePhrase[]
+  medaille: number | null
   onRejouer: () => void
   onAutre: () => void
   onQuit: () => void
@@ -459,6 +487,15 @@ function Fin({
             {record && <span className="record">★ Nouveau record de vitesse !</span>}
           </div>
         </div>
+        {medaille !== null && (
+          <div className="fin-medaille" role="status">
+            <MedailleIcone niveau={medaille} size={84} />
+            <div>
+              <strong>{NOMS_MEDAILLES[medaille]} gagnée !</strong>
+              <p>Elle est rangée dans ton coffre.</p>
+            </div>
+          </div>
+        )}
         <div className="fin-stats">
           <StatTile value={String(vitesse(resultat))} label="frappes par minute" detail={`${motsParMinute(resultat)} mots/min`} />
           <StatTile value={`${p} %`} label="de précision" detail={`${resultat.erreurs} erreur${resultat.erreurs > 1 ? 's' : ''}`} />

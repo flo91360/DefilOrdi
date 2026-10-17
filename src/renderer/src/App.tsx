@@ -75,6 +75,14 @@ export function App() {
     if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, memoire } : p)) })
   }
 
+  // Médaille de Dactylo : ajoutée au coffre de l'enfant, doublons compris.
+  const addMedaille = (profileId: string, niveau: number) => {
+    const d = dataRef.current
+    if (!d) return
+    const medailles = (p: Profile) => [...p.medailles, { niveau, date: new Date().toISOString() }]
+    update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, medailles: medailles(p) } : p)) })
+  }
+
   const saveProfile = (p: Profile) => {
     const exists = data.profiles.some((x) => x.id === p.id)
     update({ ...data, profiles: exists ? data.profiles.map((x) => (x.id === p.id ? p : x)) : [...data.profiles, p] })
@@ -110,7 +118,7 @@ export function App() {
         onResult: addResultat,
         onQuit: () => setScreen({ name: 'hub', profileId: active.id })
       }
-      if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} />
+      if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} onMedaille={(n) => addMedaille(active.id, n)} />
       else if (screen.jeu === 'memoire') content = (
           <Memoire
             {...commun}

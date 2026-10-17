@@ -60,3 +60,25 @@ export const TEXTES_SMILEY: Record<Smiley, string> = {
   vert: 'Très bien !',
   etoile: 'Grande réussite !'
 }
+
+// Médailles : seulement pour les parties de 5 phrases. Il faut que la moyenne
+// de la vitesse et celle de la précision atteignent le niveau étoile.
+export const PHRASES_MEDAILLE = 5
+
+export const NOMS_MEDAILLES: Record<number, string> = {
+  1: 'Médaille en chocolat',
+  2: 'Médaille de bronze',
+  3: 'Médaille d’argent',
+  4: 'Médaille d’or'
+}
+
+export function medailleGagnee(
+  scores: { vitesse: number; precision: number }[],
+  classe: Classe,
+  niveau: number
+): number | null {
+  if (scores.length !== PHRASES_MEDAILLE || !(niveau in NOMS_MEDAILLES)) return null
+  const moy = (f: (s: { vitesse: number; precision: number }) => number) => scores.reduce((t, s) => t + f(s), 0) / scores.length
+  const ok = smileyVitesse(moy((s) => s.vitesse), classe) === 'etoile' && smileyPrecision(moy((s) => s.precision)) === 'etoile'
+  return ok ? niveau : null
+}

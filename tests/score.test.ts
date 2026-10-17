@@ -63,3 +63,18 @@ describe('moyennes par jour', () => {
     ])
   })
 })
+
+describe('médailles', () => {
+  const bon = (n: number) => Array.from({ length: n }, () => ({ vitesse: 40, precision: 95 }))
+  it('une partie de 5 phrases au niveau étoile donne la médaille du niveau', async () => {
+    const { medailleGagnee } = await import('../src/renderer/src/games/dactylo/seuils')
+    expect([1, 2, 3, 4].map((n) => medailleGagnee(bon(5), 'CE2', n))).toEqual([1, 2, 3, 4])
+  })
+  it('pas de médaille pour 3 ou 10 phrases, ni sous les seuils', async () => {
+    const { medailleGagnee } = await import('../src/renderer/src/games/dactylo/seuils')
+    expect(medailleGagnee(bon(3), 'CE2', 4)).toBeNull()
+    expect(medailleGagnee(bon(10), 'CE2', 4)).toBeNull()
+    expect(medailleGagnee(bon(5).map((s) => ({ ...s, vitesse: 20 })), 'CE2', 4)).toBeNull()
+    expect(medailleGagnee(bon(5).map((s) => ({ ...s, precision: 80 })), 'CE2', 4)).toBeNull()
+  })
+})

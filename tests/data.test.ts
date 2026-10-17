@@ -251,3 +251,12 @@ describe('clavier à l’écran masqué par défaut', () => {
     expect(normalizeAppData({ version: 5, profiles: [p] }).profiles[0].dactylo.clavier).toBe(true)
   })
 })
+
+describe('médailles du profil', () => {
+  it('valeur par défaut vide et doublons conservés', async () => {
+    const { normalizeMedailles } = await import('../src/shared/data')
+    expect(normalizeMedailles(undefined)).toEqual([])
+    const d = '2026-01-01T10:00:00.000Z'
+    expect(normalizeMedailles([{ niveau: 2, date: d }, { niveau: 2, date: d }, { niveau: 9, date: d }, { niveau: 1 }])).toHaveLength(2)
+  })
+})
