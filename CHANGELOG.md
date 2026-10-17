@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.12 — 2026-10-17
+<!-- planifikateur:5fc5dc1a-1b85-4ffa-8a39-31fb2a7de82b -->
+
+- **Ajout d'un bouton « Indice » pour faciliter la récupération en mémoire** : « Mots à retenir » (paliers 3 à 7 mots) a maintenant un bouton « Indice ». Il apparaît dès qu'il ne reste qu'un seul mot à retrouver. Un clic affiche « Un petit coup de pouce » avec l'image du mot (si elle est connue), sa première lettre suivie de tirets (ex. « B _ _ _ _ _ ») et le nombre de lettres. Le mot n'est jamais affiché en entier. L'indice disparaît quand le mot est trouvé. Les mesures ne changent pas : aucun malus, aucun compteur ajouté, pas d'effet sur la progression. Le ton reste bienveillant. J'ai lancé `npm run typecheck` et `npm test` (114 tests, dont les nouveaux sur l'indice) : tout passe. `npm run build` n'a pas été lancé. Comme la carte laissait ces points à préciser, j'ai choisi les valeurs suivantes : - **Type d'indice :** image, première lettre et longueur du mot. - **Nombre d'utilisations :** une par partie. Le bouton est remplacé par l'indice, qui reste affiché jusqu'à ce que le mot soit trouvé. - **Autres moments :** le bouton n'apparaît que pour le dernier mot. Il n'existe pas pour la phrase du dernier palier : il faudrait décider quel mot révéler. Le bouton reprend le style de celui de « Couleurs piégées » et l'image vient de `imageConnue`. L'indice est calculé dans `engine.ts` (`dernierMotARetrouver`, `indiceMot`) et affiché dans `Memoire.tsx`.
+
 ## 0.8.11 (2026-10-17)
 
 - Mots à retenir : nouvelle option « Aide dys », à choisir avant la partie
