@@ -1,9 +1,14 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.19 — 2026-10-18
-<!-- planifikateur:99fd6661-c6fc-40b1-9cca-0290f7a6c275 -->
+## 0.8.19 (2026-10-18)
 
-- **dans le jeu couleur piégée** : J'ai corrigé l'échec de la CI : la section « Prochaine version » de changements.md n'avait pas été réécrite pour la version 0.8.19. Elle décrit maintenant, pour l'ergothérapeute, ce que cette livraison change dans Couleurs piégées. Cette description reprend les réponses possibles masquées hors indice, le mode timer (1, 2 ou 3 minutes, score égal aux bonnes réponses, un indice par minute), les records et les statistiques, et le tirage au hasard des consignes. Le script de vérification des changements passe en local. Je n'ai pas modifié le code du jeu et je n'ai pas relancé le typecheck, les tests ni le build. CHANGELOG.md n'a pas été touché.
+- Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
+- Couleurs piégées : nouveau 4e mode, « Couleurs piégées timer ». Il fonctionne comme « Les deux » (le mot ou la couleur de l'encre), mais contre la montre : l'enfant choisit 1, 2 ou 3 minutes et réussit un maximum de manches. Le temps restant s'affiche en haut de l'écran.
+- Couleurs piégées timer : à la fin du temps, le score est le nombre de bonnes réponses. Une erreur n'est pas comptée et n'entraîne aucune autre pénalité.
+- Couleurs piégées timer : le bouton « Indice » reste disponible, à raison d'un indice par minute (2 indices pour une partie de 2 minutes). Si le nombre d'indices est réglé à 0 dans l'espace ergo, le bouton reste retiré.
+- Couleurs piégées timer : l'écran de fin annonce un nouveau record quand l'enfant bat son meilleur score pour la même durée.
+- Statistiques de Couleurs piégées : les parties chronométrées s'affichent sous la forme « Couleurs piégées timer », durée en minutes et nombre de bonnes réponses. Un encadré « Records » donne le meilleur score pour chaque durée. L'export Excel contient les mêmes informations.
+- Couleurs piégées, modes « Les deux » et timer : la consigne (écrire le mot ou la couleur de l'encre) est tirée au hasard à chaque manche, pour que l'enfant ne puisse pas deviner la suite.
 
 ## 0.8.18 (2026-10-18)
 
