@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.18 — 2026-10-18
+<!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
+
+- **dactylo amélioration sur les caractéristiques** : Rien de nouveau dans cette reprise : les Échanges sont vides, il n'y a ni nouvelle correction ni nouvel échec signalé, donc je n'ai modifié aucun fichier. La demande est livrée dans la PR #27 (version 0.8.18). Elle comprend l'option de masquage du nombre d'erreurs, la meilleure vitesse en gras, les smileys sur les moyennes, la phrase personnelle après une médaille avec règles par niveau et correcteur hors ligne, et la section « Phrases des enfants » de l'espace ergo. Le dernier échec, la description des changements, a été corrigé au tour précédent, et typecheck, tests et build avaient réussi. Je n'ai pas essayé l'interface dans un navigateur. Pour changer un choix fait sur les points « À préciser » (règles du niveau 2, nombre de signes au niveau 3, masquage des erreurs dans le récapitulatif), indiquez-le dans les Échanges.
+
 ## 0.8.17 (2026-10-18)
 
 - Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et
