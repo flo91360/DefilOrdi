@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.11 — 2026-10-17
+<!-- planifikateur:72c19cab-4c5a-4b54-8a1c-1a5826c38147 -->
+
+- **Ajout d'une aide orthographique dans le jeu « Mots à retenir »** : Je n'ai rien changé à ce tour. La demande a déjà été traitée dans la PR #20, et aucun nouvel échange ni correction n'a été ajouté à la carte. - **Option :** « Aide dys » est un sélecteur « Sans aide dys / Aide dys activée » placé avant la partie. Il est désactivé par défaut. - **Erreur de saisie :** avec l'option activée, une saisie fausse mais proche d'un mot pas encore trouvé n'est pas comptée comme une erreur. L'enfant choisit alors entre trois orthographes, dont une seule est juste. - **Choix juste ou faux :** un choix juste valide le mot. Un choix faux compte une erreur, et l'enfant peut réessayer. - **Option désactivée :** le jeu se comporte comme avant. - **Périmètre :** l'aide ne s'applique qu'aux paliers de 3 à 7 mots, pas au palier « phrase ». - **Vérifications :** `npm run typecheck`, `npm test` (112 tests) et `npm run build` ont réussi. Le choix entre case à cocher et bouton restait à préciser dans la carte. J'ai repris le sélecteur déjà utilisé pour l'option « Images ». Pour passer à une case à cocher, il suffit de me le dire.
+
 ## 0.8.10 (2026-10-17)
 
 - Amélioration sur certaine mise en situation (#19)
