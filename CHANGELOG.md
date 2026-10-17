@@ -1,14 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.17 — 2026-10-17
-<!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
+## 0.8.16 (2026-10-17)
 
-- **dactylo amélioration sur les caractéristiques** : Dactylo : le nombre d'erreurs s'affiche à la fin de chaque phrase et dans le récapitulatif, et l'ergothérapeute peut le masquer pour chaque enfant (nouvelle option, active par défaut). Dans le récapitulatif, seule la meilleure vitesse est en gras, et les cartes des moyennes affichent le smiley de la moyenne. Après une médaille, l'enfant peut écrire une phrase. Le logiciel lui rappelle la règle du niveau avec le nombre maximal de mots. La phrase est vérifiée sans connexion : règles du niveau, caractères du clavier AZERTY et orthographe. Si elle est refusée, l'enfant est averti avec douceur (son d'erreur doux) et peut corriger. Une notification apparaît alors pour l'ergothérapeute. Une phrase acceptée rejoint les phrases du niveau pour tous les profils. Nouvelle section « Phrases des enfants » dans l'espace ergo : pastille de notification, correction, validation, changement de niveau et suppression. Typecheck, tests (134) et build passent ; je n'ai pas essayé l'interface dans un navigateur. Choix faits à la place des points « À préciser » : - Le nombre d'erreurs est masqué aussi dans le récapitulatif quand l'option est désactivée. - Niveau 2 : accents autorisés, majuscule au début seulement, au plus un signe de ponctuation. L'apostrophe et le trait d'union à l'intérieur d'un mot sont tolérés. - Niveau 3 : au plus 3 signes de ponctuation ou caractères spéciaux. - Niveau 1 : aucun accent, aucune majuscule, aucune ponctuation (apostrophe comprise). - Correcteur orthographique : aucun dictionnaire français complet n'était disponible hors ligne. J'ai intégré un lexique de mots courants, complété par les mots de toutes les listes de phrases, avec pluriel, féminin et verbes en -er. Un mot rare peut donc être signalé à tort, et l'ergothérapeute valide alors la phrase. - Droit à une phrase : il n'existe qu'à l'écran de fin de partie qui affiche la médaille. Si l'enfant clique « Plus tard, non merci » ou quitte l'écran, la possibilité est perdue. - Une phrase refusée n'est pas 
-
-## 0.8.16 — 2026-10-17
-<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
-
-- **dans dactylo** : Aucune nouvelle demande de modification dans ce tour : la fonctionnalité est déjà en place et je n'ai rien changé. L'avertissement Verr. Maj s'affiche pendant une partie de Dactylo et disparaît quand on le désactive. Les parties de 5 phrases au niveau étoile en vitesse (selon la classe) et en précision donnent une médaille (chocolat, bronze, argent ou or selon le niveau de la liste jouée). Elle s'affiche sur l'écran de fin et s'ajoute au coffre du profil (Profile.medailles), doublons compris. Le coffre est accessible depuis le hub. L'espace ergothérapeute affiche les médailles de chaque enfant en lecture seule.
+- dans dactylo (#25)
 
 ## 0.8.15 (2026-10-17)
 
