@@ -22,6 +22,7 @@ import { PetitBacEditor } from './PetitBacEditor'
 import { PhrasesEditor, type TextesEditeur } from './PhrasesEditor'
 import { PhrasesMemoireEditor } from './PhrasesMemoireEditor'
 import { QuizEditor } from './QuizEditor'
+import { ListeMedailles } from '../components/Medailles'
 import { Logo } from './ProfilePicker'
 
 type Section = 'patients' | 'phrases' | 'mots' | 'petitbac' | 'quiz' | 'reglages' | 'sauvegarde'
@@ -135,6 +136,7 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
   const [toDelete, setToDelete] = useState<Profile | null>(null)
   const [statsDe, setStatsDe] = useState<string | null>(null)
   const [reglagesDe, setReglagesDe] = useState<Profile | null>(null)
+  const [medaillesDe, setMedaillesDe] = useState<Profile | null>(null)
   const profiles = [...data.profiles].sort((a, b) => a.prenom.localeCompare(b.prenom, 'fr'))
 
   const majProfil = (p: Profile) => onChange({ ...data, profiles: data.profiles.map((x) => (x.id === p.id ? p : x)) })
@@ -204,6 +206,9 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
                   <button className="btn btn-soft btn-sm" onClick={() => setStatsDe(p.id)}>
                     <IconChart size={18} /> Statistiques
                   </button>
+                  <button className="btn btn-soft btn-sm" onClick={() => setMedaillesDe(p)}>
+                    🏅 Médailles ({p.medailles.length})
+                  </button>
                   <button className="btn btn-ghost btn-sm" onClick={() => setReglagesDe(p)}>
                     <IconSettings size={18} /> Réglages
                   </button>
@@ -218,6 +223,17 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
             ))}
           </tbody>
         </table>
+      )}
+
+      {medaillesDe && (
+        <Modal title={`Médailles de ${medaillesDe.prenom}`} onClose={() => setMedaillesDe(null)} width={520}>
+          <ListeMedailles medailles={medaillesDe.medailles} vide="Aucune médaille gagnée pour l’instant." />
+          <div className="modal-actions">
+            <button className="btn btn-primary" onClick={() => setMedaillesDe(null)}>
+              Fermer
+            </button>
+          </div>
+        </Modal>
       )}
 
       {reglagesDe && (

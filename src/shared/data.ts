@@ -56,6 +56,25 @@ export interface Profile {
   niveau: number
   dactylo: OptionsDactylo
   memoire: ProgressionMemoire
+  medailles: Medaille[] // coffre à médailles de Dactylo, dans l'ordre d'obtention
+}
+
+// Médaille de Dactylo : niveau 1 (chocolat), 2 (bronze), 3 (argent), 4 (or).
+// Les doublons sont conservés : chaque médaille gagnée s'ajoute au coffre.
+export interface Medaille {
+  niveau: number
+  date: string
+}
+
+export function normalizeMedailles(v: unknown): Medaille[] {
+  if (!Array.isArray(v)) return []
+  const out: Medaille[] = []
+  for (const m of v) {
+    if (!isObj(m) || typeof m.niveau !== 'number' || !NIVEAUX.includes(m.niveau)) continue
+    if (typeof m.date !== 'string' || Number.isNaN(Date.parse(m.date))) continue
+    out.push({ niveau: m.niveau, date: m.date })
+  }
+  return out
 }
 
 // « Mots à retenir » : paliers de difficulté. 3 à 7 = nombre de mots à
@@ -349,7 +368,8 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
     sonEchec: SONS_ECHEC[0],
     niveau: 1,
     dactylo: defaultOptionsDactylo(),
-    memoire: defaultProgressionMemoire()
+    memoire: defaultProgressionMemoire(),
+    medailles: []
   }
 }
 
@@ -417,7 +437,8 @@ function normalizeProfile(v: unknown, clavierMasque = false): Profile | null {
     sonEchec: pick(v.sonEchec, SONS_ECHEC, d.sonEchec),
     niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
     dactylo: clavierMasque ? { ...normalizeOptions(v.dactylo), clavier: false } : normalizeOptions(v.dactylo),
-    memoire: normalizeProgressionMemoire(v.memoire)
+    memoire: normalizeProgressionMemoire(v.memoire),
+    medailles: normalizeMedailles(v.medailles)
   }
 }
 

@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.15 — 2026-10-17
+<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
+
+- **dans dactylo** : Dactylo : un bandeau orange « Attention, les majuscules sont verrouillées ! » s'affiche pendant la partie quand Verr. Maj est actif et disparaît dès qu'on le désactive. Médailles : les parties de 5 phrases donnent une médaille (chocolat, bronze, argent ou or selon le niveau de la liste de phrases jouée) si la moyenne de la vitesse (selon la classe) et celle de la précision atteignent le niveau étoile de SEUILS_DACTYLO ; elle s'affiche sur l'écran de fin. Les médailles sont enregistrées dans le nouveau champ Profile.medailles (défaut [] dans normalizeAppData), avec leur date, doublons conservés. Un petit coffre sur l'écran des jeux du hub ouvre la liste des médailles de l'enfant. L'espace ergothérapeute a un bouton « Médailles » par enfant (lecture seule). Tests ajoutés (règles d'attribution, normalisation). Le typecheck et les tests passent ; `npm run build` n'a pas été lancé par moi, c'est le worker qui le fait.
+
 ## 0.8.14 (2026-10-17)
 
 - Carte dans le jeu chasse aux lettres (bfea0f26-a487-4dc7-a1ad-b1ee849aec56) (#23)

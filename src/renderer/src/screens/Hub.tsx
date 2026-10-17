@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import type { JeuId, Profile } from '../../../shared/data'
 import { Avatar } from '../avatar/Avatar'
 import { FullscreenButton } from '../components/FullscreenButton'
 import { GameArt, IconPencil, IconUsers } from '../components/Icons'
+import { CoffreBouton, ListeMedailles } from '../components/Medailles'
+import { Modal } from '../components/Modal'
 import { Logo } from './ProfilePicker'
 
 export const GAMES: { id: JeuId; titre: string; description: string; disponible: boolean }[] = [
@@ -51,6 +54,7 @@ interface Props {
 }
 
 export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
+  const [coffre, setCoffre] = useState(false)
   return (
     <div className="screen hub">
       <header className="topbar">
@@ -75,6 +79,7 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
               <IconPencil /> Modifier mon personnage
             </button>
           </div>
+          <CoffreBouton nombre={profile.medailles.length} onClick={() => setCoffre(true)} />
         </section>
 
         <section className="game-grid" aria-label="Jeux">
@@ -98,6 +103,16 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
           ))}
         </section>
       </main>
+      {coffre && (
+        <Modal title="Mon coffre à médailles" onClose={() => setCoffre(false)} width={520}>
+          <ListeMedailles medailles={profile.medailles} vide="Ton coffre est vide pour l’instant. Gagne une médaille en réussissant une partie de Dactylo de 5 phrases !" />
+          <div className="modal-actions">
+            <button className="btn btn-primary" onClick={() => setCoffre(false)} autoFocus>
+              Fermer
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
