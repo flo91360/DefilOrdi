@@ -66,6 +66,9 @@ le code et les commentaires aussi.
   vérifie que chaque zone attendue existe à chaque étape. Questions de
   l'ergothérapeute : `questionsPerso` / `questionsMasquees` dans les données,
   fusionnées par `construireBanque` ; éditeur dans `screens/QuizEditor.tsx`.
+  Thème à part « Points reliés » : `relier.ts` (logiciels, référentiel
+  d’actions, tirage de 10, vérification) et `RelierVue.tsx` ; liste à relire dans
+  `docs/points-relies-actions.md` (à garder identique).
 - `src/renderer/src/games/petitbac/` : Petit bac. `engine.ts` (tirage, vérification
   de la première lettre) testé dans `tests/petitbac.test.ts`. Catégories et
   lettres réglées par l'ergothérapeute : `petitBac` dans les données, éditeur

@@ -14,6 +14,10 @@ des changements ».
 
 ## Prochaine version
 
+- Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
+- Points reliés : la vérification se fait seulement une fois les 10 liaisons faites, avec la correction des erreurs. La partie n'est réussie qu'avec 10 liaisons justes sur 10.
+- Points reliés : les 10 actions sont tirées au hasard dans une liste de 26 actions, pour que les parties varient. La liste est fournie dans un document à relire (docs/points-relies-actions.md).
+- Quiz, « Tout mélanger » : le thème « Points reliés » peut apparaître, au plus une fois par partie.
 - Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
 - Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
 - Couleurs piégées : nouveau 4e mode, « Couleurs piégées timer ». Il fonctionne comme « Les deux » (le mot ou la couleur de l'encre), mais contre la montre : l'enfant choisit 1, 2 ou 3 minutes et réussit un maximum de manches. Le temps restant s'affiche en haut de l'écran.
