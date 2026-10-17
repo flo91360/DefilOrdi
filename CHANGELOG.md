@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.21 — 2026-10-18
+<!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
+
+- **quizz à améliorer** : J'ai corrigé l'échec du contrôle GitHub et résolu le conflit sur `changements.md`. Le typecheck et les tests passent en local ; je n'ai pas relancé le build. L'échec venait de deux fichiers, `Relier.tsx` et `relier.ts`, dont les noms ne diffèrent que par la casse. Sous Windows ils sont confondus, d'où l'erreur de typecheck. J'ai renommé le composant d'affichage en `RelierVue.tsx` et mis à jour les imports et la mention dans `CLAUDE.md`. Dans `changements.md`, j'ai gardé les puces « Points reliés » avec celles de la branche principale (« Mots à retenir » et « Couleurs piégées »). Je n'ai pas vérifié si certaines puces de la branche principale concernent une version déjà publiée. Le fonctionnement du jeu et le document de relecture (`points-relies-actions.md`, 9 logiciels, 26 actions) ne changent pas. Reste à confirmer avec la personne si « Exchange » et « PDF X-Change Editor » sont bien deux entrées distinctes.
+
 ## 0.8.20 — 2026-10-18
 <!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
 

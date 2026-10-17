@@ -3,7 +3,7 @@ import { LOGICIELS, type Liaisons, type LogicielId, nomLogiciel, type QuestionRe
 
 // Jeu « Points reliés » : clic sur une action, puis sur un logiciel.
 // Le contrôle se fait une seule fois, quand les 10 actions sont reliées.
-export function Relier({
+export function RelierVue({
   question: q,
   fini,
   onFin

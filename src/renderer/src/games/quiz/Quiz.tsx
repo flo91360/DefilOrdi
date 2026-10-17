@@ -7,7 +7,7 @@ import { pourcentage } from '../commun'
 import { formatDuree } from '../dactylo/engine'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import { type ElementQuiz, melangerChoix, questionsDisponibles, tirerPartie } from './engine'
-import { Relier } from './Relier'
+import { RelierVue } from './RelierVue'
 import { NB_ACTIONS_RELIER, NOM_THEME_RELIER, THEME_RELIER } from './relier'
 import { SceneCadre } from './scenes/commun'
 import { type Question, type QuestionSituation, THEMES, type ThemeId } from './types'
@@ -249,7 +249,7 @@ function Partie({
           <div className="quiz-question">
             <p className="quiz-theme">{NOM_THEME_RELIER}</p>
             <h2 className="quiz-texte">{q.question}</h2>
-            <Relier key={q.id} question={q} fini={corrigee !== null} onFin={(juste, detail) => repondre(juste, undefined, detail)} />
+            <RelierVue key={q.id} question={q} fini={corrigee !== null} onFin={(juste, detail) => repondre(juste, undefined, detail)} />
           </div>
         ) : (
           <QuestionVue key={q.id} question={q} profile={profile} corrigee={corrigee} onRepondre={repondre} />
