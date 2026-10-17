@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.18 — 2026-10-18
+<!-- planifikateur:99fd6661-c6fc-40b1-9cca-0290f7a6c275 -->
+
+- **dans le jeu couleur piégée** : Couleurs piégées : la ligne « Réponses possibles » n'est plus affichée sous la consigne, et les propositions n'apparaissent que si l'enfant clique sur Indice. J'ai ajouté un 4e mode, « Couleurs piégées timer », avec une durée de 1, 2 ou 3 minutes à choisir sur l'écran de sélection. Ce mode reprend « Les deux » avec un chronomètre visible. Le score affiché à la fin est le nombre de bonnes réponses seulement : une erreur n'est pas comptée, et la manche en cours à la fin du temps est abandonnée. L'indice est limité à 1 par minute (si le réglage ergo de l'indice n'est pas à 0). La fin de partie et l'espace ergo (statistiques, historique) affichent « Couleurs piégées timer », la durée et le nombre de bonnes réponses. Les statistiques ont aussi un bloc Records par durée, et un nouveau record est détecté par durée. Dans « Les deux » et le timer, le type de consigne passe par une fonction de tirage au hasard à chaque manche. Dans le code d'origine, ce tirage était déjà aléatoire (50/50) ; je n'ai pas trouvé d'alternance mécanique. Les résultats enregistrés ont un nouveau champ `minutes`, 0 pour les anciennes parties. J'ai ajouté des tests sur le tirage aléatoire des consignes et sur la limite d'un indice par minute. Le typecheck et les tests passent. Je n'ai pas lancé le build.
+
 ## 0.8.17 (2026-10-18)
 
 - Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et

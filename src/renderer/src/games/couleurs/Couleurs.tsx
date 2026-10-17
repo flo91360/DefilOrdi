@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ModeCouleurs, Profile, ReglagesCouleurs, Resultat, ResultatCouleurs } from '../../../../shared/data'
+import { DUREES_TIMER_COULEURS, type ModeCouleurs, Profile, ReglagesCouleurs, Resultat, ResultatCouleurs } from '../../../../shared/data'
 import { Avatar } from '../../avatar/Avatar'
 import { IconBack, IconCheck } from '../../components/Icons'
 import { playSound } from '../../sounds'
@@ -17,6 +17,7 @@ import {
   estPiege,
   genererManches,
   indiceUtile,
+  indicesTimer,
   type Manche,
   nbPropositions,
   propositionsIndice,
@@ -29,8 +30,16 @@ const NB_MANCHES = [10, 20] as const
 const MODES: { id: ModeCouleurs; titre: string; consigne: string; niveauMin: number }[] = [
   { id: 'mot', titre: 'Le mot', consigne: 'Écris le mot que tu lis, sans regarder sa couleur.', niveauMin: 1 },
   { id: 'couleur', titre: 'La couleur', consigne: 'Écris la couleur de l’encre, pas le mot !', niveauMin: 1 },
-  { id: 'melange', titre: 'Les deux', consigne: 'La consigne change à chaque fois : regarde bien !', niveauMin: 3 }
+  { id: 'melange', titre: 'Les deux', consigne: 'La consigne change à chaque fois : regarde bien !', niveauMin: 3 },
+  {
+    id: 'timer',
+    titre: 'Couleurs piégées timer',
+    consigne: 'Comme « Les deux », mais contre la montre : réussis un maximum de manches !',
+    niveauMin: 3
+  }
 ]
+
+const MANCHES_TIMER = 300 // réserve de manches : le temps s'arrête avant
 
 interface Props {
   profile: Profile
@@ -42,7 +51,7 @@ interface Props {
 
 type Phase =
   | { nom: 'choix' }
-  | { nom: 'jeu'; mode: ModeCouleurs; manches: Manche[]; clic: ClicValidation | null }
+  | { nom: 'jeu'; mode: ModeCouleurs; manches: Manche[]; clic: ClicValidation | null; minutes: number }
   | { nom: 'fin'; mode: ModeCouleurs; resultat: ResultatCouleurs; record: boolean }
 
 export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Props) {
@@ -51,19 +60,21 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
   // Entraînement à la souris (état local, non enregistré).
   const [souris, setSouris] = useState(false)
   const [clic, setClic] = useState<ClicValidation>('gauche')
+  const [minutes, setMinutes] = useState<(typeof DUREES_TIMER_COULEURS)[number]>(1)
   const couleurs = couleursPourNiveau(profile.niveau)
 
   const lancer = (mode: ModeCouleurs) =>
     setPhase({
       nom: 'jeu',
       mode,
-      manches: genererManches(nb, mode, couleurs),
-      clic: souris && mode !== 'mot' ? clic : null
+      manches: genererManches(mode === 'timer' ? MANCHES_TIMER : nb, mode, couleurs),
+      clic: souris && mode !== 'mot' ? clic : null,
+      minutes: mode === 'timer' ? minutes : 0
     })
 
-  const terminer = (mode: ModeCouleurs, reponses: Reponse[], complete: boolean) => {
+  const terminer = (mode: ModeCouleurs, reponses: Reponse[], complete: boolean, minutesPartie: number) => {
     if (reponses.length === 0) return onQuit()
-    const anciens = resultats.filter((r): r is ResultatCouleurs => r.jeu === 'couleurs' && r.profileId === profile.id && r.mode === mode)
+    const anciens = resultats.filter((r): r is ResultatCouleurs => r.jeu === 'couleurs' && r.profileId === profile.id && r.mode === mode && r.minutes === minutesPartie)
     const r: ResultatCouleurs = {
       id: uid(),
       profileId: profile.id,
@@ -75,12 +86,17 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
       dureeMs: reponses.reduce((t, x) => t + x.dureeMs, 0),
       pieges: reponses.filter((x) => estPiege(x.manche)).length,
       piegesJustes: reponses.filter((x) => x.juste && estPiege(x.manche)).length,
-      indices: reponses.filter((x) => x.indice).length
+      indices: reponses.filter((x) => x.indice).length,
+      minutes: minutesPartie
     }
     onResult(r)
     if (!complete) return onQuit()
     const meilleur = Math.max(0, ...anciens.map((a) => pourcentage(a.justes, a.manches)))
-    setPhase({ nom: 'fin', mode, resultat: r, record: anciens.length > 0 && pourcentage(r.justes, r.manches) > meilleur })
+    const record =
+      mode === 'timer'
+        ? anciens.length > 0 && r.justes > Math.max(0, ...anciens.map((a) => a.justes))
+        : anciens.length > 0 && pourcentage(r.justes, r.manches) > meilleur
+    setPhase({ nom: 'fin', mode, resultat: r, record })
   }
 
   if (phase.nom === 'jeu') {
@@ -91,8 +107,9 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
         couleurs={couleurs}
         reglages={reglages}
         clic={phase.clic}
-        onFin={(rep) => terminer(phase.mode, rep, true)}
-        onQuitter={(rep) => terminer(phase.mode, rep, false)}
+        minutes={phase.minutes}
+        onFin={(rep) => terminer(phase.mode, rep, true, phase.minutes)}
+        onQuitter={(rep) => terminer(phase.mode, rep, false, phase.minutes)}
       />
     )
   }
@@ -110,7 +127,15 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
             record={phase.record ? 'Nouveau record !' : undefined}
           />
           <div className="fin-stats">
-            <StatTile value={`${r.justes} / ${r.manches}`} label="bonnes réponses" detail={`${p} % de réussite`} />
+            {phase.mode === 'timer' ? (
+              <StatTile
+                value={String(r.justes)}
+                label={r.justes > 1 ? 'bonnes réponses' : 'bonne réponse'}
+                detail={`Couleurs piégées timer · ${r.minutes} minute${r.minutes > 1 ? 's' : ''}`}
+              />
+            ) : (
+              <StatTile value={`${r.justes} / ${r.manches}`} label="bonnes réponses" detail={`${p} % de réussite`} />
+            )}
             <StatTile
               value={`${r.piegesJustes} / ${r.pieges}`}
               label="pièges déjoués"
@@ -151,6 +176,13 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
       <main className="choix-main">
         <h2 className="choix-title">Que dois-tu écrire ?</h2>
         <Chips label="Nombre de manches" values={NB_MANCHES} value={nb} onChange={setNb} />
+        <Chips
+          label="Durée du mode timer"
+          values={DUREES_TIMER_COULEURS}
+          value={minutes}
+          onChange={setMinutes}
+          format={(m) => `${m} minute${m > 1 ? 's' : ''}`}
+        />
         <div className="entrainement-souris">
           <label className="entrainement-case">
             <input type="checkbox" checked={souris} onChange={(e) => setSouris(e.target.checked)} /> Entraînement à la souris
@@ -208,6 +240,7 @@ function Partie({
   couleurs,
   reglages,
   clic,
+  minutes,
   onFin,
   onQuitter
 }: {
@@ -216,6 +249,7 @@ function Partie({
   couleurs: Couleur[]
   reglages: ReglagesCouleurs
   clic: ClicValidation | null
+  minutes: number // > 0 : mode chronométré
   onFin: (r: Reponse[]) => void
   onQuitter: (r: Reponse[]) => void
 }) {
@@ -224,6 +258,8 @@ function Partie({
   // Propositions de l'indice du mot en cours (null = pas d'indice demandé).
   const [propositions, setPropositions] = useState<string[] | null>(null)
   const debut = useRef(Date.now())
+  const chrono = minutes > 0
+  const [restantMs, setRestantMs] = useState(minutes * 60000)
   const index = reponses.length
   const manche = manches[Math.min(index, manches.length - 1)]
   const affichee = retour ? retour.manche : manche
@@ -242,6 +278,22 @@ function Partie({
     setReponses((all) => [...all, r])
   }
 
+  // Mode chronométré : fin de la partie quand le temps est écoulé (la manche
+  // en cours n'est pas comptée).
+  useEffect(() => {
+    if (!chrono) return
+    const fin = Date.now() + minutes * 60000
+    const t = setInterval(() => {
+      const reste = fin - Date.now()
+      setRestantMs(Math.max(0, reste))
+      if (reste <= 0) {
+        clearInterval(t)
+        onFinRef.current(reponsesRef.current)
+      }
+    }, 250)
+    return () => clearInterval(t)
+  }, [chrono, minutes])
+
   // Après la correction, manche suivante (ou fin).
   useEffect(() => {
     if (!retour) return
@@ -250,23 +302,23 @@ function Partie({
         setRetour(null)
         setPropositions(null)
         debut.current = Date.now()
-        if (reponsesRef.current.length >= manches.length) onFinRef.current(reponsesRef.current)
+        if (!chrono && reponsesRef.current.length >= manches.length) onFinRef.current(reponsesRef.current)
       },
       retour.juste ? 700 : 1800
     )
     return () => clearTimeout(t)
-  }, [retour, manches.length])
+  }, [retour, manches.length, chrono])
 
   const justes = reponses.filter((r) => r.juste).length
   const consigneMot = affichee.consigne === 'mot'
-  const reponsesPossibles = couleurs.map((c) => c.nom)
 
   // Bouton Indice : limité par partie (réglage de l'ergothérapeute), inutile
   // quand la réponse est le mot déjà écrit à l'écran.
   const indicesUtilises = reponses.filter((r) => r.indice).length + (propositions && !retour ? 1 : 0)
-  const indicesRestants = Math.max(0, reglages.indicesParPartie - indicesUtilises)
+  const indicesParPartie = chrono ? (reglages.indicesParPartie > 0 ? indicesTimer(minutes) : 0) : reglages.indicesParPartie
+  const indicesRestants = Math.max(0, indicesParPartie - indicesUtilises)
   const alaSouris = !retour && clic !== null && reponseALaSouris(manche, true)
-  const montrerBoutonIndice = !alaSouris && reglages.indicesParPartie > 0 && !retour && propositions === null && indiceUtile(manche)
+  const montrerBoutonIndice = !alaSouris && indicesParPartie > 0 && !retour && propositions === null && indiceUtile(manche)
   const demanderIndice = () => {
     if (retour || propositions !== null || indicesRestants === 0 || !indiceUtile(manche)) return
     const n = nbPropositions(reglages.propositionsDepart, indicesUtilises)
@@ -279,6 +331,13 @@ function Partie({
         <button className="btn btn-ghost" onClick={() => onQuitter(reponsesRef.current)}>
           <IconBack /> Arrêter
         </button>
+        {chrono ? (
+          <div className="progress" aria-label="Temps restant">
+            <strong>
+              ⏱ {Math.floor(Math.ceil(restantMs / 1000) / 60)}:{String(Math.ceil(restantMs / 1000) % 60).padStart(2, '0')}
+            </strong>
+          </div>
+        ) : (
         <div className="progress" aria-label={`Manche ${Math.min(index + 1, manches.length)} sur ${manches.length}`}>
           {manches.map((_, i) => (
             <span
@@ -289,12 +348,13 @@ function Partie({
             />
           ))}
         </div>
+        )}
         <div className="live-stats">
           <div className="live-stat">
             <span className="live-stat-value">
-              {justes} / {reponses.length}
+              {chrono ? justes : `${justes} / ${reponses.length}`}
             </span>
-            <span className="live-stat-label">Justes</span>
+            <span className="live-stat-label">{chrono ? 'Bonnes réponses' : 'Justes'}</span>
           </div>
         </div>
       </header>
@@ -388,9 +448,7 @@ function Partie({
               <>
                 Clique avec le {clic === 'gauche' ? 'clic gauche' : clic === 'droit' ? 'clic droit' : 'double clic'} sur la couleur de l’encre.
               </>
-            ) : (
-              <>Réponses possibles : {reponsesPossibles.join(' · ')}</>
-            )}
+            ) : null}
           </p>
         </div>
       </main>

@@ -47,6 +47,18 @@ export function estJuste(m: Manche, reponse: string): boolean {
   return normaliserReponse(reponse) === reponseAttendue(m)
 }
 
+// « Les deux » et « timer » : le type de consigne est tiré au hasard à chaque
+// manche (jamais une alternance mécanique mot / encre).
+export function consigneDuMode(mode: ModeCouleurs, random: () => number = Math.random): Consigne {
+  if (mode === 'mot' || mode === 'couleur') return mode
+  return random() < 0.5 ? 'mot' : 'couleur'
+}
+
+// Indices du mode chronométré : un par minute.
+export function indicesTimer(minutes: number): number {
+  return Math.max(0, Math.round(minutes))
+}
+
 // Environ 7 manches sur 10 sont des pièges (mot et encre différents).
 // Deux manches qui se suivent ne sont jamais identiques.
 export function genererManches(
@@ -63,7 +75,7 @@ export function genererManches(
     if (random() < 0.7) {
       while (encre.nom === mot.nom) encre = pickC()
     }
-    const consigne: Consigne = mode === 'melange' ? (random() < 0.5 ? 'mot' : 'couleur') : mode
+    const consigne = consigneDuMode(mode, random)
     const m = { mot, encre, consigne }
     const prev = out[out.length - 1]
     if (prev && prev.mot.nom === m.mot.nom && prev.encre.nom === m.encre.nom) continue
