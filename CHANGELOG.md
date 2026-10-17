@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.22 — 2026-10-18
+<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+
+- **amélioration quizz sur les mise en situation** : J'ai résolu les deux conflits de fusion avec main, sans laisser de marqueur. Le typecheck et les tests passent (141) ; je n'ai pas relancé le build. - **Description des changements :** dans `changements.md`, mes deux puces sur les raccourcis du quiz s'ajoutent aux puces venues de main (Points reliés, Mots à retenir, Couleurs piégées). - **Message de correction du quiz :** dans `Quiz.tsx`, le texte de correction de main (`corrigee.detail ?? q.explication`) est conservé. Il est suivi, pour les mises en situation qui ont un raccourci, de « Ça peut aussi se faire avec Ctrl+X ».
+
 ## 0.8.21 — 2026-10-18
 <!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
 
