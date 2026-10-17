@@ -490,7 +490,8 @@ export const QUESTIONS: Question[] = [
     scene: 'texte',
     question: 'Le titre « Les volcans » est sélectionné. Mets-le en gras.',
     etapes: [{ cibles: ['gras'], aide: 'C’est le bouton « G », comme Gras.' }],
-    explication: 'Le bouton G met le texte sélectionné en gras. Raccourci : Ctrl + G.'
+    raccourci: 'Ctrl+G',
+    explication: 'Le bouton G met le texte sélectionné en gras.'
   },
   {
     id: 'txt-centrer',
@@ -500,6 +501,7 @@ export const QUESTIONS: Question[] = [
     scene: 'texte',
     question: 'Le titre est sélectionné. Centre-le au milieu de la page.',
     etapes: [{ cibles: ['centrer'], aide: 'Cherche le bouton avec des lignes centrées.' }],
+    raccourci: 'Ctrl+E',
     explication: 'Le bouton « Centrer » place le texte au milieu de la ligne. Pratique pour les titres.'
   },
   {
@@ -510,7 +512,8 @@ export const QUESTIONS: Question[] = [
     scene: 'texte',
     question: 'Oups, tu as effacé une phrase par erreur ! Annule la dernière action.',
     etapes: [{ cibles: ['annuler'], aide: 'C’est la flèche qui revient en arrière, tout en haut à gauche.' }],
-    explication: 'La flèche « Annuler » revient en arrière. Raccourci très utile : Ctrl + Z.'
+    raccourci: 'Ctrl+Z',
+    explication: 'La flèche « Annuler » revient en arrière.'
   },
   {
     id: 'txt-enregistrer',
@@ -520,7 +523,8 @@ export const QUESTIONS: Question[] = [
     scene: 'texte',
     question: 'Enregistre ton travail pour ne pas le perdre.',
     etapes: [{ cibles: ['enregistrer'], aide: 'C’est la petite disquette, tout en haut à gauche.' }],
-    explication: 'La disquette enregistre le document. Raccourci : Ctrl + S. Pense à enregistrer souvent !'
+    raccourci: 'Ctrl+S',
+    explication: 'La disquette enregistre le document. Pense à enregistrer souvent !'
   },
   {
     id: 'txt-nouveau',
@@ -534,7 +538,8 @@ export const QUESTIONS: Question[] = [
       { cibles: ['nouveau'], ouvre: 'nouveau', aide: 'Choisis « Nouveau ».' },
       { cibles: ['document-vierge'], aide: 'Clique sur « Document vierge ».' }
     ],
-    explication: 'Fichier → Nouveau → Document vierge. Raccourci : Ctrl + N.'
+    raccourci: 'Ctrl+N',
+    explication: 'Fichier → Nouveau → Document vierge.'
   },
   {
     id: 'txt-pdf',

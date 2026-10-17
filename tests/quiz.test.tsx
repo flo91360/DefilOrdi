@@ -50,6 +50,16 @@ describe('banque de questions', () => {
     }
   })
 
+  it('les mises en situation à raccourci le déclarent sans le montrer dans l’énoncé', () => {
+    const att = { 'txt-gras': 'Ctrl+G', 'txt-centrer': 'Ctrl+E', 'txt-annuler': 'Ctrl+Z', 'txt-enregistrer': 'Ctrl+S', 'txt-nouveau': 'Ctrl+N' }
+    for (const [id, r] of Object.entries(att)) {
+      const q = QUESTIONS.find((x) => x.id === id)
+      if (q?.type !== 'situation') throw new Error(id)
+      expect(q.raccourci).toBe(r)
+      expect(q.question).not.toContain('Ctrl')
+    }
+  })
+
   it('la suppression se fait aussi par clic droit puis « Supprimer »', () => {
     const q = QUESTIONS.find((x) => x.id === 'win-supprimer')
     if (q?.type !== 'situation') throw new Error()

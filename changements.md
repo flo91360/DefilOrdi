@@ -14,6 +14,8 @@ des changements ».
 
 ## Prochaine version
 
+- Quiz, mises en situation : l'enfant peut maintenant valider sa réponse en appuyant sur le raccourci clavier de l'action demandée, en plus du clic sur l'écran, qui fonctionne comme avant. Cela concerne : mettre en gras (Ctrl+G), centrer le texte (Ctrl+E), annuler (Ctrl+Z), enregistrer (Ctrl+S) et ouvrir un nouveau document (Ctrl+N).
+- Quiz, mises en situation : une fois la réponse donnée, le message de correction précise « Ça peut aussi se faire avec Ctrl+S » (ou le raccourci concerné). Rien n'est indiqué avant la réponse, ni dans la question ni sur l'écran.
 - Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
 - Points reliés : la vérification se fait seulement une fois les 10 liaisons faites, avec la correction des erreurs. La partie n'est réussie qu'avec 10 liaisons justes sur 10.
 - Points reliés : les 10 actions sont tirées au hasard dans une liste de 26 actions, pour que les parties varient. La liste est fournie dans un document à relire (docs/points-relies-actions.md).
