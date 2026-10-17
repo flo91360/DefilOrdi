@@ -1,9 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.13 — 2026-10-17
-<!-- planifikateur:e8a7f9f8-b46b-4e89-a36b-0b0d8ce66867 -->
+## 0.8.13 (2026-10-17)
 
-- **Interface de présentation des jeux** : Les jeux du hub sont réordonnés dans la liste GAMES de Hub.tsx : Chasse aux lettres, Mots à retenir, Couleurs piégées, Petit bac, Dactylo, puis Quiz de l'ordinateur. Rien d'autre n'a changé (cartes, styles, comportement, pas de déblocage de niveaux). Les cartes alternent leur style selon leur position, donc les couleurs suivent la nouvelle disposition. Je n'ai pas lancé typecheck, tests ni build, et je n'ai pas ajouté de test pour cet ordre. Le worker fait les vérifications.
+- Carte Interface de présentation des jeux (e8a7f9f8-b46b-4e89-a36b-0b0d8ce66867) (#22)
 
 ## 0.8.12 (2026-10-17)
 
