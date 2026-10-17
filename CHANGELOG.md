@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.20 — 2026-10-18
+<!-- planifikateur:ccf7f593-4e48-4be8-adc2-f4b159e22c90 -->
+
+- **quizz à améliorer** : Aucune modification supplémentaire n'était nécessaire. Le fichier joint `points-relies-actions.md` est identique à `docs/points-relies-actions.md`, que j'ai fourni avec le thème « Points reliés » (PR #30). Il contient les 9 logiciels et les 26 actions, chacune avec son logiciel, et correspond à la liste du jeu. Je n'ai donc rien modifié dans le code ni dans le document. Pour changer une ligne, il faudra corriger à la fois `src/renderer/src/games/quiz/relier.ts` et ce document. La question sur « Exchange » et « PDF X-Change Editor » reste à confirmer avec la personne : ce sont deux entrées distinctes dans la liste actuelle.
+
 ## 0.8.19 (2026-10-18)
 
 - Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
