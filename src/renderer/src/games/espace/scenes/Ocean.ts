@@ -6,7 +6,7 @@
 import { darken, lighten } from '../../../color'
 import { playSound } from '../../../sounds'
 import type { Lettre } from '../engine'
-import { alea, entre, type Fantome, POLICE, roundRect, SceneTheme } from './base'
+import { alea, entre, type Fantome, policeLettres, roundRect, SceneTheme } from './base'
 
 type Objet = 'clown' | 'bleu' | 'jaune' | 'coquillage' | 'etoile' | 'huitre' | 'piece' | 'coffre'
 const OBJETS: Objet[] = ['clown', 'coquillage', 'bleu', 'etoile', 'piece', 'jaune', 'huitre', 'coffre']
@@ -478,7 +478,7 @@ export class Ocean extends SceneTheme {
     ctx.strokeStyle = bord
     ctx.lineWidth = 3
     ctx.stroke()
-    ctx.font = `900 ${Math.round(R * 0.88)}px ${POLICE}`
+    ctx.font = `900 ${Math.round(R * 0.88)}px ${policeLettres(this.couleurs)}`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = '#0b2545'

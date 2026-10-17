@@ -3,7 +3,7 @@
 
 import { darken, lighten, mix } from '../../../color'
 import type { Lettre } from '../engine'
-import { alea, entre, lettreContour, SceneTheme } from './base'
+import { alea, entre, lettreContour, policeLettres, SceneTheme } from './base'
 
 interface Etoile {
   x: number
@@ -366,7 +366,7 @@ export class Spatial extends SceneTheme {
     }
     ctx.restore()
 
-    lettreContour(ctx, l.char, x, y, R * 1.15, '#ffffff', 'rgba(16, 12, 40, 0.92)')
+    lettreContour(ctx, l.char, x, y, R * 1.15, '#ffffff', 'rgba(16, 12, 40, 0.92)', policeLettres(this.couleurs))
 
     if (visee) this.mire(ctx, x, y, R)
   }

@@ -3570,3 +3570,9 @@ label.quiz-ed-item {
 }
 .medailles-liste { list-style: none; margin: 0 0 12px; padding: 0; max-height: 50vh; overflow: auto; }
 .medaille-ligne { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid #0001; }
+
+.police-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.police-option { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px; border-radius: 16px; border: 3px solid #d7dbe4; background: #fff; cursor: pointer; }
+.police-option.selected { border-color: var(--c1, #4f6bd9); box-shadow: 0 0 0 3px rgba(79, 107, 217, 0.25); }
+.police-apercu { font-size: 44px; font-weight: 700; letter-spacing: 0.12em; color: #222; }
+.police-nom { font-size: 16px; color: #555; }

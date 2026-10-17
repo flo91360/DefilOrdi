@@ -1,9 +1,9 @@
 # Journal des modifications de DefilOrdi
 
 ## 0.8.15 — 2026-10-17
-<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
+<!-- planifikateur:cbda4775-a2ef-4b8e-a99f-e9acd0a98ec9 -->
 
-- **dans dactylo** : Dactylo : un bandeau orange « Attention, les majuscules sont verrouillées ! » s'affiche pendant la partie quand Verr. Maj est actif et disparaît dès qu'on le désactive. Médailles : les parties de 5 phrases donnent une médaille (chocolat, bronze, argent ou or selon le niveau de la liste de phrases jouée) si la moyenne de la vitesse (selon la classe) et celle de la précision atteignent le niveau étoile de SEUILS_DACTYLO ; elle s'affiche sur l'écran de fin. Les médailles sont enregistrées dans le nouveau champ Profile.medailles (défaut [] dans normalizeAppData), avec leur date, doublons conservés. Un petit coffre sur l'écran des jeux du hub ouvre la liste des médailles de l'enfant. L'espace ergothérapeute a un bouton « Médailles » par enfant (lecture seule). Tests ajoutés (règles d'attribution, normalisation). Le typecheck et les tests passent ; `npm run build` n'a pas été lancé par moi, c'est le worker qui le fait.
+- **dans chasse au lettres** : Aucun changement n'était nécessaire à cette reprise : la carte n'apporte aucune nouvelle demande, et je n'ai relancé ni les tests ni le build. La fonctionnalité est déjà livrée dans la PR 24. Chaque profil a un réglage de police (Verdana, Arial, Calibri ou Comic Sans MS), avec Verdana par défaut pour les profils existants. L'étape « Lettres » de l'éditeur de profil le propose à la création et à la modification, avec un aperçu J L I l T F. Les lettres de la Chasse aux lettres utilisent cette police dans les trois aventures. Le clavier à l'écran et les autres jeux sont inchangés. À la dernière vérification du worker, le typecheck, les tests et le build passaient.
 
 ## 0.8.14 (2026-10-17)
 

@@ -4,7 +4,7 @@
 import { darken, lighten } from '../../../color'
 import { playSound } from '../../../sounds'
 import type { Lettre } from '../engine'
-import { alea, entre, type Fantome, POLICE, roundRect, SceneTheme } from './base'
+import { alea, entre, type Fantome, policeLettres, roundRect, SceneTheme } from './base'
 
 const VERRES = [
   { corps: '#2f9e44', alpha: 0.88 },
@@ -424,7 +424,7 @@ export class Western extends SceneTheme {
     ctx.lineWidth = 1.5
     roundRect(ctx, ex + 3, ey + 3, ew - 6, eh - 6, 3)
     ctx.stroke()
-    ctx.font = `900 ${Math.round(Math.min(ew * 0.82, eh * 0.95))}px ${POLICE}`
+    ctx.font = `900 ${Math.round(Math.min(ew * 0.82, eh * 0.95))}px ${policeLettres(this.couleurs)}`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = '#3b2412'
