@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.19 — 2026-10-18
+<!-- planifikateur:99fd6661-c6fc-40b1-9cca-0290f7a6c275 -->
+
+- **dans le jeu couleur piégée** : Les modifications demandées sont déjà dans le dépôt et dans la PR #28 (version 0.8.18, typecheck, tests et build réussis). Je n'ai rien changé de plus. Je n'ai vérifié que la présence du code du mode timer dans le dépôt. Je n'ai pas relancé les tests. Réponses possibles : la ligne permanente est supprimée, les propositions n'apparaissent qu'avec le bouton Indice. Mode « Couleurs piégées timer » : durée de 1, 2 ou 3 minutes, score égal aux seules bonnes réponses, un indice par minute. Records : affichés dans les statistiques sous la forme « Couleurs piégées timer », durée, nombre de bonnes réponses. Consignes : le type (mot ou encre) est tiré au hasard à chaque manche dans « Les deux » et dans le timer. Le code d'origine tirait déjà au hasard (50/50), donc je n'ai pas trouvé d'alternance mécanique à corriger. J'ai ajouté des tests qui vérifient ce tirage.
+
 ## 0.8.18 — 2026-10-18
 <!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
 
