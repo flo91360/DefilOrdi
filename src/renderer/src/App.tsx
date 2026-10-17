@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type AppData, type JeuId, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
+import { type AppData, type JeuId, type PhraseEnfant, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
+import { listesAvecPhrasesEnfants } from '../../shared/phrases'
 import { api } from './api'
 import { themeStyle } from './theme'
 import { setVolume } from './sounds'
@@ -83,6 +84,12 @@ export function App() {
     update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, medailles: medailles(p) } : p)) })
   }
 
+  // Phrase d'un enfant (validée ou refusée, donc à vérifier par l'ergothérapeute).
+  const addPhraseEnfant = (phrase: PhraseEnfant) => {
+    const d = dataRef.current
+    if (d) update({ ...d, phrasesEnfants: [...d.phrasesEnfants, phrase] })
+  }
+
   const saveProfile = (p: Profile) => {
     const exists = data.profiles.some((x) => x.id === p.id)
     update({ ...data, profiles: exists ? data.profiles.map((x) => (x.id === p.id ? p : x)) : [...data.profiles, p] })
@@ -118,7 +125,14 @@ export function App() {
         onResult: addResultat,
         onQuit: () => setScreen({ name: 'hub', profileId: active.id })
       }
-      if (screen.jeu === 'dactylo') content = <Dactylo {...commun} listes={data.listes} onMedaille={(n) => addMedaille(active.id, n)} />
+      if (screen.jeu === 'dactylo') content = (
+        <Dactylo
+          {...commun}
+          listes={listesAvecPhrasesEnfants(data.listes, data.phrasesEnfants)}
+          onMedaille={(n) => addMedaille(active.id, n)}
+          onPhrase={addPhraseEnfant}
+        />
+      )
       else if (screen.jeu === 'memoire') content = (
           <Memoire
             {...commun}

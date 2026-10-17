@@ -121,6 +121,7 @@ export interface OptionsDactylo {
   bloquer: boolean // une erreur n'avance pas : il faut taper la bonne lettre
   clavier: boolean // clavier affiché à l'écran avec la touche à taper
   sonErreur: boolean // son d'erreur à chaque faute
+  afficherErreurs: boolean // nombre d'erreurs affiché à la fin de chaque phrase et dans le récapitulatif
 }
 
 // Une partie de dactylographie terminée (ou arrêtée après au moins une phrase).
@@ -308,11 +309,44 @@ export interface Settings {
   volume: number
 }
 
+// Phrase personnelle écrite par un enfant après une médaille. « valide » : elle
+// est tirée avec les phrases du niveau, pour tous les profils. « a_verifier » :
+// refusée par le correcteur ; elle attend l'ergothérapeute (c'est la
+// notification affichée dans son espace) et n'est pas jouée tant qu'elle n'a
+// pas été validée.
+export interface PhraseEnfant {
+  id: string
+  texte: string
+  niveau: number
+  profileId: string
+  prenom: string
+  date: string
+  statut: 'valide' | 'a_verifier'
+  motifs: string[] // raisons du refus, pour l'ergothérapeute
+}
+
+function normalizePhraseEnfant(v: unknown): PhraseEnfant | null {
+  if (!isObj(v) || typeof v.id !== 'string' || v.id === '' || typeof v.texte !== 'string') return null
+  const texte = v.texte.trim().replace(/\s+/g, ' ').slice(0, PHRASE_MAX)
+  if (texte === '') return null
+  return {
+    id: v.id,
+    texte,
+    niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : 1,
+    profileId: typeof v.profileId === 'string' ? v.profileId : '',
+    prenom: typeof v.prenom === 'string' ? v.prenom.slice(0, PRENOM_MAX) : '',
+    date: typeof v.date === 'string' && !Number.isNaN(Date.parse(v.date)) ? v.date : new Date(0).toISOString(),
+    statut: v.statut === 'a_verifier' ? 'a_verifier' : 'valide',
+    motifs: (Array.isArray(v.motifs) ? v.motifs : []).filter((m): m is string => typeof m === 'string').map((m) => m.slice(0, 200)).slice(0, 10)
+  }
+}
+
 export interface AppData {
   version: number
   profiles: Profile[]
   listes: ListePhrases[] // phrases du jeu Dactylo
   mots: ListePhrases[] // listes de mots du jeu Mots à retenir
+  phrasesEnfants: PhraseEnfant[] // phrases ajoutées par les enfants (Dactylo)
   phrasesMemoire: string[] // phrases du palier « phrase » de Mots à retenir
   questionsPerso: QuestionPerso[]
   questionsMasquees: string[] // questions fournies désactivées par l'ergothérapeute
@@ -390,7 +424,7 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
 }
 
 export function defaultOptionsDactylo(): OptionsDactylo {
-  return { accents: true, majuscules: true, bloquer: true, clavier: false, sonErreur: true }
+  return { accents: true, majuscules: true, bloquer: true, clavier: false, sonErreur: true, afficherErreurs: true }
 }
 
 export function defaultAppData(): AppData {
@@ -399,6 +433,7 @@ export function defaultAppData(): AppData {
     profiles: [],
     listes: defaultListes(),
     mots: defaultListesMots(),
+    phrasesEnfants: [],
     phrasesMemoire: defaultPhrasesMemoire(),
     questionsPerso: [],
     questionsMasquees: [],
@@ -731,6 +766,9 @@ export function normalizeAppData(v: unknown): AppData {
     profiles,
     listes,
     mots,
+    phrasesEnfants: (Array.isArray(v.phrasesEnfants) ? v.phrasesEnfants : [])
+      .map(normalizePhraseEnfant)
+      .filter((p): p is PhraseEnfant => p !== null),
     phrasesMemoire,
     questionsPerso,
     questionsMasquees,

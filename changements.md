@@ -14,11 +14,13 @@ des changements ».
 
 ## Prochaine version
 
-- Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et
-  0.8.12 à 0.8.16 décrivent maintenant ce qui a vraiment changé, au lieu de
-  reprendre le titre de la carte.
-- Améliorations internes : une nouvelle version ne peut plus être livrée
-  sans sa description pour le journal.
+- Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
+- Dactylo : dans le récapitulatif, la meilleure vitesse de frappe de la série est en gras.
+- Dactylo : les grandes cartes de moyennes (vitesse et précision) affichent aussi le smiley correspondant.
+- Dactylo : après une médaille, l'enfant peut écrire sa propre phrase (une phrase par médaille). Le logiciel lui rappelle la règle du niveau, dont le nombre maximal de mots : niveau 1, 6 mots sans accent, majuscule ni ponctuation ; niveau 2, 10 mots, une majuscule au début et au plus un signe de ponctuation ; niveau 3, 14 mots, au plus 3 signes ; niveau 4, sans maximum.
+- Dactylo : la phrase est vérifiée sans connexion Internet (règles du niveau, caractères du clavier, orthographe). Si elle est refusée, l'enfant est averti avec douceur et peut la corriger. Le correcteur connaît les mots courants et ceux de vos listes de phrases : un mot rare peut être signalé à tort, vous pouvez alors valider la phrase.
+- Dactylo : une phrase acceptée rejoint les phrases du niveau et peut être tirée pour tous les enfants.
+- Espace ergo : nouvelle section « Phrases des enfants ». Les phrases refusées y apparaissent comme une notification (pastille rouge sur la section) ; vous pouvez les corriger, les valider, changer leur niveau ou les supprimer, ainsi que les phrases déjà ajoutées.
 
 ## 0.8.16
 
