@@ -14,11 +14,13 @@ des changements ».
 
 ## Prochaine version
 
-- Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et
-  0.8.12 à 0.8.16 décrivent maintenant ce qui a vraiment changé, au lieu de
-  reprendre le titre de la carte.
-- Améliorations internes : une nouvelle version ne peut plus être livrée
-  sans sa description pour le journal.
+- Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
+- Dactylo : dans le récapitulatif, la meilleure vitesse de frappe de la série est en gras.
+- Dactylo : les grandes cartes de moyennes (vitesse et précision) affichent aussi le smiley correspondant.
+- Dactylo : après une médaille, l'enfant peut écrire sa propre phrase (une phrase par médaille). Le logiciel lui rappelle la règle du niveau, dont le nombre maximal de mots : niveau 1, 6 mots sans accent, majuscule ni ponctuation ; niveau 2, 10 mots, une majuscule au début et au plus un signe de ponctuation ; niveau 3, 14 mots, au plus 3 signes ; niveau 4, sans maximum.
+- Dactylo : la phrase est vérifiée sans connexion Internet (règles du niveau, caractères du clavier, orthographe). Si elle est refusée, l'enfant est averti avec douceur et peut la corriger. Le correcteur connaît les mots courants et ceux de vos listes de phrases : un mot rare peut être signalé à tort, vous pouvez alors valider la phrase.
+- Dactylo : une phrase acceptée rejoint les phrases du niveau et peut être tirée pour tous les enfants.
+- Espace ergo : nouvelle section « Phrases des enfants ». Les phrases refusées y apparaissent comme une notification (pastille rouge sur la section) ; vous pouvez les corriger, les valider, changer leur niveau ou les supprimer, ainsi que les phrases déjà ajoutées.
 
 ## 0.8.16
 
@@ -99,13 +101,25 @@ des changements ».
 
 ## 0.8.6
 
-- Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
-- Dactylo : dans le récapitulatif, la meilleure vitesse de frappe de la série est en gras.
-- Dactylo : les grandes cartes de moyennes (vitesse et précision) affichent aussi le smiley correspondant.
-- Dactylo : après une médaille, l'enfant peut écrire sa propre phrase (une phrase par médaille). Le logiciel lui rappelle la règle du niveau, dont le nombre maximal de mots : niveau 1, 6 mots sans accent, majuscule ni ponctuation ; niveau 2, 10 mots, une majuscule au début et au plus un signe de ponctuation ; niveau 3, 14 mots, au plus 3 signes ; niveau 4, sans maximum.
-- Dactylo : la phrase est vérifiée sans connexion Internet (règles du niveau, caractères du clavier, orthographe). Si elle est refusée, l'enfant est averti avec douceur et peut la corriger. Le correcteur connaît les mots courants et ceux de vos listes de phrases : un mot rare peut être signalé à tort, vous pouvez alors valider la phrase.
-- Dactylo : une phrase acceptée rejoint les phrases du niveau et peut être tirée pour tous les enfants.
-- Espace ergo : nouvelle section « Phrases des enfants ». Les phrases refusées y apparaissent comme une notification (pastille rouge sur la section) ; vous pouvez les corriger, les valider, changer leur niveau ou les supprimer, ainsi que les phrases déjà ajoutées.
+- Couleurs piégées : nouveau bouton « Indice ». Quand l'enfant doit écrire
+  la couleur de l'encre, il peut cliquer dessus s'il bloque : quelques
+  couleurs s'affichent, dont toujours la bonne réponse (le mot piège peut
+  aussi y figurer). L'enfant doit quand même taper sa réponse au clavier. Les
+  propositions restent affichées jusqu'à la fin du mot.
+- Couleurs piégées : le bouton n'apparaît pas quand il faut écrire le mot,
+  puisqu'il est déjà affiché à l'écran.
+- Couleurs piégées : 3 indices au plus par partie. Le premier montre 2
+  propositions, le deuxième 3 et le troisième 4. Sans indice, le jeu se
+  déroule comme avant.
+- Espace ergo, Réglages : on peut choisir le nombre d'indices par partie
+  (de 0, ce qui retire le bouton, à 3) et le nombre de propositions du
+  premier indice (2, 3 ou 4). Ce réglage vaut pour tous les enfants.
+- Statistiques de Couleurs piégées : le nombre d'indices utilisés est
+  indiqué pour chaque partie et dans l'export Excel. Il vaut 0 pour les
+  parties jouées avant cette version.
+- Couleurs piégées : tous les textes du jeu sont nettement plus grands (mot
+  en couleur, consignes, réponse, boutons, écran de fin…). Le mot en couleur
+  s'adapte à la largeur de l'écran pour ne jamais déborder.
 
 ## 0.8.2
 
