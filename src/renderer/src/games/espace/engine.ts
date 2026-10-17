@@ -9,6 +9,8 @@
 // Dans tous les modes, 8 lettres réussies d'affilée sans erreur font monter
 // d'un palier : d'abord la vitesse, puis deux lettres à la fois.
 //
+// `y` est la progression de la lettre : 0 au départ, 1 à l'arrivée (sol, ou sous-marin
+// en haut de l'écran dans l'aventure sous-marine, où les objets remontent).
 // Les positions sont en proportions de l'écran (0 à 1) pour que la logique ne
 // dépende pas de la taille de la fenêtre.
 
@@ -52,6 +54,8 @@ export interface Reglages {
   serie: Serie
   dureeS: number
   niveau: number
+  // Facteur de vitesse propre à chaque objet (ex. poissons plus rapides), selon son identifiant.
+  vitesseObjet?: (id: number) => number
   mode?: ModeChasse // chrono par défaut
 }
 
@@ -207,7 +211,8 @@ export function avancer(e: Etat, dt: number, r: Reglages, random: () => number =
     const nb = Math.min(simultanees(e.palier), MAX_A_L_ECRAN - lettres.length)
     for (let i = 0; i < nb; i++) {
       const type = modeDe(r) === 'pieges' ? choisirType(etat, random) : undefined
-      const lettre: Lettre = { id: ++compteur, char: choisirLettre(etat, r, random), x: choisirX(etat, random), y: 0, vitesse: 1 / chute }
+      const id = ++compteur
+      const lettre: Lettre = { id, char: choisirLettre(etat, r, random), x: choisirX(etat, random), y: 0, vitesse: (r.vitesseObjet?.(id) ?? 1) / chute }
       if (type) lettre.type = type
       lettres = [...lettres, lettre]
       etat = { ...etat, lettres }

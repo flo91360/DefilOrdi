@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.9 — 2026-10-17
+<!-- planifikateur:63a80af8-fc84-4400-90e9-433980fd1cc8 -->
+
+- **Amélioration chasse aux lettres SOUS-MARIN** : Je n'ai rien modifié ce tour, car aucune nouvelle demande n'est arrivée. J'ai seulement relu le dépôt: il n'y reste aucun marqueur de conflit et la vitesse relative des objets est toujours branchée dans le moteur, l'écran de jeu et les thèmes. Je n'ai pas relancé les tests; avant la fusion, le typecheck, les 109 tests et le build passaient. Dans « Plongée sous-marine », le sous-marin est en haut de l'écran et les objets remontent du fond. Le rayon est dirigé vers le bas. Les poissons vont 1,6 fois plus vite que les autres objets.
+
 ## 0.8.8 (2026-10-17)
 
 - Chasse aux lettres (les trois aventures) : pendant la partie, un bouton
