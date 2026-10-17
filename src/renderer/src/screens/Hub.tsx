@@ -6,9 +6,9 @@ import { Logo } from './ProfilePicker'
 
 export const GAMES: { id: JeuId; titre: string; description: string; disponible: boolean }[] = [
   {
-    id: 'dactylo',
-    titre: 'Dactylo',
-    description: 'Tape les phrases le plus juste et le plus vite possible.',
+    id: 'espace',
+    titre: 'Chasse aux lettres',
+    description: 'Fusée, cow-boy ou sous-marin : attrape les lettres avant qu’elles ne tombent.',
     disponible: true
   },
   {
@@ -24,21 +24,21 @@ export const GAMES: { id: JeuId; titre: string; description: string; disponible:
     disponible: true
   },
   {
-    id: 'espace',
-    titre: 'Chasse aux lettres',
-    description: 'Fusée, cow-boy ou sous-marin : attrape les lettres avant qu’elles ne tombent.',
+    id: 'petitbac',
+    titre: 'Petit bac',
+    description: 'Une lettre au hasard : trouve un mot pour chaque catégorie.',
+    disponible: true
+  },
+  {
+    id: 'dactylo',
+    titre: 'Dactylo',
+    description: 'Tape les phrases le plus juste et le plus vite possible.',
     disponible: true
   },
   {
     id: 'quiz',
     titre: 'Quiz de l’ordinateur',
     description: 'Vrai ou faux, QCM et mises en situation sur de vrais écrans.',
-    disponible: true
-  },
-  {
-    id: 'petitbac',
-    titre: 'Petit bac',
-    description: 'Une lettre au hasard : trouve un mot pour chaque catégorie.',
     disponible: true
   }
 ]
