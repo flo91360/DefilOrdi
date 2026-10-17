@@ -1,9 +1,9 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.17 — 2026-10-18
+## 0.8.18 — 2026-10-18
 <!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
 
-- **dactylo amélioration sur les caractéristiques** : Rien de nouveau dans cette reprise : les Échanges sont vides et aucune correction n'est demandée, donc je n'ai modifié aucun fichier. La demande est déjà traitée dans la PR #27 (version 0.8.17). Le code de la branche contient les changements : option « Afficher le nombre d'erreurs », meilleure vitesse en gras, smileys sur les moyennes, phrase personnelle après une médaille, règles par niveau, correcteur hors ligne et section « Phrases des enfants » dans l'espace ergo. Typecheck, tests et build avaient réussi. Je n'ai pas relancé les vérifications et je n'ai pas essayé l'interface dans un navigateur. Les choix faits sur les points « À préciser » sont détaillés dans le résumé précédent. Pour les modifier (par exemple les règles du niveau 2 ou le nombre de signes au niveau 3), il suffit de les indiquer dans les Échanges.
+- **dactylo amélioration sur les caractéristiques** : Rien de nouveau depuis la dernière reprise : les Échanges sont toujours vides et aucune correction n'est demandée, donc je n'ai modifié aucun fichier. La demande est déjà traitée dans la PR #27 (version 0.8.17). Elle comprend l'option de masquage du nombre d'erreurs, la meilleure vitesse en gras, les smileys sur les moyennes, la phrase personnelle après une médaille, les règles par niveau, le correcteur hors ligne et la section « Phrases des enfants » dans l'espace ergo. Typecheck, tests et build avaient réussi. Je n'ai pas essayé l'interface dans un navigateur. Pour changer un choix fait sur les points « À préciser » (règles du niveau 2, nombre de signes au niveau 3, masquage des erreurs dans le récapitulatif), indiquez-le dans les Échanges.
 
 ## 0.8.16 (2026-10-17)
 
