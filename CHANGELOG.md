@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.21 — 2026-10-18
+<!-- planifikateur:e514bc6e-fa06-4185-a0e0-7ee994498765 -->
+
+- **amélioration quizz sur les mise en situation** : J'ai corrigé l'échec du contrôle GitHub. La section « Prochaine version » de `changements.md` n'avait pas été réécrite pour cette livraison. Je l'ai remplacée par deux puces rédigées pour l'ergothérapeute : la validation par raccourci clavier (Ctrl+G, Ctrl+E, Ctrl+Z, Ctrl+S, Ctrl+N) en plus du clic, et le message « Ça peut aussi se faire avec … » affiché seulement après la réponse. Le code du quiz n'a pas changé. Je n'ai relancé ni les tests ni le contrôle, le worker s'en charge.
+
 ## 0.8.20 (2026-10-18)
 
 - Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
