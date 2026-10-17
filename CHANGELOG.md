@@ -1,24 +1,56 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.17 (2026-10-18)
+
+- Journal des modifications : les versions 0.8.6, 0.8.7, 0.8.9, 0.8.10 et
+  0.8.12 à 0.8.16 décrivent maintenant ce qui a vraiment changé, au lieu de
+  reprendre le titre de la carte.
+- Améliorations internes : une nouvelle version ne peut plus être livrée
+  sans sa description pour le journal.
+
 ## 0.8.16 (2026-10-17)
 
-- dans dactylo (#25)
+- Dactylo : un message prévient l'enfant quand les majuscules sont
+  verrouillées (touche Verr. Maj) et disparaît dès qu'il les enlève.
+- Dactylo : nouvelles médailles. Une partie de 5 phrases réussie avec une
+  vitesse et une précision moyennes au niveau étoile rapporte une médaille :
+  chocolat, bronze, argent ou or selon le niveau de la liste jouée. La
+  vitesse attendue dépend de la classe de l'enfant.
+- La médaille gagnée s'affiche sur l'écran de fin et rejoint le coffre à
+  médailles de l'enfant, ouvert depuis la page des jeux.
+- Espace ergo : un bouton « Médailles » montre, pour chaque enfant, les
+  médailles gagnées et leur date.
 
 ## 0.8.15 (2026-10-17)
 
-- dans chasse au lettres (#24)
+- Profil de l'enfant : nouvelle étape « Lettres » pour choisir la police où
+  il voit le mieux les lettres (Verdana, Arial, Calibri ou Comic Sans MS),
+  avec un aperçu des lettres J, L, I, l, T et F. Verdana est choisie pour les
+  profils existants.
+- Chasse aux lettres : les lettres qui tombent utilisent cette police, dans
+  les trois aventures.
 
 ## 0.8.14 (2026-10-17)
 
-- Carte dans le jeu chasse aux lettres (bfea0f26-a487-4dc7-a1ad-b1ee849aec56) (#23)
+- Clavier à l'écran : il est maintenant masqué par défaut, pour les nouveaux
+  profils comme pour les profils existants. Il peut être réactivé pour chaque
+  enfant dans ses réglages.
+- Chasse aux lettres : quand le clavier est activé pour l'enfant, on choisit
+  avant chaque partie « Avec le clavier » ou « Sans le clavier ». Quand il
+  est désactivé, il n'est pas proposé pendant la partie non plus.
 
 ## 0.8.13 (2026-10-17)
 
-- Carte Interface de présentation des jeux (e8a7f9f8-b46b-4e89-a36b-0b0d8ce66867) (#22)
+- Page des jeux : nouvel ordre des jeux. Chasse aux lettres, Mots à retenir,
+  Couleurs piégées, Petit bac, Dactylo, puis Quiz de l'ordinateur.
 
 ## 0.8.12 (2026-10-17)
 
-- Carte Ajout d'un bouton « Indice » pour faciliter la récupération en mémoire (5fc5dc1a-1b85-4ffa-8a39-31fb2a7de82b) (#21)
+- Mots à retenir : nouveau bouton « Indice » quand il ne reste qu'un mot à
+  retrouver (paliers de 3 à 7 mots). Il montre l'image du mot quand elle
+  existe, sa première lettre et son nombre de lettres, sans jamais donner le
+  mot entier.
+- Un seul indice par partie, sans effet sur le score ni sur la progression.
 
 ## 0.8.11 (2026-10-17)
 
@@ -31,11 +63,16 @@
 
 ## 0.8.10 (2026-10-17)
 
-- Amélioration sur certaine mise en situation (#19)
+- Quiz, mise en situation « Supprime le fichier brouillon.txt » : on peut
+  aussi faire un clic droit sur le fichier puis choisir « Supprimer » dans
+  le menu. L'ancienne façon (sélectionner le fichier puis cliquer sur la
+  corbeille) reste acceptée.
 
 ## 0.8.9 (2026-10-17)
 
-- Amélioration chasse aux lettres SOUS-MARIN (#18)
+- Chasse aux lettres, Plongée sous-marine : le sous-marin est maintenant en
+  haut de l'écran, son rayon vise vers le bas et les objets remontent du
+  fond. Les poissons vont plus vite que les autres objets.
 
 ## 0.8.8 (2026-10-17)
 
@@ -65,11 +102,36 @@
 
 ## 0.8.7 (2026-10-17)
 
-- Carte Amélioration compréhension couleurs piégées (7ac00861-ded1-4ff3-af38-7d79b9fda221) (#16)
+- Couleurs piégées : nouvelle case « Entraînement à la souris », à cocher
+  avant la partie (modes « La couleur » et « Les deux »). Pour donner la
+  couleur de l'encre, l'enfant clique sur le bon nom de couleur au lieu de
+  le taper.
+- On choisit le clic à travailler : clic gauche (par défaut), clic droit ou
+  double clic. Les autres clics sont ignorés. Ce choix n'est pas enregistré.
+- Couleurs piégées : le message après une erreur dit « Tu as répondu » au
+  lieu de « Tu as écrit ».
 
 ## 0.8.6 (2026-10-15)
 
-- Carte Amélioration couleurs piégées (c27f01ee-84e7-4a48-ae7e-93e0f4e998e7) (#15)
+- Couleurs piégées : nouveau bouton « Indice ». Quand l'enfant doit écrire
+  la couleur de l'encre, il peut cliquer dessus s'il bloque : quelques
+  couleurs s'affichent, dont toujours la bonne réponse (le mot piège peut
+  aussi y figurer). L'enfant doit quand même taper sa réponse au clavier. Les
+  propositions restent affichées jusqu'à la fin du mot.
+- Couleurs piégées : le bouton n'apparaît pas quand il faut écrire le mot,
+  puisqu'il est déjà affiché à l'écran.
+- Couleurs piégées : 3 indices au plus par partie. Le premier montre 2
+  propositions, le deuxième 3 et le troisième 4. Sans indice, le jeu se
+  déroule comme avant.
+- Espace ergo, Réglages : on peut choisir le nombre d'indices par partie
+  (de 0, ce qui retire le bouton, à 3) et le nombre de propositions du
+  premier indice (2, 3 ou 4). Ce réglage vaut pour tous les enfants.
+- Statistiques de Couleurs piégées : le nombre d'indices utilisés est
+  indiqué pour chaque partie et dans l'export Excel. Il vaut 0 pour les
+  parties jouées avant cette version.
+- Couleurs piégées : tous les textes du jeu sont nettement plus grands (mot
+  en couleur, consignes, réponse, boutons, écran de fin…). Le mot en couleur
+  s'adapte à la largeur de l'écran pour ne jamais déborder.
 
 ## 0.8.5 (2026-10-15)
 
