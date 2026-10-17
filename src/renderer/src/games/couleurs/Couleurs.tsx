@@ -8,6 +8,9 @@ import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
 import {
+  CLICS_VALIDATION,
+  type ClicValidation,
+  clicValide,
   type Couleur,
   couleursPourNiveau,
   estJuste,
@@ -17,6 +20,7 @@ import {
   type Manche,
   nbPropositions,
   propositionsIndice,
+  reponseALaSouris,
   reponseAttendue
 } from './engine'
 
@@ -38,15 +42,24 @@ interface Props {
 
 type Phase =
   | { nom: 'choix' }
-  | { nom: 'jeu'; mode: ModeCouleurs; manches: Manche[] }
+  | { nom: 'jeu'; mode: ModeCouleurs; manches: Manche[]; clic: ClicValidation | null }
   | { nom: 'fin'; mode: ModeCouleurs; resultat: ResultatCouleurs; record: boolean }
 
 export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nb, setNb] = useState<(typeof NB_MANCHES)[number]>(10)
+  // Entraînement à la souris (état local, non enregistré).
+  const [souris, setSouris] = useState(false)
+  const [clic, setClic] = useState<ClicValidation>('gauche')
   const couleurs = couleursPourNiveau(profile.niveau)
 
-  const lancer = (mode: ModeCouleurs) => setPhase({ nom: 'jeu', mode, manches: genererManches(nb, mode, couleurs) })
+  const lancer = (mode: ModeCouleurs) =>
+    setPhase({
+      nom: 'jeu',
+      mode,
+      manches: genererManches(nb, mode, couleurs),
+      clic: souris && mode !== 'mot' ? clic : null
+    })
 
   const terminer = (mode: ModeCouleurs, reponses: Reponse[], complete: boolean) => {
     if (reponses.length === 0) return onQuit()
@@ -77,6 +90,7 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
         manches={phase.manches}
         couleurs={couleurs}
         reglages={reglages}
+        clic={phase.clic}
         onFin={(rep) => terminer(phase.mode, rep, true)}
         onQuitter={(rep) => terminer(phase.mode, rep, false)}
       />
@@ -137,6 +151,21 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
       <main className="choix-main">
         <h2 className="choix-title">Que dois-tu écrire ?</h2>
         <Chips label="Nombre de manches" values={NB_MANCHES} value={nb} onChange={setNb} />
+        <div className="entrainement-souris">
+          <label className="entrainement-case">
+            <input type="checkbox" checked={souris} onChange={(e) => setSouris(e.target.checked)} /> Entraînement à la souris
+            (pour « La couleur » et « Les deux »)
+          </label>
+          {souris && (
+            <Chips
+              label="Clic qui valide la réponse"
+              values={CLICS_VALIDATION.map((c) => c.id)}
+              value={clic}
+              onChange={setClic}
+              format={(id) => CLICS_VALIDATION.find((c) => c.id === id)?.titre ?? id}
+            />
+          )}
+        </div>
         <div className="liste-grid">
           {MODES.map((m) => (
             <button key={m.id} className="liste-card mode-card" onClick={() => lancer(m.id)}>
@@ -178,6 +207,7 @@ function Partie({
   manches,
   couleurs,
   reglages,
+  clic,
   onFin,
   onQuitter
 }: {
@@ -185,6 +215,7 @@ function Partie({
   manches: Manche[]
   couleurs: Couleur[]
   reglages: ReglagesCouleurs
+  clic: ClicValidation | null
   onFin: (r: Reponse[]) => void
   onQuitter: (r: Reponse[]) => void
 }) {
@@ -234,7 +265,8 @@ function Partie({
   // quand la réponse est le mot déjà écrit à l'écran.
   const indicesUtilises = reponses.filter((r) => r.indice).length + (propositions && !retour ? 1 : 0)
   const indicesRestants = Math.max(0, reglages.indicesParPartie - indicesUtilises)
-  const montrerBoutonIndice = reglages.indicesParPartie > 0 && !retour && propositions === null && indiceUtile(manche)
+  const alaSouris = !retour && clic !== null && reponseALaSouris(manche, true)
+  const montrerBoutonIndice = !alaSouris && reglages.indicesParPartie > 0 && !retour && propositions === null && indiceUtile(manche)
   const demanderIndice = () => {
     if (retour || propositions !== null || indicesRestants === 0 || !indiceUtile(manche)) return
     const n = nbPropositions(reglages.propositionsDepart, indicesUtilises)
@@ -319,7 +351,28 @@ function Partie({
         </div>
 
         <div className="reponse-zone">
-          <ReponseInput onSubmit={valider} disabled={retour !== null} placeholder="Tape ta réponse puis Entrée" etat={retour ? (retour.juste ? 'juste' : 'faux') : null} />
+          {clic !== null && reponseALaSouris(affichee, true) ? (
+            <div className="choix-couleurs" role="group" aria-label="Choisis la couleur de l’encre">
+              {couleurs.map((c) => (
+                <button
+                  key={c.nom}
+                  type="button"
+                  className="btn btn-soft choix-couleur"
+                  disabled={retour !== null}
+                  onClick={() => clicValide(clic, 'click') && valider(c.nom)}
+                  onContextMenu={(e) => {
+                    e.preventDefault()
+                    if (clicValide(clic, 'contextmenu')) valider(c.nom)
+                  }}
+                  onDoubleClick={() => clicValide(clic, 'dblclick') && valider(c.nom)}
+                >
+                  {c.nom}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <ReponseInput onSubmit={valider} disabled={retour !== null} placeholder="Tape ta réponse puis Entrée" etat={retour ? (retour.juste ? 'juste' : 'faux') : null} />
+          )}
           <p className={retour ? (retour.juste ? 'reponse-retour juste' : 'reponse-retour faux') : 'reponse-retour'}>
             {retour ? (
               retour.juste ? (
@@ -328,9 +381,13 @@ function Partie({
                 </>
               ) : (
                 <span>
-                  Tu as écrit « {retour.saisie.trim()} ». La bonne réponse était <strong>{reponseAttendue(retour.manche)}</strong>.
+                  Tu as répondu « {retour.saisie.trim()} ». La bonne réponse était <strong>{reponseAttendue(retour.manche)}</strong>.
                 </span>
               )
+            ) : alaSouris ? (
+              <>
+                Clique avec le {clic === 'gauche' ? 'clic gauche' : clic === 'droit' ? 'clic droit' : 'double clic'} sur la couleur de l’encre.
+              </>
             ) : (
               <>Réponses possibles : {reponsesPossibles.join(' · ')}</>
             )}

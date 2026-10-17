@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.7 — 2026-10-17
+<!-- planifikateur:7ac00861-ded1-4ff3-af38-7d79b9fda221 -->
+
+- **Amélioration compréhension couleurs piégées** : J'ai ajouté un mode « Entraînement à la souris » à Couleurs piégées. La vérification de types et les 94 tests passent. Je n'ai pas lancé le build et je n'ai pas essayé les clics dans l'interface. - **Où on le choisit :** sur l'écran de choix avant la partie, avec une case « Entraînement à la souris ». Ce choix n'est pas enregistré. - **Modes concernés :** « La couleur » et « Les deux ». Dans « Les deux », seules les manches « couleur de l'encre » se répondent à la souris ; les manches « mot » restent au clavier. Le mode « Le mot » n'est pas concerné. - **Type de clic :** une fois la case cochée, l'enfant choisit entre clic gauche (par défaut), clic droit et double clic. - **Réponse :** des boutons avec le nom de chaque couleur du niveau s'affichent à la place de la saisie. Les noms sont écrits en couleur neutre pour ne pas ajouter un piège. Le menu contextuel du clic droit est bloqué sur ces boutons. - **Autres clics :** les autres types de clic sont ignorés et ne valident rien. - **Bouton Indice :** il est masqué quand on répond à la souris. - **Sons :** ils sont inchangés, donc toujours doux. - **Message d'erreur :** il dit maintenant « Tu as répondu » au lieu de « Tu as écrit ». - **Fichiers modifiés :** - la logique et l'écran de Couleurs piégées (`engine.ts` et `Couleurs.tsx`) ; - `styles.css` ; - `tests/jeux.test.ts`, avec de nouveaux tests ; - `CLAUDE.md`. J'ai tranché moi-même les deux points « À préciser » de la carte (où choisir le clic, quels modes), faute de réponse. Si l'ergothérapeute préfère un réglage dans l'espace ergo, c'est à changer.
+
 ## 0.8.6 (2026-10-15)
 
 - Carte Amélioration couleurs piégées (c27f01ee-84e7-4a48-ae7e-93e0f4e998e7) (#15)

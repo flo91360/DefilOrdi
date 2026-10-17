@@ -107,3 +107,31 @@ function melanger<T>(t: T[], random: () => number): T[] {
   }
   return t
 }
+
+// ---------- Mode entraînement à la souris ----------
+// Pour les manches « couleur de l'encre », l'enfant clique sur une couleur au
+// lieu de la taper. Le type de clic qui valide est choisi avant la partie ;
+// les autres types de clic sont ignorés.
+
+export type ClicValidation = 'gauche' | 'droit' | 'double'
+
+export const CLICS_VALIDATION: { id: ClicValidation; titre: string }[] = [
+  { id: 'gauche', titre: 'Clic gauche' },
+  { id: 'droit', titre: 'Clic droit' },
+  { id: 'double', titre: 'Double clic' }
+]
+
+// Vrai si la manche se répond à la souris dans le mode entraînement.
+export function reponseALaSouris(m: Manche, entrainement: boolean): boolean {
+  return entrainement && m.consigne === 'couleur'
+}
+
+// Un clic gauche est un `click` (bouton 0), un clic droit un `contextmenu`,
+// un double clic un `dblclick`.
+export function clicValide(choisi: ClicValidation, evenement: 'click' | 'contextmenu' | 'dblclick'): boolean {
+  return (
+    (choisi === 'gauche' && evenement === 'click') ||
+    (choisi === 'droit' && evenement === 'contextmenu') ||
+    (choisi === 'double' && evenement === 'dblclick')
+  )
+}

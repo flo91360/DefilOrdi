@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { normaliserReponse } from '../src/renderer/src/games/commun'
 import {
+  clicValide,
   COULEURS,
   estJuste,
   estPiege,
   genererManches,
   indiceUtile,
   nbPropositions,
-  propositionsIndice
+  propositionsIndice,
+  reponseALaSouris
 } from '../src/renderer/src/games/couleurs/engine'
 import {
   avancerProgression,
@@ -197,5 +199,22 @@ describe('Mots à retenir : palier phrase', () => {
   it('choisit une phrase de la liste, ou une phrase d’origine si la liste est vide', () => {
     expect(choisirPhrase(['Une seule phrase pour ce test.'], () => 0)).toBe('Une seule phrase pour ce test.')
     expect(defaultPhrasesMemoire()).toContain(choisirPhrase([], () => 0))
+  })
+})
+
+describe('Couleurs piégées : entraînement à la souris', () => {
+  const m = (consigne: 'mot' | 'couleur') => ({ mot: COULEURS[0], encre: COULEURS[1], consigne })
+  it('ne concerne que les manches « couleur de l’encre »', () => {
+    expect(reponseALaSouris(m('couleur'), true)).toBe(true)
+    expect(reponseALaSouris(m('mot'), true)).toBe(false)
+    expect(reponseALaSouris(m('couleur'), false)).toBe(false)
+  })
+  it('seul le clic choisi valide', () => {
+    expect(clicValide('gauche', 'click')).toBe(true)
+    expect(clicValide('gauche', 'contextmenu')).toBe(false)
+    expect(clicValide('droit', 'contextmenu')).toBe(true)
+    expect(clicValide('droit', 'click')).toBe(false)
+    expect(clicValide('double', 'dblclick')).toBe(true)
+    expect(clicValide('double', 'click')).toBe(false)
   })
 })
