@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.16 — 2026-10-17
+<!-- planifikateur:e8d14e31-47c2-4955-8043-c66d61f855a3 -->
+
+- **dans dactylo** : Conflit de fusion résolu dans styles.css : les styles de l'avertissement Verr. Maj, des médailles et du coffre sont conservés, ainsi que les styles de choix de police venus de main. Aucun marqueur de conflit ne reste. Le code de la fonctionnalité est inchangé.
+
 ## 0.8.15 — 2026-10-17
 <!-- planifikateur:cbda4775-a2ef-4b8e-a99f-e9acd0a98ec9 -->
 
