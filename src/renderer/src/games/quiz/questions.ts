@@ -201,10 +201,15 @@ export const QUESTIONS: Question[] = [
     scene: 'explorateur',
     question: 'Supprime le fichier « brouillon.txt ».',
     etapes: [
-      { cibles: ['fichier-brouillon'], ouvre: 'selection-brouillon', aide: 'Clique d’abord sur le fichier « brouillon.txt » pour le sélectionner.' },
-      { cibles: ['supprimer'], aide: 'Clique ensuite sur la corbeille, en haut.' }
+      {
+        cibles: ['fichier-brouillon', 'fichier-brouillon@droit'],
+        ouvre: 'selection-brouillon',
+        ouvrePar: { 'fichier-brouillon@droit': 'contexte-brouillon' },
+        aide: 'Clique d’abord sur le fichier « brouillon.txt » (clic gauche pour le sélectionner, ou clic droit pour ouvrir son menu).'
+      },
+      { cibles: ['supprimer', 'ctx-supprimer'], aide: 'Clique ensuite sur la corbeille en haut, ou sur « Supprimer » dans le menu du clic droit.' }
     ],
-    explication: 'On sélectionne d’abord le fichier, puis on clique sur la corbeille (ou on appuie sur la touche Suppr). Il part dans la Corbeille.'
+    explication: 'On sélectionne le fichier puis on clique sur la corbeille, ou on fait un clic droit sur le fichier et on choisit « Supprimer » (ou on appuie sur la touche Suppr). Il part dans la Corbeille.'
   },
   {
     id: 'win-renommer',

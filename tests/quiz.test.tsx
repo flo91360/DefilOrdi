@@ -31,15 +31,36 @@ describe('banque de questions', () => {
   })
 
   it('chaque étape des mises en situation correspond à une zone visible', () => {
+    // Explore tous les chemins possibles (clic gauche ou clic droit) : chaque
+    // cible doit être visible dans au moins un chemin qui y mène.
     for (const q of QUESTIONS) {
       if (q.type !== 'situation') continue
-      let menu: string | null = q.menuDepart ?? null
-      for (const e of q.etapes) {
+      const vues = new Set<string>()
+      const explorer = (i: number, menu: string | null): void => {
+        if (i >= q.etapes.length) return
+        const e = q.etapes[i]
         const visibles = zones(q.scene, menu)
-        for (const c of e.cibles) expect(visibles.has(c), `${q.id} : ${c}`).toBe(true)
-        menu = e.ouvre ?? menu
+        for (const c of e.cibles) {
+          if (visibles.has(c.replace(/@droit$/, ''))) vues.add(`${i}:${c}`)
+          explorer(i + 1, e.ouvrePar?.[c] ?? e.ouvre ?? menu)
+        }
       }
+      explorer(0, q.menuDepart ?? null)
+      q.etapes.forEach((e, i) => e.cibles.forEach((c) => expect(vues.has(`${i}:${c}`), `${q.id} étape ${i + 1} : ${c}`).toBe(true)))
     }
+  })
+
+  it('la suppression se fait aussi par clic droit puis « Supprimer »', () => {
+    const q = QUESTIONS.find((x) => x.id === 'win-supprimer')
+    if (q?.type !== 'situation') throw new Error()
+    const [e1, e2] = q.etapes
+    expect(e1.cibles).toContain('fichier-brouillon')
+    expect(e1.cibles).toContain('fichier-brouillon@droit')
+    const menu = e1.ouvrePar?.['fichier-brouillon@droit'] ?? null
+    expect(menu).not.toBeNull()
+    expect(zones(q.scene, null).has('ctx-supprimer')).toBe(false)
+    expect(zones(q.scene, menu).has('ctx-supprimer')).toBe(true)
+    expect(e2.cibles).toEqual(expect.arrayContaining(['supprimer', 'ctx-supprimer']))
   })
 })
 

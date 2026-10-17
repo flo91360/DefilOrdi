@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.9 — 2026-10-17
+<!-- planifikateur:54486b12-c2a5-455a-b912-b76709103401 -->
+
+- **Amélioration sur certaine mise en situation** : Dans la mise en situation « Supprime le fichier brouillon.txt », on peut maintenant supprimer par clic droit sur le fichier, puis « Supprimer » dans un menu contextuel simulé (Ouvrir, Copier, Renommer, Supprimer). Les typecheck et les tests du quiz passent. Je n'ai pas lancé `npm test` en entier ni `npm run build`, et je n'ai pas essayé le clic droit dans un navigateur. **Ambiguïté sur « ajouter ou remplacer » :** j'ai pris « ajouter », donc les deux chemins sont valides. Le chemin d'origine (sélectionner le fichier, puis cliquer sur la corbeille) reste accepté. Si tu veux seulement le clic droit, il suffit de retirer les cibles « clic gauche » de la question dans `questions.ts`. - **Clic droit :** les zones signalent un clic droit sous la forme `id@droit`. Un clic droit n'est une erreur que si l'étape en attend un ; sinon il est ignoré, sans menu du navigateur. Les règles existantes sont inchangées (indice après deux erreurs, question juste seulement sans mauvais clic). - **Étapes du quiz :** `types.ts` gagne un champ `ouvrePar` qui choisit le menu affiché selon la zone cliquée. `Quiz.tsx` l'utilise. - **Scène de l'explorateur :** le menu contextuel s'affiche quand le fichier est sélectionné par clic droit (`Explorateur.tsx` et `quiz.css`). - **Question `win-supprimer` :** l'étape 1 accepte le clic gauche ou le clic droit sur le fichier. L'étape 2 accepte la corbeille ou « Supprimer » du menu. L'explication de la question est mise à jour. - **Tests :** le test des étapes parcourt maintenant tous les chemins (clic gauche ou droit) et vérifie que chaque zone attendue existe. Un nouveau test couvre la suppression par clic droit.
+
 ## 0.8.8 (2026-10-17)
 
 - Chasse aux lettres (les trois aventures) : pendant la partie, un bouton

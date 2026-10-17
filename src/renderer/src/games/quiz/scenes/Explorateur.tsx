@@ -1,7 +1,7 @@
 import { Ico, PATHS, Zone } from './commun'
 
 // Explorateur de fichiers. Menus : nouveau, selection-brouillon,
-// selection-expose.
+// selection-expose, contexte-brouillon, contexte-expose (clic droit sur le fichier).
 const FICHIERS = [
   { id: 'dossier-ecole', nom: 'École', type: 'Dossier de fichiers', date: '02/10/2026', dossier: true },
   { id: 'fichier-expose', nom: 'Exposé volcans.docx', type: 'Document texte', date: '10/10/2026' },
@@ -10,7 +10,12 @@ const FICHIERS = [
 ]
 
 export function Explorateur({ menu }: { menu: string | null }) {
-  const selection = menu === 'selection-brouillon' ? 'fichier-brouillon' : menu === 'selection-expose' ? 'fichier-expose' : null
+  const selection =
+    menu === 'selection-brouillon' || menu === 'contexte-brouillon'
+      ? 'fichier-brouillon'
+      : menu === 'selection-expose' || menu === 'contexte-expose'
+        ? 'fichier-expose'
+        : null
   return (
     <div className="sc-fenetre sc-explo">
       <div className="sc-titre sc-titre-clair">
@@ -87,6 +92,22 @@ export function Explorateur({ menu }: { menu: string | null }) {
           ))}
         </div>
       </div>
+      {(menu === 'contexte-brouillon' || menu === 'contexte-expose') && (
+        <div className="sc-popup sc-popup-contexte">
+          <Zone id="ctx-ouvrir" className="sc-popup-item" titre="Ouvrir">
+            Ouvrir
+          </Zone>
+          <Zone id="ctx-copier" className="sc-popup-item" titre="Copier">
+            Copier
+          </Zone>
+          <Zone id="ctx-renommer" className="sc-popup-item" titre="Renommer">
+            Renommer
+          </Zone>
+          <Zone id="ctx-supprimer" className="sc-popup-item" titre="Supprimer">
+            <Ico d={PATHS.corbeille} size={16} /> Supprimer
+          </Zone>
+        </div>
+      )}
     </div>
   )
 }

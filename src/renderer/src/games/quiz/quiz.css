@@ -1150,6 +1150,12 @@
   width: 200px;
 }
 
+.sc-popup-contexte {
+  top: 270px;
+  left: 330px;
+  width: 190px;
+}
+
 .sc-explo-corps {
   flex: 1;
   display: flex;
