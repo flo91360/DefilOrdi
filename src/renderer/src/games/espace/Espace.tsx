@@ -54,7 +54,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
   const [mode, setMode] = useState<ModeChasse>('chrono')
 
   const lancer = (theme: ThemeJeu, serie: Serie, modeJeu: ModeChasse = mode) =>
-    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu } })
+    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu, vitesseObjet: theme.vitesseObjet } })
 
   const terminer = (theme: ThemeJeu, reglages: Reglages, e: Etat, complete: boolean) => {
     if (e.detruites + e.manquees + e.erreurs + e.pieges === 0) return complete ? setPhase({ nom: 'lettres', theme }) : onQuit()

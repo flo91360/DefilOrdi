@@ -4,7 +4,7 @@
 
 import type { ThemeChasse } from '../../../../shared/data'
 import type { Couleurs, SceneTheme } from './scenes/base'
-import { Ocean } from './scenes/Ocean'
+import { Ocean, vitesseObjetOcean } from './scenes/Ocean'
 import { Spatial } from './scenes/Spatial'
 import { Western } from './scenes/Western'
 
@@ -20,6 +20,7 @@ export interface ThemeJeu {
   parfait: string // message de fin quand rien n'est tombé
   sons: { toucher: string[]; rater: string; sol: string }
   classe: string // classe CSS de l'écran de jeu
+  vitesseObjet?: (id: number) => number // vitesse relative de chaque objet (aventure sous-marine)
   creer: (c: Couleurs) => SceneTheme
 }
 
@@ -57,15 +58,16 @@ export const THEMES_JEU: ThemeJeu[] = [
   {
     id: 'ocean',
     nom: 'Plongée sous-marine',
-    description: 'Avec ton sous-marin, récupère les poissons, coquillages et trésors avant qu’ils ne s’enfoncent dans le sable.',
+    description: 'Depuis la surface, aspire avec ton sous-marin les poissons, coquillages et trésors qui remontent du fond avant qu’ils n’atteignent ton sous-marin.',
     consigne: 'Tape la lettre de l’objet pour l’attraper avec le rayon de ton sous-marin.',
     objets: 'trésors',
     compteur: 'Trésors',
     tombees: 'Perdus',
     reussites: (n) => pluriel(n, 'trésor récupéré', 'trésors récupérés'),
-    parfait: 'Aucun trésor perdu dans le sable !',
+    parfait: 'Aucun trésor n’a échappé à ton sous-marin !',
     sons: { toucher: ['aspire'], rater: 'bloup', sol: 'sable' },
     classe: 'theme-ocean',
+    vitesseObjet: vitesseObjetOcean,
     creer: (c) => new Ocean(c)
   }
 ]
