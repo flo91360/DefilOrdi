@@ -21,9 +21,11 @@ import {
   choisirMots,
   choisirPhrase,
   departProgression,
+  dernierMotARetrouver,
   dureeMemorisation,
   ECHECS_POUR_DESCENDRE,
   estPhrase,
+  indiceMot,
   libellePalier,
   motProche,
   motsDePhrase,
@@ -34,7 +36,7 @@ import {
   toleranceAccents,
   verifierPhrase
 } from './engine'
-import { imageDuMot } from './images'
+import { imageConnue, imageDuMot } from './images'
 
 type Palier = (typeof PALIERS_MEMOIRE)[number]
 
@@ -424,6 +426,8 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
   const [dernier, setDernier] = useState<number | null>(null)
   // Aide dys : mot visé et orthographes proposées en attendant le choix.
   const [choix, setChoix] = useState<{ index: number; options: string[] } | null>(null)
+  // Indice : un seul par partie, pour le dernier mot à retrouver (sans effet sur les mesures).
+  const [indice, setIndice] = useState<number | null>(null)
   const sonErreur = useSonErreur(profile)
   const fini = useRef(false)
 
@@ -437,6 +441,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
     const t = trouves.map((x, i) => x || i === index)
     setTrouves(t)
     setDernier(index)
+    setIndice(null)
     setMessage({ type: 'juste', texte: `Oui ! « ${mots[index]} »` })
     playSound(profile.sonReussite)
     if (t.every(Boolean)) {
@@ -531,6 +536,37 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
             ))}
           </div>
         )}
+        {(() => {
+          const dernierIndex = dernierMotARetrouver(trouves)
+          if (indice !== null && !trouves[indice]) {
+            const ind = indiceMot(mots[indice])
+            const img = imageConnue(mots[indice])
+            return (
+              <div className="indice-zone">
+                <div className="indice-propositions" aria-live="polite">
+                  <span className="indice-titre">Un petit coup de pouce :</span>
+                  {img && (
+                    <span className="mot-image" aria-hidden="true">
+                      {img}
+                    </span>
+                  )}
+                  <span className="indice-mot">{ind.masque}</span>
+                  <span className="indice-titre">
+                    {ind.longueur} lettre{ind.longueur > 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+            )
+          }
+          if (dernierIndex === null || fini.current) return null
+          return (
+            <div className="indice-zone">
+              <button className="btn btn-soft indice-bouton" onClick={() => setIndice(dernierIndex)}>
+                Indice
+              </button>
+            </div>
+          )
+        })()}
         <button className="btn btn-soft" onClick={() => finir(trouves, erreurs, dureeRappel())}>
           Je ne me souviens plus des autres
         </button>

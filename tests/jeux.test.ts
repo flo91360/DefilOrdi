@@ -16,7 +16,9 @@ import {
   choisirMots,
   choisirPhrase,
   departProgression,
+  dernierMotARetrouver,
   estPhrase,
+  indiceMot,
   motProche,
   motsDePhrase,
   orthographesPossibles,
@@ -239,5 +241,20 @@ describe('Mots à retenir : aide dys', () => {
         expect(o.filter((x) => x === mot)).toHaveLength(1)
       }
     }
+  })
+})
+
+describe('Mots à retenir : indice', () => {
+  it('ne propose un indice que s’il reste un seul mot', () => {
+    expect(dernierMotARetrouver([true, false, true])).toBe(1)
+    expect(dernierMotARetrouver([false, false, true])).toBeNull()
+    expect(dernierMotARetrouver([true, true, true])).toBeNull()
+  })
+  it('ne donne que la première lettre et la longueur', () => {
+    const i = indiceMot('bateau')
+    expect(i.premiere).toBe('B')
+    expect(i.longueur).toBe(6)
+    expect(i.masque).toBe('B _ _ _ _ _')
+    expect(i.masque).not.toContain('a')
   })
 })

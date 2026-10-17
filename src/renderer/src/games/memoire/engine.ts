@@ -234,3 +234,25 @@ export function orthographesPossibles(mot: string, palier: number, random: () =>
   }
   return melanger([mot, ...fausses], random)
 }
+
+// --- Indice (paliers 3 à 7) ------------------------------------------------------
+
+// Index du seul mot qui reste à retrouver, sinon null (aucun ou plusieurs).
+export function dernierMotARetrouver(trouves: boolean[]): number | null {
+  const restants = trouves.flatMap((t, i) => (t ? [] : [i]))
+  return restants.length === 1 ? restants[0] : null
+}
+
+export interface IndiceMot {
+  premiere: string // première lettre, en majuscule
+  longueur: number // nombre de lettres
+  masque: string // « B _ _ _ _ _ » : première lettre puis des tirets bas
+}
+
+// Aide à la récupération sans donner le mot : sa première lettre et sa longueur.
+export function indiceMot(mot: string): IndiceMot {
+  const lettres = [...mot.trim()]
+  const premiere = (lettres[0] ?? '').toLocaleUpperCase('fr')
+  const masque = [premiere, ...lettres.slice(1).map((c) => (/[\p{L}\p{N}]/u.test(c) ? '_' : c))].join(' ')
+  return { premiere, longueur: lettres.filter((c) => /[\p{L}\p{N}]/u.test(c)).length, masque }
+}
