@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.19 — 2026-10-18
+<!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
+
+- **mot à retenir** : Mots à retenir : quand aucun mot n'est trouvé, « Je ne me souviens plus » donne d'abord un indice au lieu d'arrêter la partie. Pour les paliers 3 à 7 mots, le jeu réutilise l'indice existant (première lettre, nombre de lettres, image si connue) sur le premier mot. Pour le palier phrase, il affiche la première lettre du premier mot et le nombre de mots. Un second clic termine la partie. Dès qu'un mot est trouvé, le bouton garde son rôle actuel. Le typecheck, les tests et le build ont réussi lors de la livraison précédente (PR 29). Je n'ai pas lancé de partie dans l'interface.
+
 ## 0.8.18 (2026-10-18)
 
 - Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
