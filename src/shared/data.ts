@@ -155,6 +155,9 @@ export interface ResultatMemoire {
 // Une partie de « Chasse aux lettres » (identifiant historique : 'espace').
 export const THEMES_CHASSE = ['espace', 'western', 'ocean'] as const
 export type ThemeChasse = (typeof THEMES_CHASSE)[number]
+// Mode de jeu : chrono (durée fixe), 3 vies, ou pièges et cadeaux (infini).
+export const MODES_CHASSE = ['chrono', 'vies', 'pieges'] as const
+export type ModeChasse = (typeof MODES_CHASSE)[number]
 
 export interface ResultatEspace {
   id: string
@@ -167,6 +170,10 @@ export interface ResultatEspace {
   detruites: number
   manquees: number // lettres tombées au sol
   erreurs: number // touches qui ne visaient aucune lettre
+  mode: ModeChasse // chrono pour les parties d'avant les modes à vies
+  pieges: number // pièges tapés (mode Pièges et cadeaux)
+  cadeaux: number // vies récupérées (mode Pièges et cadeaux)
+  palier: number // palier de difficulté atteint (0 = aucun)
   lettresRatees: Record<string, number> // lettre -> fois où elle est tombée ou a été manquée
 }
 
@@ -593,6 +600,10 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       detruites: count(v.detruites),
       manquees: count(v.manquees),
       erreurs: count(v.erreurs),
+      mode: pick(v.mode, MODES_CHASSE, 'chrono'),
+      pieges: count(v.pieges),
+      cadeaux: count(v.cadeaux),
+      palier: count(v.palier),
       lettresRatees: compteurs(v.lettresRatees)
     }
   }
