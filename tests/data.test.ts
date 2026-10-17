@@ -203,7 +203,7 @@ describe('Couleurs piégées : réglages du bouton Indice', () => {
     const date = '2026-02-01T00:00:00.000Z'
     const data = normalizeAppData({
       profiles: [profil('a1', 'Léa')],
-      resultats: [{ id: 'c', profileId: 'a1', date, jeu: 'couleurs', mode: 'couleur', manches: 10, justes: 8, pieges: 7, piegesJustes: 5, dureeMs: 1, indices: 2 }]
+      resultats: [{ id: 'c', profileId: 'a1', date, jeu: 'couleurs', mode: 'couleur', manches: 10, justes: 8, pieges: 7, piegesJustes: 5, dureeMs: 1, indices: 2, minutes: 0 }]
     })
     expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', indices: 2 })
   })

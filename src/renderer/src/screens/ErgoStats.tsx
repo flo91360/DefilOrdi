@@ -12,7 +12,7 @@ import type {
   ResultatQuiz,
   ReponseBac
 } from '../../../shared/data'
-import { PALIER_PHRASE } from '../../../shared/data'
+import { DUREES_TIMER_COULEURS, PALIER_PHRASE } from '../../../shared/data'
 import { api } from '../api'
 import { Avatar } from '../avatar/Avatar'
 import { LineChart, type Point } from '../components/LineChart'
@@ -41,7 +41,8 @@ export const NOMS_JEUX: Record<JeuId, string> = {
 export const MODES_COULEURS_LABELS: Record<ResultatCouleurs['mode'], string> = {
   mot: 'Écrire le mot',
   couleur: 'Écrire la couleur',
-  melange: 'Les deux'
+  melange: 'Les deux',
+  timer: 'Couleurs piégées timer'
 }
 
 // Résumé d'une partie en quelques mots (liste des patients).
@@ -76,7 +77,7 @@ const COLONNES_DACTYLO: Colonne<ResultatDactylo>[] = [
 ]
 
 const COLONNES_COULEURS: Colonne<ResultatCouleurs>[] = [
-  { titre: 'Mode', valeur: (r) => MODES_COULEURS_LABELS[r.mode] },
+  { titre: 'Mode', valeur: (r) => (r.mode === 'timer' ? `${MODES_COULEURS_LABELS.timer}, ${r.minutes} min` : MODES_COULEURS_LABELS[r.mode]) },
   { titre: 'Justes', valeur: (r) => `${r.justes} / ${r.manches}`, num: true },
   { titre: 'Réussite', valeur: (r) => `${pourcentage(r.justes, r.manches)} %`, num: true },
   { titre: 'Pièges déjoués', valeur: (r) => `${r.piegesJustes} / ${r.pieges}`, num: true },
@@ -402,6 +403,10 @@ function StatsCouleurs({ parties, onSupprimer }: { parties: ResultatCouleurs[]; 
   const piegesTotal = parties.reduce((t, r) => t + r.pieges, 0)
   const piegesJustes = parties.reduce((t, r) => t + r.piegesJustes, 0)
   const indicesTotal = parties.reduce((t, r) => t + r.indices, 0)
+  const recordsTimer = DUREES_TIMER_COULEURS.map((minutes) => ({
+    minutes,
+    justes: Math.max(0, ...parties.filter((r) => r.mode === 'timer' && r.minutes === minutes).map((r) => r.justes))
+  })).filter((x) => parties.some((r) => r.mode === 'timer' && r.minutes === x.minutes))
   const partiesAvecIndice = parties.filter((r) => r.indices > 0).length
   return (
     <>
@@ -426,6 +431,18 @@ function StatsCouleurs({ parties, onSupprimer }: { parties: ResultatCouleurs[]; 
               points={points(parties, (r) => Math.round(r.dureeMs / Math.max(1, r.manches) / 100) / 10, (r) => MODES_COULEURS_LABELS[r.mode])}
             />
           </div>
+        </div>
+      )}
+      {recordsTimer.length > 0 && (
+        <div className="card">
+          <h2 className="card-title">Records</h2>
+          <ul>
+            {recordsTimer.map((x) => (
+              <li key={x.minutes}>
+                {MODES_COULEURS_LABELS.timer} · {x.minutes} minute{x.minutes > 1 ? 's' : ''} · <strong>{x.justes}</strong> bonne{x.justes > 1 ? 's' : ''} réponse{x.justes > 1 ? 's' : ''}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       <Historique parties={parties} colonnes={COLONNES_COULEURS} onSupprimer={onSupprimer} />

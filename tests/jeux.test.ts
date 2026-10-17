@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { normaliserReponse } from '../src/renderer/src/games/commun'
 import {
   clicValide,
+  consigneDuMode,
   COULEURS,
   estJuste,
   estPiege,
   genererManches,
   indiceUtile,
+  indicesTimer,
   nbPropositions,
   propositionsIndice,
   reponseALaSouris
@@ -57,9 +59,23 @@ describe('Couleurs piégées', () => {
     expect(manches.every((m) => m.consigne === 'couleur')).toBe(true)
   })
 
-  it('le mode mélange alterne les consignes', () => {
-    const consignes = new Set(genererManches(50, 'melange', COULEURS).map((m) => m.consigne))
-    expect(consignes).toEqual(new Set(['mot', 'couleur']))
+  it('le mode mélange tire les consignes au hasard, sans alternance régulière', () => {
+    const consignes = genererManches(60, 'melange', COULEURS).map((m) => m.consigne)
+    expect(new Set(consignes)).toEqual(new Set(['mot', 'couleur']))
+    const alterne = consignes.every((c, i) => i === 0 || c !== consignes[i - 1])
+    expect(alterne).toBe(false)
+    const timer = genererManches(60, 'timer', COULEURS).map((m) => m.consigne)
+    expect(new Set(timer)).toEqual(new Set(['mot', 'couleur']))
+  })
+
+  it('consigneDuMode suit le hasard fourni', () => {
+    expect(consigneDuMode('melange', () => 0.1)).toBe('mot')
+    expect(consigneDuMode('timer', () => 0.9)).toBe('couleur')
+    expect(consigneDuMode('mot', () => 0.9)).toBe('mot')
+  })
+
+  it('un indice par minute en mode chronométré', () => {
+    expect([1, 2, 3].map(indicesTimer)).toEqual([1, 2, 3])
   })
 
   it('l’indice ne sert que si la réponse n’est pas le mot écrit', () => {

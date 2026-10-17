@@ -139,7 +139,8 @@ export interface ResultatDactylo {
   erreursParTouche: Record<string, number> // caractère attendu -> nombre d'erreurs
 }
 
-export const MODES_COULEURS = ['mot', 'couleur', 'melange'] as const
+export const MODES_COULEURS = ['mot', 'couleur', 'melange', 'timer'] as const
+export const DUREES_TIMER_COULEURS = [1, 2, 3] as const // minutes du mode chronométré
 export type ModeCouleurs = (typeof MODES_COULEURS)[number]
 
 // Une partie de « Couleurs piégées » (effet Stroop).
@@ -155,6 +156,7 @@ export interface ResultatCouleurs {
   piegesJustes: number // réponses justes quand le mot et l'encre diffèrent
   pieges: number
   indices: number // clics sur le bouton Indice pendant la partie (0 pour les anciennes parties)
+  minutes: number // durée du mode « timer » (1, 2 ou 3), 0 pour les autres modes
 }
 
 // Couleurs piégées : bouton Indice, réglé par l'ergothérapeute pour tous les profils.
@@ -645,7 +647,8 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
       justes: Math.min(count(v.justes), manches),
       pieges,
       piegesJustes: Math.min(count(v.piegesJustes), pieges),
-      indices: count(v.indices)
+      indices: count(v.indices),
+      minutes: v.mode === 'timer' ? choix(v.minutes, DUREES_TIMER_COULEURS, 1) : 0
     }
   }
   if (v.jeu === 'memoire') {
