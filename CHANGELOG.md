@@ -1,14 +1,14 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.19 — 2026-10-18
-<!-- planifikateur:984e71e3-dc57-4430-a4f7-36e07815a998 -->
+## 0.8.18 (2026-10-18)
 
-- **mot à retenir** : Mots à retenir : si aucun mot n'est trouvé, « Je ne me souviens plus » donne d'abord un indice au lieu d'arrêter la partie. Pour les paliers 3 à 7 mots, le jeu réutilise l'indice existant (première lettre, nombre de lettres, image si connue) sur le premier mot. Pour le palier phrase, il affiche la première lettre du premier mot et le nombre de mots. Un second clic termine la partie. Dès qu'un mot est trouvé, le bouton garde son rôle actuel. Le typecheck passe. Je n'ai lancé ni les tests, ni le build, ni la partie dans l'interface.
-
-## 0.8.18 — 2026-10-18
-<!-- planifikateur:5e657acf-1f5f-45b0-a47b-065b4d3fcb0a -->
-
-- **dactylo amélioration sur les caractéristiques** : Rien de nouveau dans cette reprise : les Échanges sont vides, il n'y a ni nouvelle correction ni nouvel échec signalé, donc je n'ai modifié aucun fichier. La demande est livrée dans la PR #27 (version 0.8.18). Elle comprend l'option de masquage du nombre d'erreurs, la meilleure vitesse en gras, les smileys sur les moyennes, la phrase personnelle après une médaille avec règles par niveau et correcteur hors ligne, et la section « Phrases des enfants » de l'espace ergo. Le dernier échec, la description des changements, a été corrigé au tour précédent, et typecheck, tests et build avaient réussi. Je n'ai pas essayé l'interface dans un navigateur. Pour changer un choix fait sur les points « À préciser » (règles du niveau 2, nombre de signes au niveau 3, masquage des erreurs dans le récapitulatif), indiquez-le dans les Échanges.
+- Dactylo : le nombre d'erreurs de chaque phrase s'affiche à la fin de la phrase (jamais pendant la frappe) et dans le récapitulatif. L'ergothérapeute peut le masquer pour chaque enfant : Patients, réglages Dactylo, « Afficher le nombre d'erreurs ».
+- Dactylo : dans le récapitulatif, la meilleure vitesse de frappe de la série est en gras.
+- Dactylo : les grandes cartes de moyennes (vitesse et précision) affichent aussi le smiley correspondant.
+- Dactylo : après une médaille, l'enfant peut écrire sa propre phrase (une phrase par médaille). Le logiciel lui rappelle la règle du niveau, dont le nombre maximal de mots : niveau 1, 6 mots sans accent, majuscule ni ponctuation ; niveau 2, 10 mots, une majuscule au début et au plus un signe de ponctuation ; niveau 3, 14 mots, au plus 3 signes ; niveau 4, sans maximum.
+- Dactylo : la phrase est vérifiée sans connexion Internet (règles du niveau, caractères du clavier, orthographe). Si elle est refusée, l'enfant est averti avec douceur et peut la corriger. Le correcteur connaît les mots courants et ceux de vos listes de phrases : un mot rare peut être signalé à tort, vous pouvez alors valider la phrase.
+- Dactylo : une phrase acceptée rejoint les phrases du niveau et peut être tirée pour tous les enfants.
+- Espace ergo : nouvelle section « Phrases des enfants ». Les phrases refusées y apparaissent comme une notification (pastille rouge sur la section) ; vous pouvez les corriger, les valider, changer leur niveau ou les supprimer, ainsi que les phrases déjà ajoutées.
 
 ## 0.8.17 (2026-10-18)
 
