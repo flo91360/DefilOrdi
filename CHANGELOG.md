@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.10 — 2026-10-17
+<!-- planifikateur:54486b12-c2a5-455a-b912-b76709103401 -->
+
+- **Amélioration sur certaine mise en situation** : Rien de nouveau à modifier : la branche contient déjà la suppression par clic droit, livrée dans la PR n°19. Dans « Supprime le fichier brouillon.txt », un clic droit sur le fichier ouvre un menu contextuel simulé, et « Supprimer » valide l'étape. La sélection suivie du clic sur la corbeille reste acceptée, car j'ai choisi d'ajouter la méthode plutôt que de remplacer l'ancienne. L'indice après deux erreurs et la règle « juste seulement sans mauvais clic » sont inchangés. Les tests du quiz vérifient que chaque zone attendue existe, quel que soit le chemin pris.
+
 ## 0.8.9 — 2026-10-17
 <!-- planifikateur:63a80af8-fc84-4400-90e9-433980fd1cc8 -->
 
