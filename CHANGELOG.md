@@ -1,9 +1,30 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.8 — 2026-10-17
-<!-- planifikateur:e11bf219-0793-4d5d-b2e8-ac5407ee9dc7 -->
+## 0.8.8 (2026-10-17)
 
-- **Amélioration spatiale** : Chasse aux lettres est amélioré dans les trois aventures (Mission spatiale, Stand de tir, Plongée sous-marine). Le typecheck, les 108 tests et le build passent. Je n'ai pas lancé le jeu dans un navigateur, donc l'affichage reste à regarder. Les « À préciser » de la carte n'étaient pas bloquants. J'ai pris ces choix par défaut, faciles à changer : - **Clavier à l'écran** : un bouton « Clavier : affiché/masqué » dans la barre du jeu. Il complète le réglage de l'enfant : la partie commence selon ce réglage, et le bouton ne change rien au profil. - **Niveau 5** : minuscules et majuscules (52 lettres). - **Niveau 6** : les 26 majuscules plus é è à ç ù. Les minuscules simples en sont exclues. - **Niveau 7** : tout mélangé (minuscules, majuscules, accents). - **Paliers** : après 8 réussites d'affilée, le jeu va plus vite. Après 8 autres, deux lettres tombent ensemble. Une faute ou une lettre tombée remet le compte des 8 à zéro, mais le palier atteint reste. Un message s'affiche à chaque palier. En chrono, la progression s'arrête à « deux lettres ». Dans les modes à vies, elle continue : plus vite, puis trois lettres ensemble au maximum. - **Mode « 3 vies »** : sans durée. Une faute ou une lettre tombée retire une vie, et la partie s'arrête à zéro vie. Les vies s'affichent en cœurs à la place du chrono. - **Mode « Pièges et cadeaux »** : comme les 3 vies, avec en plus : - Les pièges (étoiles sombres barrées de rouge) font perdre une vie si on les tape. Les laisser tomber ne coûte rien. - Les cadeaux dorés rendent une vie quand on tape leur lettre. Le maximum est de 5 vies. - Si un piège et une vraie lettre portent le même caractère, la vraie lettre est visée en premier. - **Choix du mode** : il se fait sur l'écran de choix des lettres. La durée n'y apparaît qu'en mode chrono. - **Sons** : ce sont les sons doux existants. Un piège tapé joue le même petit son qu'une faute. - **Records** : ils sont séparés par série, par aventure et par mode. En chrono, la mesure est le nombre
+- Chasse aux lettres (les trois aventures) : pendant la partie, un bouton
+  permet d'afficher ou de masquer le clavier à l'écran. Au départ, il suit le
+  réglage de l'enfant, et ce choix ne vaut que pour la partie en cours.
+- Chasse aux lettres : trois nouveaux niveaux de lettres. Niveau 5 :
+  minuscules et majuscules. Niveau 6 : majuscules et lettres accentuées.
+  Niveau 7 : tout mélangé (minuscules, majuscules, accents).
+- Chasse aux lettres : après 8 lettres réussies de suite sans erreur, le jeu
+  va plus vite ; après 8 autres, deux lettres tombent en même temps. Une
+  erreur remet seulement le compte des 8 lettres à zéro, le palier atteint
+  est conservé. Un message encourageant s'affiche à chaque palier.
+- Chasse aux lettres : nouveau mode « 3 vies », sans durée. Une faute ou une
+  lettre tombée fait perdre une vie ; la partie s'arrête à zéro vie et le jeu
+  devient plus difficile à chaque palier.
+- Chasse aux lettres : nouveau mode « Pièges et cadeaux », comme le mode 3
+  vies avec en plus des pièges à ne pas taper (en taper un fait perdre une
+  vie, les laisser tomber ne coûte rien) et des cadeaux dorés à taper pour
+  regagner une vie (5 vies au maximum).
+- Les sons d'erreur restent doux. Les records sont comptés séparément pour
+  chaque mode, en plus de la série de lettres et de l'aventure : lettres par
+  minute en mode chrono, nombre de lettres attrapées dans les modes à vies.
+- Statistiques de Chasse aux lettres : le mode, les pièges tapés, les cadeaux
+  et le palier atteint sont indiqués (et dans l'export Excel). Les parties
+  jouées avant cette version comptent comme des parties chrono.
 
 ## 0.8.7 (2026-10-17)
 
