@@ -3,6 +3,7 @@
 import type { QuestionPerso } from '../../../../shared/data'
 import { melanger } from '../commun'
 import { QUESTIONS } from './questions'
+import { THEME_RELIER, type QuestionRelier, tirerRelier } from './relier'
 import type { Question, QuestionChoix, ThemeId } from './types'
 
 export function versQuestion(p: QuestionPerso): Question {
@@ -49,4 +50,25 @@ export function tirerQuestions(
   random: () => number = Math.random
 ): Question[] {
   return melanger(questionsDisponibles(banque, niveau, theme), random).slice(0, n)
+}
+
+// Un élément d'une partie : une question, ou le jeu « Points reliés ».
+export type ElementQuiz = Question | QuestionRelier
+
+// Partie du thème « Points reliés » : un seul jeu de 10 liaisons.
+// Avec « Tout mélanger » : « Points reliés » remplace au plus une question
+// (une chance sur 6, comme un thème parmi les six proposés).
+export function tirerPartie(
+  banque: Question[],
+  niveau: number,
+  theme: ThemeId | 'tout' | typeof THEME_RELIER,
+  n: number,
+  random: () => number = Math.random
+): ElementQuiz[] {
+  if (theme === THEME_RELIER) return [tirerRelier(random)]
+  const questions: ElementQuiz[] = tirerQuestions(banque, niveau, theme, n, random)
+  if (theme === 'tout' && questions.length > 0 && random() < 1 / 6) {
+    questions[Math.floor(random() * questions.length)] = tirerRelier(random)
+  }
+  return questions
 }

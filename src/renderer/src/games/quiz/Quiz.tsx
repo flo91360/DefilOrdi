@@ -6,7 +6,9 @@ import { uid } from '../../uid'
 import { pourcentage } from '../commun'
 import { formatDuree } from '../dactylo/engine'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
-import { melangerChoix, questionsDisponibles, tirerQuestions } from './engine'
+import { type ElementQuiz, melangerChoix, questionsDisponibles, tirerPartie } from './engine'
+import { Relier } from './Relier'
+import { NB_ACTIONS_RELIER, NOM_THEME_RELIER, THEME_RELIER } from './relier'
 import { SceneCadre } from './scenes/commun'
 import { type Question, type QuestionSituation, THEMES, type ThemeId } from './types'
 import { AfficherVisuel, Ecran } from './visuels'
@@ -15,13 +17,17 @@ import './quiz.css'
 const NOMBRES = [5, 10, 15, 20] as const
 type Nombre = (typeof NOMBRES)[number]
 
-const NOMS_THEMES: Record<ThemeId | 'tout', string> = {
-  tout: 'Tout mélanger',
-  ...Object.fromEntries(THEMES.map((t) => [t.id, t.nom]))
-} as Record<ThemeId | 'tout', string>
+type ChoixTheme = ThemeId | 'tout' | typeof THEME_RELIER
 
-const DESCRIPTIONS: Record<ThemeId | 'tout', string> = {
+const NOMS_THEMES: Record<ChoixTheme, string> = {
+  tout: 'Tout mélanger',
+  relier: NOM_THEME_RELIER,
+  ...Object.fromEntries(THEMES.map((t) => [t.id, t.nom]))
+} as Record<ChoixTheme, string>
+
+const DESCRIPTIONS: Record<ChoixTheme, string> = {
   tout: 'Des questions de tous les thèmes.',
+  relier: 'Relie les actions faites sur l’ordinateur au bon logiciel.',
   materiel: 'Souris, clé USB, écran, Wi-Fi…',
   windows: 'Le bureau, les dossiers, éteindre l’ordinateur…',
   internet: 'Naviguer, se protéger, repérer les pièges…',
@@ -38,22 +44,22 @@ interface Props {
 }
 
 interface Reponse {
-  question: Question
+  question: ElementQuiz
   juste: boolean
 }
 
 type Phase =
   | { nom: 'choix' }
-  | { nom: 'jeu'; theme: ThemeId | 'tout'; questions: Question[] }
-  | { nom: 'fin'; theme: ThemeId | 'tout'; reponses: Reponse[]; resultat: ResultatQuiz; record: boolean }
+  | { nom: 'jeu'; theme: ChoixTheme; questions: ElementQuiz[] }
+  | { nom: 'fin'; theme: ChoixTheme; reponses: Reponse[]; resultat: ResultatQuiz; record: boolean }
 
 export function Quiz({ profile, banque, resultats, onResult, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState<Nombre>(10)
 
-  const lancer = (theme: ThemeId | 'tout') => setPhase({ nom: 'jeu', theme, questions: tirerQuestions(banque, profile.niveau, theme, nombre) })
+  const lancer = (theme: ChoixTheme) => setPhase({ nom: 'jeu', theme, questions: tirerPartie(banque, profile.niveau, theme, nombre) })
 
-  const terminer = (theme: ThemeId | 'tout', reponses: Reponse[], dureeMs: number, complete: boolean) => {
+  const terminer = (theme: ChoixTheme, reponses: Reponse[], dureeMs: number, complete: boolean) => {
     if (reponses.length === 0) return onQuit()
     const anciens = resultats.filter(
       (r): r is ResultatQuiz => r.jeu === 'quiz' && r.profileId === profile.id && r.themeNom === NOMS_THEMES[theme]
@@ -138,7 +144,16 @@ export function Quiz({ profile, banque, resultats, onResult, onQuit }: Props) {
         <h2 className="choix-title">Choisis ton thème</h2>
         <Chips label="Nombre de questions" values={NOMBRES} value={nombre} onChange={setNombre} />
         <div className="liste-grid">
-          {(['tout', ...THEMES.map((t) => t.id)] as (ThemeId | 'tout')[]).map((t) => {
+          {(['tout', ...THEMES.map((t) => t.id), THEME_RELIER] as ChoixTheme[]).map((t) => {
+            if (t === THEME_RELIER) {
+              return (
+                <button key={t} className="liste-card" onClick={() => lancer(t)}>
+                  <span className="liste-nom">{NOMS_THEMES[t]}</span>
+                  <span className="liste-exemple wrap">{DESCRIPTIONS[t]}</span>
+                  <span className="liste-info">{NB_ACTIONS_RELIER} actions à relier</span>
+                </button>
+              )
+            }
             const n = questionsDisponibles(banque, profile.niveau, t).length
             return (
               <button key={t} className="liste-card" onClick={() => lancer(t)} disabled={n === 0}>
@@ -165,21 +180,21 @@ function Partie({
   onQuitter
 }: {
   profile: Profile
-  questions: Question[]
+  questions: ElementQuiz[]
   onFin: (r: Reponse[], dureeMs: number) => void
   onQuitter: (r: Reponse[], dureeMs: number) => void
 }) {
   const [reponses, setReponses] = useState<Reponse[]>([])
-  const [corrigee, setCorrigee] = useState<{ juste: boolean; choix?: number } | null>(null)
+  const [corrigee, setCorrigee] = useState<{ juste: boolean; choix?: number; detail?: string } | null>(null)
   const debut = useRef(Date.now())
   const index = reponses.length - (corrigee ? 1 : 0)
   const q = questions[index]
   const justes = reponses.filter((r) => r.juste).length
 
-  const repondre = (juste: boolean, choix?: number) => {
+  const repondre = (juste: boolean, choix?: number, detail?: string) => {
     if (corrigee) return
     playSound(juste ? profile.sonReussite : profile.dactylo.sonErreur ? profile.sonEchec : 'aucun')
-    setCorrigee({ juste, choix })
+    setCorrigee({ juste, choix, detail })
     setReponses((r) => [...r, { question: q, juste }])
   }
 
@@ -230,7 +245,15 @@ function Partie({
         </div>
       </header>
       <main className="quiz-main">
-        <QuestionVue key={q.id} question={q} profile={profile} corrigee={corrigee} onRepondre={repondre} />
+        {q.type === 'relier' ? (
+          <div className="quiz-question">
+            <p className="quiz-theme">{NOM_THEME_RELIER}</p>
+            <h2 className="quiz-texte">{q.question}</h2>
+            <Relier key={q.id} question={q} fini={corrigee !== null} onFin={(juste, detail) => repondre(juste, undefined, detail)} />
+          </div>
+        ) : (
+          <QuestionVue key={q.id} question={q} profile={profile} corrigee={corrigee} onRepondre={repondre} />
+        )}
         {corrigee && (
           <div
             className={corrigee.juste ? 'quiz-retour juste' : 'quiz-retour faux'}
@@ -239,9 +262,9 @@ function Partie({
           >
             <div>
               <strong>
-                {corrigee.juste ? 'Bonne réponse !' : q.type === 'situation' ? 'Tu y es arrivé, avec un peu d’aide !' : 'Pas tout à fait…'}
+                {corrigee.juste ? 'Bonne réponse !' : q.type === 'relier' ? 'Presque, regarde la correction !' : q.type === 'situation' ? 'Tu y es arrivé, avec un peu d’aide !' : 'Pas tout à fait…'}
               </strong>
-              <p>{q.explication}</p>
+              <p>{corrigee.detail ?? q.explication}</p>
             </div>
             <button className="btn btn-primary btn-lg" onClick={suivante} autoFocus>
               {reponses.length >= questions.length ? 'Voir mon score' : 'Question suivante'}
