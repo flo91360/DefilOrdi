@@ -223,3 +223,17 @@ describe('Chasse aux lettres : anciens résultats', () => {
   })
 })
 
+
+describe('Police des lettres (Chasse aux lettres)', () => {
+  it('un profil existant sans le champ reçoit la police par défaut', () => {
+    const { policeLettres: _p, ...ancien } = profil('a', 'Tom')
+    const data = normalizeAppData({ ...defaultAppData(), profiles: [ancien] })
+    expect(data.profiles[0].policeLettres).toBe('verdana')
+  })
+  it('conserve une police valide et corrige une valeur inconnue', () => {
+    const ok = normalizeAppData({ ...defaultAppData(), profiles: [{ ...profil('a', 'Tom'), policeLettres: 'comic' }] })
+    expect(ok.profiles[0].policeLettres).toBe('comic')
+    const ko = normalizeAppData({ ...defaultAppData(), profiles: [{ ...profil('b', 'Léa'), policeLettres: 'Papyrus' }] })
+    expect(ko.profiles[0].policeLettres).toBe('verdana')
+  })
+})

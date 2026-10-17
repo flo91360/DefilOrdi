@@ -7,6 +7,8 @@ import {
   CLASSES,
   COULEURS_PREFEREES,
   newProfile,
+  POLICES_INFO,
+  POLICES_LETTRES,
   PRENOM_MAX,
   type Profile,
   SONS_ECHEC,
@@ -24,7 +26,8 @@ const STEPS = [
   { id: 'classe', titre: 'Classe' },
   { id: 'personnage', titre: 'Personnage' },
   { id: 'couleurs', titre: 'Couleurs' },
-  { id: 'sons', titre: 'Sons' }
+  { id: 'sons', titre: 'Sons' },
+  { id: 'police', titre: 'Lettres' }
 ] as const
 
 type StepId = (typeof STEPS)[number]['id']
@@ -103,6 +106,7 @@ export function ProfileEditor({ initial, onCancel, onDone }: Props) {
           {step === 'personnage' &&<StepPersonnage draft={draft} onChange={setAvatar} />}
           {step === 'couleurs' && <StepCouleurs draft={draft} onChange={set} />}
           {step === 'sons' && <StepSons draft={draft} onChange={set} />}
+          {step === 'police' && <StepPolice draft={draft} onChange={set} />}
         </section>
       </main>
 
@@ -374,6 +378,31 @@ function SoundChoice({
                 <IconCheck size={20} />
               </span>
             )}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function StepPolice({ draft, onChange }: { draft: Profile; onChange: (patch: Partial<Profile>) => void }) {
+  return (
+    <div className="step-body">
+      <h2 className="step-title">Tes lettres</h2>
+      <p className="step-help">Choisis la police où tu vois le mieux les lettres, surtout J et L. Elle sera utilisée dans la Chasse aux lettres.</p>
+      <div className="police-list" role="radiogroup" aria-label="Police des lettres">
+        {POLICES_LETTRES.map((p) => (
+          <button
+            key={p}
+            role="radio"
+            aria-checked={p === draft.policeLettres}
+            className={p === draft.policeLettres ? 'police-option selected' : 'police-option'}
+            onClick={() => onChange({ policeLettres: p })}
+          >
+            <span className="police-apercu" style={{ fontFamily: POLICES_INFO[p].css }} aria-hidden="true">
+              J L I l T F
+            </span>
+            <span className="police-nom">{POLICES_INFO[p].nom}</span>
           </button>
         ))}
       </div>

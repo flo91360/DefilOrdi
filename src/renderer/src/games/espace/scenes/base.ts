@@ -9,6 +9,7 @@ import type { Lettre } from '../engine'
 export interface Couleurs {
   principale: string
   secondaire: string
+  police?: string // police CSS des lettres (réglage du profil)
 }
 
 // Générateur pseudo-aléatoire déterministe (mulberry32) : une même lettre
@@ -60,6 +61,11 @@ export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w
 
 export const POLICE = 'Nunito, system-ui, sans-serif'
 
+// Police des lettres qui tombent : celle du profil, ou la police par défaut.
+export function policeLettres(c: Couleurs): string {
+  return c.police ?? POLICE
+}
+
 // Lettre bien lisible : texte épais avec un contour.
 export function lettreContour(
   ctx: CanvasRenderingContext2D,
@@ -68,9 +74,10 @@ export function lettreContour(
   y: number,
   taille: number,
   remplissage: string,
-  contour: string
+  contour: string,
+  police: string = POLICE
 ) {
-  ctx.font = `900 ${Math.round(taille)}px ${POLICE}`
+  ctx.font = `900 ${Math.round(taille)}px ${police}`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.lineJoin = 'round'
@@ -187,7 +194,7 @@ export abstract class SceneTheme {
     } else ctx.arc(0, 0, R, 0, Math.PI * 2)
     ctx.fill()
     ctx.stroke()
-    lettreContour(ctx, l.char, 0, R * 0.05, R * 1.05, piege ? '#fecaca' : '#7c2d12', piege ? '#2b1020' : '#fff4c2')
+    lettreContour(ctx, l.char, 0, R * 0.05, R * 1.05, piege ? '#fecaca' : '#7c2d12', piege ? '#2b1020' : '#fff4c2', policeLettres(this.couleurs))
     // marque : croix rouge pour le piège, cœur pour le cadeau
     if (piege) {
       ctx.globalAlpha = 0.55

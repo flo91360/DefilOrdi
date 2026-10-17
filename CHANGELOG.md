@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.14 — 2026-10-17
+<!-- planifikateur:cbda4775-a2ef-4b8e-a99f-e9acd0a98ec9 -->
+
+- **dans chasse au lettres** : Chaque profil a maintenant un réglage de police pour la Chasse aux lettres, avec Verdana par défaut. Le typecheck et les tests passent (116). Je n'ai pas lancé `npm run build`, et je n'ai pas essayé les trois aventures dans un navigateur. - **Quatre polices :** Verdana, Arial, Calibri et Comic Sans MS, toutes sans empattement. Elles sont définies dans `src/shared/data.ts`. Si une police manque sur le poste, une police de repli proche prend le relais. - **Profils existants :** un profil sans ce champ, ou avec une valeur inconnue, reçoit Verdana au chargement. Ils s'ouvrent donc sans erreur. - **Choix de l'enfant :** une nouvelle étape « Lettres » apparaît à la fin de l'éditeur de profil, à la création comme à la modification. Chaque police est montrée avec « J L I l T F », pour comparer les lettres faciles à confondre. - **Dans le jeu :** les lettres qui tombent utilisent la police du profil dans les trois aventures, y compris l'aperçu des aventures. La taille des lettres n'a pas changé. - **Clavier et autres jeux :** inchangés. Dans la Chasse aux lettres, seules les lettres elles-mêmes changent. Les textes de score et le cœur gardent la police actuelle. - **Test ajouté :** `tests/data.test.ts` vérifie la valeur par défaut d'un ancien profil, la conservation d'une police valide et le remplacement d'une valeur inconnue.
+
 ## 0.8.13 (2026-10-17)
 
 - Carte Interface de présentation des jeux (e8a7f9f8-b46b-4e89-a36b-0b0d8ce66867) (#22)
