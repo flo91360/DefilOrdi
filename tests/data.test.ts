@@ -80,7 +80,7 @@ describe('migration des données de la version 1', () => {
     const p = profil('a1', 'Léa') as Record<string, unknown>
     delete p.dactylo
     const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '1234', volume: 0.5 } })
-    expect(data.version).toBe(4)
+    expect(data.version).toBe(5)
     expect(data.listes.length).toBe(4)
     expect(data.resultats).toEqual([])
     expect(data.profiles[0].dactylo).toEqual(newProfile('x', '', 'CP').dactylo)
@@ -111,7 +111,7 @@ describe('migration vers la version 3', () => {
         { id: 'm', profileId: 'a1', date, jeu: 'memoire', listeNom: 'Animaux', mots: 5, trouves: 4, erreurs: 2, dureeMs: 40000 }
       ]
     })
-    expect(data.version).toBe(4)
+    expect(data.version).toBe(5)
     expect(data.mots.length).toBe(4)
     expect(data.resultats[0]).toMatchObject({ jeu: 'couleurs', mode: 'mot', manches: 10, justes: 10, pieges: 7, piegesJustes: 5, indices: 0 })
     expect(data.resultats[1]).toMatchObject({ jeu: 'memoire', mots: 5, trouves: 4, erreurs: 2 })
@@ -235,5 +235,19 @@ describe('Police des lettres (Chasse aux lettres)', () => {
     expect(ok.profiles[0].policeLettres).toBe('comic')
     const ko = normalizeAppData({ ...defaultAppData(), profiles: [{ ...profil('b', 'Léa'), policeLettres: 'Papyrus' }] })
     expect(ko.profiles[0].policeLettres).toBe('verdana')
+  })
+})
+
+describe('clavier à l’écran masqué par défaut', () => {
+  it('est masqué pour un nouveau profil', () => {
+    expect(newProfile('n', '', 'CP').dactylo.clavier).toBe(false)
+  })
+  it('masque le clavier des profils d’une ancienne version', () => {
+    const p = { ...newProfile('x', '', 'CP'), prenom: 'Léa', dactylo: { ...newProfile('x', '', 'CP').dactylo, clavier: true } }
+    expect(normalizeAppData({ version: 4, profiles: [p] }).profiles[0].dactylo.clavier).toBe(false)
+  })
+  it('garde le réglage de l’ergothérapeute une fois migré', () => {
+    const p = { ...newProfile('x', '', 'CP'), prenom: 'Léa', dactylo: { ...newProfile('x', '', 'CP').dactylo, clavier: true } }
+    expect(normalizeAppData({ version: 5, profiles: [p] }).profiles[0].dactylo.clavier).toBe(true)
   })
 })

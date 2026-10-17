@@ -39,10 +39,12 @@ interface Props {
 type Phase =
   | { nom: 'aventure' }
   | { nom: 'lettres'; theme: ThemeJeu }
-  | { nom: 'jeu'; theme: ThemeJeu; reglages: Reglages }
+  | { nom: 'jeu'; theme: ThemeJeu; reglages: Reglages; clavier: boolean }
   | { nom: 'fin'; theme: ThemeJeu; reglages: Reglages; resultat: ResultatEspace; record: boolean }
 
 const VIES_DEPART_AFFICHEE = Math.min(VIES_MAX, 3)
+const CHOIX_CLAVIER = ['oui', 'non'] as const
+const formatClavier = (v: (typeof CHOIX_CLAVIER)[number]) => (v === 'oui' ? 'Avec le clavier' : 'Sans le clavier')
 const formatMinutes = (s: number) => `${s / 60} min`
 
 export function Espace({ profile, resultats, onResult, onQuit }: Props) {
@@ -52,11 +54,13 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
   const [duree, setDuree] = useState<(typeof DUREES)[number]>(60)
 
   const [mode, setMode] = useState<ModeChasse>('chrono')
+  const [avecClavier, setAvecClavier] = useState<'oui' | 'non'>('oui') // choix pour la partie seulement
 
   const lancer = (theme: ThemeJeu, serie: Serie, modeJeu: ModeChasse = mode) =>
-    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu, vitesseObjet: theme.vitesseObjet } })
+    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu, vitesseObjet: theme.vitesseObjet }, clavier: profile.dactylo.clavier && avecClavier === 'oui' })
 
   const terminer = (theme: ThemeJeu, reglages: Reglages, e: Etat, complete: boolean) => {
+    setAvecClavier('oui') // le choix ne vaut que pour la partie qui vient de se terminer
     if (e.detruites + e.manquees + e.erreurs + e.pieges === 0) return complete ? setPhase({ nom: 'lettres', theme }) : onQuit()
     const modeJeu = reglages.mode ?? 'chrono'
     // Records séparés par série, par aventure et par mode.
@@ -90,6 +94,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
         profile={profile}
         theme={phase.theme}
         reglages={phase.reglages}
+        clavierInitial={phase.clavier}
         onFin={(e) => terminer(phase.theme, phase.reglages, e, true)}
         onQuitter={(e) => terminer(phase.theme, phase.reglages, e, false)}
       />
@@ -168,6 +173,9 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
             <div>
               <h2 className="choix-title">Quelles lettres vont tomber ?</h2>
               <Chips label="Mode" values={MODES} value={mode} onChange={setMode} format={(m) => NOMS_MODES[m]} />
+              {profile.dactylo.clavier && (
+                <Chips label="Clavier à l’écran" values={CHOIX_CLAVIER} value={avecClavier} onChange={setAvecClavier} format={formatClavier} />
+              )}
               {mode === 'chrono' && <Chips label="Durée" values={DUREES} value={duree} onChange={setDuree} format={formatMinutes} />}
               <p className="choix-note">
                 {theme.consigne} Échap met le jeu en pause.
@@ -273,12 +281,14 @@ function Partie({
   profile,
   theme,
   reglages,
+  clavierInitial,
   onFin,
   onQuitter
 }: {
   profile: Profile
   theme: ThemeJeu
   reglages: Reglages
+  clavierInitial: boolean
   onFin: (e: Etat) => void
   onQuitter: (e: Etat) => void
 }) {
@@ -291,7 +301,7 @@ function Partie({
   const enCompte = useRef(true)
   const dernierSon = useRef(0)
   const [decompte, setDecompte] = useState<number | null>(3)
-  const [clavier, setClavier] = useState(profile.dactylo.clavier) // complète le réglage du profil, le temps de la partie
+  const [clavier, setClavier] = useState(clavierInitial) // réglage du profil et choix avant la partie
   const [annonce, setAnnonce] = useState<{ texte: string; cle: number } | null>(null)
   const vies = aDesVies(reglages)
   const [affiche, setAffiche] = useState({ ...etat.current, pause: false })
@@ -454,6 +464,7 @@ function Partie({
           {affiche.pause ? 'Reprendre' : 'Pause'}
         </button>
         <span className="espace-titre">{theme.nom}</span>
+        {profile.dactylo.clavier && (
         <button
           className="btn btn-ghost btn-dark"
           aria-pressed={clavier}
@@ -464,6 +475,7 @@ function Partie({
         >
           Clavier : {clavier ? 'affiché' : 'masqué'}
         </button>
+        )}
         <div className="live-stats">
           {vies ? (
             <div className="live-stat live-stat-dark">
