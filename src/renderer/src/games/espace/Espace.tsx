@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Profile, Resultat, ResultatEspace, ThemeChasse } from '../../../../shared/data'
+import { policeCss, type Profile, Resultat, ResultatEspace, ThemeChasse } from '../../../../shared/data'
 import { IconBack } from '../../components/Icons'
 import { geste } from '../../keyboard/azerty'
 import { Keyboard } from '../../keyboard/Keyboard'
@@ -233,7 +233,7 @@ function Apercu({ theme, profile }: { theme: ThemeJeu; profile: Profile }) {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const scene = theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire })
+    const scene = theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire, police: policeCss(profile.policeLettres) })
     const exemples: Lettre[] = [
       { id: 1, char: 'f', x: 0.18, y: 0.3, vitesse: 0 },
       { id: 2, char: 'j', x: 0.62, y: 0.62, vitesse: 0 },
@@ -273,7 +273,7 @@ function Apercu({ theme, profile }: { theme: ThemeJeu; profile: Profile }) {
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [theme, profile.couleurPrincipale, profile.couleurSecondaire])
+  }, [theme, profile.couleurPrincipale, profile.couleurSecondaire, profile.policeLettres])
   return <canvas ref={ref} className="apercu-canvas" aria-hidden="true" />
 }
 
@@ -295,7 +295,7 @@ function Partie({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const zoneRef = useRef<HTMLDivElement>(null)
   const etat = useRef<Etat>(nouvelEtat())
-  const scene = useRef(theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire }))
+  const scene = useRef(theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire, police: policeCss(profile.policeLettres) }))
   const pause = useRef(false)
   const fini = useRef(false)
   const enCompte = useRef(true)

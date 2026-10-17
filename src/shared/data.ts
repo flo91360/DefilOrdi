@@ -41,6 +41,20 @@ export const AGE_MIN = 6
 export const AGE_MAX = 18
 export const AGES = Array.from({ length: AGE_MAX - AGE_MIN + 1 }, (_, i) => AGE_MIN + i)
 
+// Polices très lisibles, sans empattement, proposées pour la Chasse aux lettres.
+export const POLICES_LETTRES = ['verdana', 'arial', 'calibri', 'comic'] as const
+export type PoliceLettres = (typeof POLICES_LETTRES)[number]
+export const POLICE_DEFAUT: PoliceLettres = 'verdana'
+export const POLICES_INFO: Record<PoliceLettres, { nom: string; css: string }> = {
+  verdana: { nom: 'Verdana', css: 'Verdana, Geneva, sans-serif' },
+  arial: { nom: 'Arial', css: 'Arial, Helvetica, sans-serif' },
+  calibri: { nom: 'Calibri', css: 'Calibri, Carlito, Arial, sans-serif' },
+  comic: { nom: 'Comic Sans MS', css: '"Comic Sans MS", "Comic Neue", cursive, sans-serif' }
+}
+export function policeCss(p: PoliceLettres): string {
+  return POLICES_INFO[p].css
+}
+
 export interface Profile {
   id: string
   prenom: string
@@ -52,6 +66,7 @@ export interface Profile {
   couleurSecondaire: string
   sonReussite: string
   sonEchec: string
+  policeLettres: PoliceLettres // police des lettres de la Chasse aux lettres
   // Réglé par l'ergothérapeute : 1 (débutant) à 4 (expert)
   niveau: number
   dactylo: OptionsDactylo
@@ -347,6 +362,7 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
     couleurSecondaire: COULEURS_PREFEREES[2],
     sonReussite: SONS_REUSSITE[0],
     sonEchec: SONS_ECHEC[0],
+    policeLettres: POLICE_DEFAUT,
     niveau: 1,
     dactylo: defaultOptionsDactylo(),
     memoire: defaultProgressionMemoire()
@@ -415,6 +431,7 @@ function normalizeProfile(v: unknown, clavierMasque = false): Profile | null {
     couleurSecondaire: pick(v.couleurSecondaire, COULEURS_PREFEREES, d.couleurSecondaire),
     sonReussite: pick(v.sonReussite, SONS_REUSSITE, d.sonReussite),
     sonEchec: pick(v.sonEchec, SONS_ECHEC, d.sonEchec),
+    policeLettres: pick(v.policeLettres, POLICES_LETTRES, d.policeLettres),
     niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
     dactylo: clavierMasque ? { ...normalizeOptions(v.dactylo), clavier: false } : normalizeOptions(v.dactylo),
     memoire: normalizeProgressionMemoire(v.memoire)
