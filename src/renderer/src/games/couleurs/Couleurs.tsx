@@ -6,6 +6,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
+import { EcranPause, useChrono, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
 import {
   CLICS_VALIDATION,
@@ -259,7 +260,6 @@ function Partie({
   const [propositions, setPropositions] = useState<string[] | null>(null)
   const debut = useRef(Date.now())
   const chrono = minutes > 0
-  const [restantMs, setRestantMs] = useState(minutes * 60000)
   const index = reponses.length
   const manche = manches[Math.min(index, manches.length - 1)]
   const affichee = retour ? retour.manche : manche
@@ -268,6 +268,14 @@ function Partie({
   reponsesRef.current = reponses
   const onFinRef = useRef(onFin)
   onFinRef.current = onFin
+  // Pause automatique : le temps de la pause ne compte ni dans le chrono ni
+  // dans le temps de réponse de la manche.
+  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+    debut.current += d
+  })
+  const { ecoule } = useChrono(chrono && !enPause, 250)
+  const restantMs = Math.max(0, minutes * 60000 - ecoule)
+  const finChrono = useRef(false)
 
   const valider = (saisie: string) => {
     if (retour) return
@@ -281,18 +289,10 @@ function Partie({
   // Mode chronométré : fin de la partie quand le temps est écoulé (la manche
   // en cours n'est pas comptée).
   useEffect(() => {
-    if (!chrono) return
-    const fin = Date.now() + minutes * 60000
-    const t = setInterval(() => {
-      const reste = fin - Date.now()
-      setRestantMs(Math.max(0, reste))
-      if (reste <= 0) {
-        clearInterval(t)
-        onFinRef.current(reponsesRef.current)
-      }
-    }, 250)
-    return () => clearInterval(t)
-  }, [chrono, minutes])
+    if (!chrono || restantMs > 0 || finChrono.current) return
+    finChrono.current = true
+    onFinRef.current(reponsesRef.current)
+  }, [chrono, restantMs])
 
   // Après la correction, manche suivante (ou fin).
   useEffect(() => {
@@ -431,7 +431,7 @@ function Partie({
               ))}
             </div>
           ) : (
-            <ReponseInput onSubmit={valider} disabled={retour !== null} placeholder="Tape ta réponse puis Entrée" etat={retour ? (retour.juste ? 'juste' : 'faux') : null} />
+            <ReponseInput onSubmit={valider} disabled={retour !== null || enPause} placeholder="Tape ta réponse puis Entrée" etat={retour ? (retour.juste ? 'juste' : 'faux') : null} />
           )}
           <p className={retour ? (retour.juste ? 'reponse-retour juste' : 'reponse-retour faux') : 'reponse-retour'}>
             {retour ? (
@@ -452,6 +452,7 @@ function Partie({
           </p>
         </div>
       </main>
+      {enPause && <EcranPause onReprendre={reprendre} />}
     </div>
   )
 }

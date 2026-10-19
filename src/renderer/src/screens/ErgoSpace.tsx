@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   type AppData,
   CODE_DEFAUT,
@@ -17,7 +17,7 @@ import { FullscreenButton } from '../components/FullscreenButton'
 import { IconBack, IconChart, IconDownload, IconFolder, IconPencil, IconSettings, IconSpeaker, IconTrash, IconUpload } from '../components/Icons'
 import { defaultListes, defaultListesMots } from '../../../shared/phrases'
 import { imageDuMot } from '../games/memoire/images'
-import { playSound } from '../sounds'
+import { playSound, setVolume } from '../sounds'
 import { ErgoStats, NOMS_JEUX, resumePartie } from './ErgoStats'
 import { NIVEAU_LABELS } from './niveaux'
 import { PetitBacEditor } from './PetitBacEditor'
@@ -366,24 +366,7 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
     <section>
       <h1 className="ergo-title">Réglages</h1>
 
-      <div className="card">
-        <h2 className="card-title">Volume des sons</h2>
-        <div className="volume-row">
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={data.settings.volume}
-            aria-label="Volume"
-            onChange={(e) => onChange({ ...data, settings: { ...data.settings, volume: Number(e.target.value) } })}
-          />
-          <span className="volume-value">{Math.round(data.settings.volume * 100)} %</span>
-          <button className="btn btn-ghost btn-sm" onClick={() => playSound('carillon')}>
-            <IconSpeaker size={18} /> Tester
-          </button>
-        </div>
-      </div>
+      <ReglageVolume data={data} onChange={onChange} />
 
       <ReglagesIndice data={data} onChange={onChange} />
 
@@ -392,6 +375,46 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
         <FormulaireCode onCode={(codeErgo) => onChange({ ...data, settings: { ...data.settings, codeErgo } })} />
       </div>
     </section>
+  )
+}
+
+// Volume : appliqué tout de suite, enregistré quand le curseur s'arrête
+// (et pas à chaque cran, ce qui réécrirait tout le fichier de données).
+const DELAI_VOLUME_MS = 400
+
+function ReglageVolume({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
+  const [volume, setVolumeAffiche] = useState(data.settings.volume)
+  const minuteur = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const dernier = useRef({ data, onChange, volume })
+  dernier.current = { data, onChange, volume }
+
+  const enregistrer = () => {
+    clearTimeout(minuteur.current)
+    const d = dernier.current
+    if (d.volume !== d.data.settings.volume) d.onChange({ ...d.data, settings: { ...d.data.settings, volume: d.volume } })
+  }
+  // Section quittée avant la fin du délai : le dernier volume est enregistré.
+  useEffect(() => () => enregistrer(), [])
+
+  const changer = (v: number) => {
+    setVolumeAffiche(v)
+    dernier.current.volume = v
+    setVolume(v)
+    clearTimeout(minuteur.current)
+    minuteur.current = setTimeout(enregistrer, DELAI_VOLUME_MS)
+  }
+
+  return (
+    <div className="card">
+      <h2 className="card-title">Volume des sons</h2>
+      <div className="volume-row">
+        <input type="range" min={0} max={1} step={0.05} value={volume} aria-label="Volume" onChange={(e) => changer(Number(e.target.value))} />
+        <span className="volume-value">{Math.round(volume * 100)} %</span>
+        <button className="btn btn-ghost btn-sm" onClick={() => playSound('carillon')}>
+          <IconSpeaker size={18} /> Tester
+        </button>
+      </div>
+    </div>
   )
 }
 

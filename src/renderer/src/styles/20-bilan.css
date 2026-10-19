@@ -1,0 +1,147 @@
+/* ---------- Espace ergo : bilan imprimable ---------- */
+
+.bilan-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.bilan-outils label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.bilan-periodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bilan {
+  max-width: 900px;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.bilan-tete h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.bilan-tete p {
+  margin: 2px 0;
+  color: var(--ink-2);
+}
+
+.bilan-resume {
+  margin: 18px 0;
+  font-size: 17px;
+}
+
+.bilan-jeu {
+  margin-top: 22px;
+  break-inside: avoid;
+}
+
+.bilan-jeu h2,
+.bilan-observations h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.bilan-jeu-info {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.bilan-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bilan-table th,
+.bilan-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.bilan-table .num {
+  text-align: right;
+}
+
+.bilan-mieux {
+  color: var(--success);
+  font-weight: 800;
+}
+
+.bilan-moins {
+  color: var(--ink-2);
+}
+
+.bilan-courbe {
+  margin-top: 10px;
+}
+
+.bilan-note {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.bilan-observations {
+  margin-top: 24px;
+}
+
+.bilan-observations textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.bilan-observations-texte {
+  display: none;
+  white-space: pre-wrap;
+}
+
+/* À l'impression : seul le bilan, en noir sur blanc. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .bilan,
+  .bilan * {
+    visibility: visible;
+  }
+
+  .bilan {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .no-print,
+  .bilan-observations textarea {
+    display: none;
+  }
+
+  .bilan-observations-texte {
+    display: block;
+  }
+
+  /* Courbes dessinées à la largeur de l'écran : ramenées à celle de la page. */
+  .bilan svg {
+    width: 100%;
+    height: auto;
+  }
+}

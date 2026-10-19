@@ -1,0 +1,192 @@
+/* ---------- Espace ergo : statistiques ---------- */
+
+.muted {
+  color: var(--ink-2);
+}
+
+.stats-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+.stats-head svg {
+  border-radius: 50%;
+}
+
+.stats-head .ergo-title {
+  margin: 0;
+}
+
+.stats-sub {
+  margin: 2px 0 0;
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.stats-export {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.stats-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stats-tiles.stats-tiles-4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.stats .stat-tile {
+  padding: 18px 20px;
+  border-radius: var(--radius-sm);
+}
+
+.stats .stat-value {
+  font-size: 34px;
+}
+
+.stats-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.stats-charts .card {
+  min-width: 0;
+}
+
+.chart {
+  margin: 0;
+}
+
+.chart-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.chart-plot {
+  position: relative;
+}
+
+.chart-plot svg {
+  display: block;
+  overflow: visible;
+}
+
+.chart-grid {
+  stroke: #e6e8ec;
+  stroke-width: 1;
+}
+
+.chart-crosshair {
+  stroke: #9aa0ad;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.chart-tick {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #ffffff;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+}
+
+.chart-tooltip strong {
+  font-size: 16px;
+}
+
+.card-title-sub {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.stats-kb {
+  display: flex;
+  justify-content: center;
+}
+
+.stats-kb .kb {
+  width: min(100%, 820px);
+}
+
+.heat-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.heat-swatch {
+  width: 28px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.stats-pires {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 16px 0 0;
+  font-weight: 700;
+}
+
+.stats-pire {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.stats-pire kbd {
+  min-width: 32px;
+  height: 32px;
+}
+
+.history-table {
+  box-shadow: none;
+}
+
+.history-table td,
+.history-table th {
+  padding: 8px 10px;
+  font-size: 15px;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+th.num {
+  text-align: right;
+}

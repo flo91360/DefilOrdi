@@ -215,7 +215,7 @@ export interface ResultatEspace {
   lettresRatees: Record<string, number> // lettre -> fois où elle est tombée ou a été manquée
 }
 
-// Une partie du quiz « L'ordinateur et moi ».
+// Une partie du quiz « Quiz de l'ordinateur ».
 export interface ResultatQuiz {
   id: string
   profileId: string

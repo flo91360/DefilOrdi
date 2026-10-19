@@ -1,0 +1,115 @@
+/* ---------- Fenêtres (modales) ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(31, 35, 48, 0.45);
+  z-index: 10;
+  animation: fade 0.15s ease;
+}
+
+.modal {
+  max-width: calc(100vw - 32px);
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.18s ease;
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 20px;
+}
+
+.center {
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.pin-dots {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0 6px;
+}
+
+.pin-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+}
+
+.pin-dot.filled {
+  background: var(--ink);
+}
+
+.pin-message {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin: 8px 0 16px;
+  min-height: 20px;
+}
+
+.shake + .pin-message {
+  color: var(--danger);
+}
+
+.pin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pin-key {
+  height: 60px;
+  border-radius: 14px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.pin-key:hover {
+  background: var(--surface-2);
+}
+
+.pin-key-small {
+  font-size: 15px;
+}
+
+.shake {
+  animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.96); }
+}

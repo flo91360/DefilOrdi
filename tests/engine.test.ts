@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   choisirPhrases,
   cumuler,
+  decalerDebut,
+  dureePhrase,
   effacer,
   type EtatPhrase,
   memeCaractere,
@@ -98,5 +100,16 @@ describe('choisirPhrases', () => {
     expect(choix).toHaveLength(3)
     expect(new Set(choix).size).toBe(3)
     expect(choisirPhrases(phrases, 10)).toHaveLength(4)
+  })
+})
+
+describe('pause automatique', () => {
+  it('ne compte pas la pause dans la phrase en cours, seulement dans celle-ci', () => {
+    const enCours = taper(nouvellePhrase('chat'), 'c', 1000, strict).etat
+    expect(dureePhrase(decalerDebut(enCours, 5000), 7000)).toBe(1000)
+    const finie = tout(nouvellePhrase('le'), 'le', strict)
+    expect(decalerDebut(finie, 5000)).toBe(finie)
+    const pasCommencee = nouvellePhrase('chat')
+    expect(decalerDebut(pasCommencee, 5000)).toBe(pasCommencee)
   })
 })

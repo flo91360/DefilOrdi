@@ -1,0 +1,90 @@
+/* ---------- Espace ergo : phrases ---------- */
+
+.phrases-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.phrases-side {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phrases-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.phrases-item.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.phrases-item-nom {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.phrases-item-info {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.phrases-form {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+}
+
+.phrases-form-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.phrases-form-row .field:first-child {
+  flex: 1;
+  min-width: 220px;
+}
+
+.phrases-delete {
+  margin-left: auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.phrases-textarea {
+  min-height: 340px;
+  resize: vertical;
+  line-height: 1.7;
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.ergo-help.small {
+  font-size: 14px;
+  margin: 0;
+}

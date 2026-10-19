@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { JeuId, Profile } from '../../../shared/data'
+import { JEUX, ORDRE_JEUX } from '../games/jeux'
 import { Avatar } from '../avatar/Avatar'
 import { FullscreenButton } from '../components/FullscreenButton'
 import { GameArt, IconPencil, IconUsers } from '../components/Icons'
@@ -7,44 +8,8 @@ import { CoffreBouton, ListeMedailles } from '../components/Medailles'
 import { Modal } from '../components/Modal'
 import { Logo } from './ProfilePicker'
 
-export const GAMES: { id: JeuId; titre: string; description: string; disponible: boolean }[] = [
-  {
-    id: 'espace',
-    titre: 'Chasse aux lettres',
-    description: 'Fusée, cow-boy ou sous-marin : attrape les lettres avant qu’elles ne tombent.',
-    disponible: true
-  },
-  {
-    id: 'memoire',
-    titre: 'Mots à retenir',
-    description: 'Mémorise une liste de mots, puis retape-les de tête.',
-    disponible: true
-  },
-  {
-    id: 'couleurs',
-    titre: 'Couleurs piégées',
-    description: 'Le mot ou sa couleur ? Ne te laisse pas piéger !',
-    disponible: true
-  },
-  {
-    id: 'petitbac',
-    titre: 'Petit bac',
-    description: 'Une lettre au hasard : trouve un mot pour chaque catégorie.',
-    disponible: true
-  },
-  {
-    id: 'dactylo',
-    titre: 'Dactylo',
-    description: 'Tape les phrases le plus juste et le plus vite possible.',
-    disponible: true
-  },
-  {
-    id: 'quiz',
-    titre: 'Quiz de l’ordinateur',
-    description: 'Vrai ou faux, QCM et mises en situation sur de vrais écrans.',
-    disponible: true
-  }
-]
+// Les jeux affichés, dans l'ordre de la liste unique (games/jeux.ts).
+export const GAMES = ORDRE_JEUX.map((id) => ({ id, ...JEUX[id] }))
 
 interface Props {
   profile: Profile
@@ -87,9 +52,8 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
             <button
               key={g.id}
               className={i % 2 === 0 ? 'game-tile' : 'game-tile game-tile-alt'}
-              disabled={!g.disponible}
               onClick={() => onPlay(g.id)}
-              aria-label={`${g.titre}${g.disponible ? '' : ' (bientôt disponible)'}`}
+              aria-label={g.titre}
             >
               <div className="game-art">
                 <GameArt game={g.id} />
@@ -98,7 +62,6 @@ export function Hub({ profile, onEdit, onSwitch, onPlay }: Props) {
                 <span className="game-title">{g.titre}</span>
                 <span className="game-desc">{g.description}</span>
               </div>
-              {!g.disponible && <span className="game-badge">Bientôt</span>}
             </button>
           ))}
         </section>

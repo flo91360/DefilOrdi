@@ -1,4 +1,4 @@
-// Types des questions du quiz « L'ordinateur et moi ».
+// Types des questions du quiz « Quiz de l'ordinateur ».
 
 import type { ThemeQuiz } from '../../../../shared/data'
 

@@ -79,7 +79,7 @@ export function LineChart({ titre, points, unite = '', min, max, couleur = 'var(
     <figure className="chart" ref={ref}>
       <figcaption className="chart-title">{titre}</figcaption>
       <div className="chart-plot">
-        <svg width={w} height={H} onMouseMove={onMove} onMouseLeave={() => setSurvol(null)} role="img" aria-label={titre}>
+        <svg width={w} height={H} viewBox={`0 0 ${w} ${H}`} onMouseMove={onMove} onMouseLeave={() => setSurvol(null)} role="img" aria-label={titre}>
           {ticks.map((t) => (
             <g key={t}>
               <line x1={M.gauche} x2={w - M.droite} y1={y(t)} y2={y(t)} className="chart-grid" />
