@@ -1,5 +1,15 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.23 (2026-10-19)
+
+- Mots à retenir et Chasse aux lettres (correction) : quand l'enfant cliquait sur « Arrêter » juste après la fin de la partie, la partie était enregistrée deux fois dans les statistiques (et, dans Mots à retenir, une fois comme ratée). Elle n'est plus enregistrée qu'une fois, et l'écran de fin s'affiche normalement.
+- Dactylo (correction) : un enfant qui clique sur « Arrêter » pendant le « Bravo » de la dernière phrase reçoit bien sa médaille.
+- Espace ergothérapeute : le code par défaut (0000) n'est plus affiché aux enfants sur le pavé de code, sauf avant la création du tout premier profil. Tant que le code est 0000, l'espace ergo demande d'en choisir un autre avant de s'ouvrir.
+- Sauvegarde : le logiciel garde tout seul des copies datées des données sur le PC (une par jour d'utilisation, et avant chaque restauration ou mise à jour). Les 30 plus récentes sont conservées, dans le dossier des données, sous-dossier « sauvegardes » ; chacune peut être rechargée avec « Restaurer une sauvegarde ».
+- Sauvegarde : restaurer une sauvegarde faite avec une version plus récente de DefilOrdi affiche un avertissement. Les parties des jeux que cette version ne connaît pas sont ignorées au lieu d'apparaître comme de fausses parties de Dactylo.
+- Couleurs de l'enfant : le texte des boutons est plus lisible sur les couleurs claires (orange, vert, turquoise, bleu clair, rose), où il passe en foncé.
+- Notes de version : elles ne parlent plus d'une version portable qui n'est pas proposée, et chaque version ne décrit plus que ses propres changements.
+
 ## 0.8.22 (2026-10-18)
 
 - Quiz, mises en situation : l'enfant peut maintenant valider sa réponse en appuyant sur le raccourci clavier de l'action demandée, en plus du clic sur l'écran, qui fonctionne comme avant. Cela concerne : mettre en gras (Ctrl+G), centrer le texte (Ctrl+E), annuler (Ctrl+Z), enregistrer (Ctrl+S) et ouvrir un nouveau document (Ctrl+N).
