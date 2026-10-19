@@ -84,7 +84,7 @@ le code et les commentaires aussi.
   statistiques dans `screens/ErgoStats.tsx` (onglets, exports, accès au bilan)
   et `screens/stats/` : un fichier par jeu (colonnes de l'export, écran,
   indicateurs du bilan), `parJeu.tsx` (tout ce qui dépend du jeu), `commun.tsx`,
-  `bilan.ts` (calcul du bilan imprimable, testé dans `tests/bilan.test.ts`) et
+  `calculBilan.ts` (calcul du bilan imprimable, testé dans `tests/bilan.test.ts`) et
   `Bilan.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
   presser pour chaque caractère) et son affichage.

@@ -4,7 +4,7 @@ import { IconBack } from '../../components/Icons'
 import { LineChart } from '../../components/LineChart'
 import { formatDuree } from '../../games/dactylo/engine'
 import { nomJeu } from '../../games/jeux'
-import { calculerBilan, jourLocal, type LigneBilan } from './bilan'
+import { calculerBilan, jourLocal, type LigneBilan } from './calculBilan'
 import { ecart, points } from './commun'
 import { indicateursDu } from './parJeu'
 

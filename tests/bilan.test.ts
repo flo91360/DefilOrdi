@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Resultat, ResultatDactylo, ResultatQuiz } from '../src/shared/data'
 import { JEUX, nomJeu, ORDRE_JEUX } from '../src/renderer/src/games/jeux'
-import { calculerBilan, jourLocal } from '../src/renderer/src/screens/stats/bilan'
+import { calculerBilan, jourLocal } from '../src/renderer/src/screens/stats/calculBilan'
 import { csvComplet, partiesDe, resumePartie } from '../src/renderer/src/screens/stats/parJeu'
 import { newProfile } from '../src/shared/data'
 
