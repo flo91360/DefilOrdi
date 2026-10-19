@@ -100,3 +100,27 @@ describe('Storage', () => {
     expect(await s.listeCopies()).toEqual([])
   })
 })
+
+describe('remplacement du fichier de données', () => {
+  const erreur = (code: string) => Object.assign(new Error(code), { code })
+
+  it('retente quand Windows verrouille le fichier un instant', async () => {
+    const { remplacer } = await import('../src/main/storage')
+    let essais = 0
+    await remplacer('a', 'b', 1, async () => {
+      essais++
+      if (essais < 3) throw erreur('EPERM')
+    })
+    expect(essais).toBe(3)
+  })
+
+  it('abandonne après plusieurs essais, ou tout de suite pour une autre erreur', async () => {
+    const { ESSAIS_REMPLACEMENT, remplacer } = await import('../src/main/storage')
+    let essais = 0
+    await expect(remplacer('a', 'b', 1, async () => { essais++; throw erreur('EBUSY') })).rejects.toThrow('EBUSY')
+    expect(essais).toBe(ESSAIS_REMPLACEMENT)
+    essais = 0
+    await expect(remplacer('a', 'b', 1, async () => { essais++; throw erreur('ENOSPC') })).rejects.toThrow('ENOSPC')
+    expect(essais).toBe(1)
+  })
+})

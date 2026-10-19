@@ -36,13 +36,21 @@ export function App() {
   const dataRef = useRef<AppData | null>(null)
   dataRef.current = data
 
-  useEffect(() => {
-    api.load().then(({ data: d, plusRecente }) => {
-      setVolume(d.settings.volume)
-      setData(d)
-      setVersionPlusRecente(plusRecente)
-    })
+  // Chargement des données ; en cas d'échec (dossier inaccessible…), un
+  // message remplace « Chargement… », qui sinon ne s'arrêterait jamais.
+  const [erreurChargement, setErreurChargement] = useState(false)
+  const charger = useCallback(() => {
+    setErreurChargement(false)
+    api.load().then(
+      ({ data: d, plusRecente }) => {
+        setVolume(d.settings.volume)
+        setData(d)
+        setVersionPlusRecente(plusRecente)
+      },
+      () => setErreurChargement(true)
+    )
   }, [])
+  useEffect(charger, [charger])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -65,6 +73,21 @@ export function App() {
     )
   }, [])
 
+  if (!data && erreurChargement) {
+    return (
+      <div className="loading" role="alert">
+        <div className="chargement-erreur">
+          <p>
+            <strong>Impossible de lire les données de DefilOrdi sur ce PC.</strong>
+          </p>
+          <p>Fermez les autres fenêtres de DefilOrdi, puis réessayez. Si le problème continue, redémarrez l’ordinateur.</p>
+          <button className="btn btn-primary" onClick={charger} autoFocus>
+            Réessayer
+          </button>
+        </div>
+      </div>
+    )
+  }
   if (!data) return <div className="loading">Chargement…</div>
 
   const profileOf = (id: string): Profile | undefined => data.profiles.find((p) => p.id === id)

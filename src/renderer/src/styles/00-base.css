@@ -80,6 +80,14 @@ h3 {
   color: var(--ink-2);
 }
 
+.chargement-erreur {
+  max-width: 560px;
+  padding: 24px;
+  text-align: center;
+  font-size: 18px;
+  color: var(--ink);
+}
+
 .screen {
   height: 100%;
   display: flex;

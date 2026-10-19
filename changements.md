@@ -14,12 +14,10 @@ des changements ».
 
 ## Prochaine version
 
-- Phrases des enfants : chaque phrase écrite par un enfant attend maintenant votre accord avant d'être proposée aux autres enfants, même si le correcteur l'a acceptée. Le correcteur vérifie l'orthographe et les règles du niveau, mais pas le sens : une phrase blessante pour un autre enfant pouvait être partagée. La relecture peut être désactivée dans la section « Phrases des enfants ».
-- Bilan imprimable : les parties sont comparées seulement à celles du même mode, de la même liste ou du même palier (par exemple « Écrire le mot » d'un côté, « Couleurs piégées timer » de l'autre). Un changement de difficulté ne passe plus pour un progrès ou un recul.
-- Statistiques : les parties arrêtées avant la fin avec « Arrêter » sont signalées dans l'historique (« arrêtée ») et dans l'export Excel. Le bilan ne les compte plus dans ses mesures et indique combien il y en a.
-- Démarrage : si les données de ce PC ont été enregistrées par une version plus récente de DefilOrdi, un message prévient avant de continuer et rappelle qu'une copie des données a été gardée.
-- Dactylo, Mots à retenir, Couleurs piégées, Petit bac et Quiz : nouveau bouton « Pause » en haut de l'écran. La touche Échap met aussi le jeu en pause et le relance, comme dans la Chasse aux lettres.
-- Journal des modifications : les versions 0.8.20, 0.8.21 et 0.8.22 ne répètent plus les nouveautés des versions précédentes.
+- Démarrage : si les données du PC ne peuvent pas être lues, un message l'explique et propose de réessayer, au lieu de rester bloqué sur « Chargement… ».
+- Enregistrement : quand Windows bloque le fichier des données un court instant (antivirus par exemple), le logiciel réessaie au lieu d'afficher tout de suite une erreur.
+- Statistiques, export Excel : un nom de liste ou une réponse qui commence par « - », « + » ou « = » s'affiche tel quel dans Excel, au lieu de « #NOM? ».
+- Améliorations internes, sans changement visible.
 
 ## 0.8.22
 
