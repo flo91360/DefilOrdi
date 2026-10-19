@@ -14,6 +14,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
+import { EcranPause, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
 import {
   avancerProgression,
@@ -312,11 +313,16 @@ function useFin() {
 }
 
 // Mémorisation puis rappel : partie commune aux mots et à la phrase.
+// Pause automatique si la fenêtre est quittée : le compte à rebours de
+// mémorisation s'arrête et la pause ne compte pas dans le temps de rappel.
 function useMemorisation(nbMots: number) {
   const duree = dureeMemorisation(nbMots)
   const [etape, setEtape] = useState<'memoriser' | 'rappel'>('memoriser')
   const [reste, setReste] = useState(duree)
   const debutRappel = useRef(0)
+  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+    debutRappel.current += d
+  })
 
   const commencerRappel = () => {
     debutRappel.current = Date.now()
@@ -324,7 +330,7 @@ function useMemorisation(nbMots: number) {
   }
 
   useEffect(() => {
-    if (etape !== 'memoriser') return
+    if (etape !== 'memoriser' || enPause) return
     const fin = Date.now() + reste
     const t = setInterval(() => {
       const r = Math.max(0, fin - Date.now())
@@ -332,10 +338,11 @@ function useMemorisation(nbMots: number) {
       if (r === 0) commencerRappel()
     }, 100)
     return () => clearInterval(t)
-  }, [etape])
+  }, [etape, enPause])
 
   const dureeRappel = () => (etape === 'rappel' ? Date.now() - debutRappel.current : 0)
-  return { duree, etape, reste, commencerRappel, dureeRappel }
+  const ecranPause = enPause ? <EcranPause onReprendre={reprendre} /> : null
+  return { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause }
 }
 
 function EcranMemoriser({
@@ -438,7 +445,7 @@ function EnteteRappel({
 
 // Paliers 3 à 7 : les mots sont retapés un par un, dans n'importe quel ordre.
 function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: PartieProps) {
-  const { duree, etape, reste, commencerRappel, dureeRappel } = useMemorisation(mots.length)
+  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux' | 'info'; texte: string } | null>(null)
@@ -503,16 +510,19 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
 
   if (etape === 'memoriser') {
     return (
-      <EcranMemoriser
-        titre={`Retiens bien ces ${mots.length} mots !`}
-        mots={mots}
-        phrase=""
-        images={images}
-        reste={reste}
-        duree={duree}
-        onPret={commencerRappel}
-        onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
-      />
+      <>
+        {ecranPause}
+        <EcranMemoriser
+          titre={`Retiens bien ces ${mots.length} mots !`}
+          mots={mots}
+          phrase=""
+          images={images}
+          reste={reste}
+          duree={duree}
+          onPret={commencerRappel}
+          onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
+        />
+      </>
     )
   }
 
@@ -534,7 +544,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
           ))}
         </div>
         <div className="reponse-zone">
-          <ReponseInput onSubmit={valider} placeholder="Tape un mot puis Entrée" etat={message?.type === 'juste' ? 'juste' : message?.type === 'faux' ? 'faux' : null} />
+          <ReponseInput onSubmit={valider} disabled={enPause} placeholder="Tape un mot puis Entrée" etat={message?.type === 'juste' ? 'juste' : message?.type === 'faux' ? 'faux' : null} />
           <p className={`reponse-retour ${message?.type ?? ''}`}>
             {message
               ? message.texte
@@ -597,6 +607,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
           {trouves.some(Boolean) ? 'Je ne me souviens plus des autres' : 'Je ne me souviens plus'}
         </button>
       </main>
+      {ecranPause}
     </div>
   )
 }
@@ -605,7 +616,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
 // majuscules et ponctuation ne comptent pas. L'enfant peut réessayer : les
 // mots bien placés de son meilleur essai s'affichent.
 function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) {
-  const { duree, etape, reste, commencerRappel, dureeRappel } = useMemorisation(mots.length)
+  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux'; texte: string } | null>(null)
@@ -643,16 +654,19 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
 
   if (etape === 'memoriser') {
     return (
-      <EcranMemoriser
-        titre="Retiens bien cette phrase !"
-        mots={mots}
-        phrase={phrase}
-        images={false}
-        reste={reste}
-        duree={duree}
-        onPret={commencerRappel}
-        onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
-      />
+      <>
+        {ecranPause}
+        <EcranMemoriser
+          titre="Retiens bien cette phrase !"
+          mots={mots}
+          phrase={phrase}
+          images={false}
+          reste={reste}
+          duree={duree}
+          onPret={commencerRappel}
+          onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
+        />
+      </>
     )
   }
 
@@ -674,7 +688,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
           ))}
         </div>
         <div className="reponse-zone">
-          <ReponseInput onSubmit={valider} placeholder="Tape toute la phrase puis Entrée" etat={message?.type ?? null} />
+          <ReponseInput onSubmit={valider} disabled={enPause} placeholder="Tape toute la phrase puis Entrée" etat={message?.type ?? null} />
           <p className={`reponse-retour ${message?.type ?? ''}`}>
             {message ? message.texte : 'Tape la phrase entière, dans l’ordre. Les accents, les majuscules et la ponctuation ne comptent pas.'}
           </p>
@@ -704,6 +718,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
           Je ne me souviens plus
         </button>
       </main>
+      {ecranPause}
     </div>
   )
 }

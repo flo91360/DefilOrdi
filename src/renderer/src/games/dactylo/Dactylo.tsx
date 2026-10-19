@@ -7,10 +7,12 @@ import { geste } from '../../keyboard/azerty'
 import { Keyboard } from '../../keyboard/Keyboard'
 import { playSound } from '../../sounds'
 import { uid } from '../../uid'
+import { EcranPause, usePauseAuto } from '../pause'
 import { StatTile } from '../ui'
 import {
   choisirPhrases,
   cumuler,
+  decalerDebut,
   effacer,
   type EtatPhrase,
   formatDuree,
@@ -265,6 +267,11 @@ function Partie({
   etatsRef.current = etats
   const onFinRef = useRef(onFin)
   onFinRef.current = onFin
+  // Pause automatique : la frappe est ignorée et le temps de la pause ne
+  // compte pas dans la phrase en cours.
+  const { enPause, reprendre } = usePauseAuto(true, (d) => setEtats((all) => all.map((e) => decalerDebut(e, d))))
+  const pauseRef = useRef(enPause)
+  pauseRef.current = enPause
 
   const index = etats.length - 1
   const courant = etats[index]
@@ -298,13 +305,15 @@ function Partie({
   }
 
   const garderFocus = useCallback(() => {
-    requestAnimationFrame(() => inputRef.current?.focus())
+    requestAnimationFrame(() => {
+      if (!pauseRef.current) inputRef.current?.focus()
+    })
   }, [])
 
   useEffect(garderFocus, [garderFocus])
 
   const saisir = (texte: string) => {
-    if (!texte) return
+    if (!texte || pauseRef.current) return
     let e = etatsRef.current[etatsRef.current.length - 1]
     let erreur = false
     for (const c of texte) {
@@ -460,6 +469,14 @@ function Partie({
         onDrop={(e) => e.preventDefault()}
         onBlur={garderFocus}
       />
+      {enPause && (
+        <EcranPause
+          onReprendre={() => {
+            reprendre()
+            garderFocus()
+          }}
+        />
+      )}
     </div>
   )
 }

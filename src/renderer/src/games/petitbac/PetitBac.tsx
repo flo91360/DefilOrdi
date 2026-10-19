@@ -13,6 +13,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
+import { EcranPause, useChrono, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import {
   choisirCategories,
@@ -62,22 +63,39 @@ export function PetitBac({ profile, reglages, resultats, onResult, onQuit }: Pro
     setPhase({ nom: 'jeu', grille: { lettre, categories: choisirCategories(reglages.categories, nb), tempsLimite: temps } })
   }
 
+  const resultatDe = (grille: Grille, reponses: ReponseBac[], dureeMs: number): ResultatPetitBac => ({
+    id: uid(),
+    profileId: profile.id,
+    jeu: 'petitbac',
+    date: new Date().toISOString(),
+    lettre: grille.lettre,
+    tempsLimite: grille.tempsLimite,
+    dureeMs,
+    categories: grille.categories.length,
+    justes: reponses.filter((x) => x.valide).length,
+    reponses
+  })
+
+  // Partie arrêtée avant la fin : enregistrée si au moins une case est remplie,
+  // sans l'étape de vérification (seule la première lettre est contrôlée).
+  const abandonner = (grille: Grille, mots: string[], dureeMs: number) => {
+    if (mots.some((m) => m !== '')) {
+      onResult(
+        resultatDe(
+          grille,
+          grille.categories.map((categorie, i) => ({ categorie, mot: mots[i], valide: etatReponse(mots[i], grille.lettre) === 'ok' })),
+          dureeMs
+        )
+      )
+    }
+    onQuit()
+  }
+
   const terminer = (grille: Grille, reponses: ReponseBac[], dureeMs: number) => {
     const anciens = resultats.filter(
       (r): r is ResultatPetitBac => r.jeu === 'petitbac' && r.profileId === profile.id && r.categories === grille.categories.length
     )
-    const r: ResultatPetitBac = {
-      id: uid(),
-      profileId: profile.id,
-      jeu: 'petitbac',
-      date: new Date().toISOString(),
-      lettre: grille.lettre,
-      tempsLimite: grille.tempsLimite,
-      dureeMs,
-      categories: grille.categories.length,
-      justes: reponses.filter((x) => x.valide).length,
-      reponses
-    }
+    const r = resultatDe(grille, reponses, dureeMs)
     onResult(r)
     if (r.justes > 0) playSound(profile.sonReussite)
     const meilleur = Math.max(0, ...anciens.map((a) => a.justes))
@@ -90,7 +108,7 @@ export function PetitBac({ profile, reglages, resultats, onResult, onQuit }: Pro
         grille={phase.grille}
         lettres={reglages.lettres}
         onFini={(mots, dureeMs, tempsEcoule) => setPhase({ nom: 'verif', grille: phase.grille, mots, dureeMs, tempsEcoule })}
-        onQuitter={onQuit}
+        onQuitter={(mots, dureeMs) => abandonner(phase.grille, mots, dureeMs)}
       />
     )
   }
@@ -202,16 +220,17 @@ function Partie({
   grille: Grille
   lettres: string[]
   onFini: (mots: string[], dureeMs: number, tempsEcoule: boolean) => void
-  onQuitter: () => void
+  onQuitter: (mots: string[], dureeMs: number) => void
 }) {
   const n = grille.categories.length
   const [tirage, setTirage] = useState(true)
   const [affichee, setAffichee] = useState('?')
   const [mots, setMots] = useState<string[]>(() => grille.categories.map(() => ''))
   const [focus, setFocus] = useState<number | null>(null)
-  const [maintenant, setMaintenant] = useState(0)
-  const debut = useRef(0)
   const fini = useRef(false)
+  // Pause automatique (fenêtre quittée) : le chronomètre s'arrête.
+  const { enPause, reprendre } = usePauseAuto(!tirage)
+  const { ecoule: ecouleChrono, lire } = useChrono(!tirage && !enPause)
   const inputs = useRef<(HTMLInputElement | null)[]>([])
   const boutonFini = useRef<HTMLButtonElement>(null)
   const motsRef = useRef(mots)
@@ -246,24 +265,34 @@ function Partie({
     fini.current = true
     onFini(
       motsRef.current.map((m) => m.trim()),
-      tempsEcoule ? grille.tempsLimite * 1000 : Date.now() - debut.current,
+      tempsEcoule ? grille.tempsLimite * 1000 : lire(),
       tempsEcoule
     )
   }
 
-  // Chronomètre, lancé quand la lettre est tirée.
+  // La lettre est tirée : le chronomètre démarre, première case prête.
   useEffect(() => {
-    if (tirage) return
-    debut.current = Date.now()
-    setMaintenant(debut.current)
-    inputs.current[0]?.focus()
-    const t = setInterval(() => {
-      const now = Date.now()
-      setMaintenant(now)
-      if (grille.tempsLimite > 0 && now - debut.current >= grille.tempsLimite * 1000) finir(true)
-    }, 200)
-    return () => clearInterval(t)
+    if (!tirage) inputs.current[0]?.focus()
   }, [tirage])
+
+  useEffect(() => {
+    if (!tirage && grille.tempsLimite > 0 && ecouleChrono >= grille.tempsLimite * 1000) finir(true)
+  }, [ecouleChrono, tirage])
+
+  const reprendrePartie = () => {
+    reprendre()
+    requestAnimationFrame(() => inputs.current[focus ?? 0]?.focus())
+  }
+
+  // « Arrêter » : la grille commencée est enregistrée, comme dans les autres jeux.
+  const arreter = () => {
+    if (fini.current) return
+    fini.current = true
+    onQuitter(
+      motsRef.current.map((m) => m.trim()),
+      lire()
+    )
+  }
 
   const aller = (i: number) => inputs.current[i]?.focus()
 
@@ -285,7 +314,7 @@ function Partie({
     }
   }
 
-  const ecoule = tirage ? 0 : Math.max(0, maintenant - debut.current)
+  const ecoule = tirage ? 0 : ecouleChrono
   const limiteMs = grille.tempsLimite * 1000
   const reste = Math.max(0, limiteMs - ecoule)
   const remplies = mots.filter((m) => m.trim() !== '').length
@@ -293,7 +322,7 @@ function Partie({
   return (
     <div className="screen dactylo">
       <header className="topbar">
-        <button className="btn btn-ghost" onClick={onQuitter}>
+        <button className="btn btn-ghost" onClick={arreter}>
           <IconBack /> Arrêter
         </button>
         <div className="live-stats">
@@ -368,6 +397,7 @@ function Partie({
           J’ai fini !
         </button>
       </main>
+      {enPause && <EcranPause onReprendre={reprendrePartie} />}
     </div>
   )
 }

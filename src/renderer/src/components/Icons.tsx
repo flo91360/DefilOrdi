@@ -1,3 +1,5 @@
+import type { JeuId } from '../../../shared/data'
+import { jamais } from '../games/jeux'
 // Petites icônes au trait, en SVG, qui prennent la couleur du texte.
 import type { ReactNode } from 'react'
 
@@ -120,7 +122,7 @@ export const IconSettings = ({ size }: P) => (
 )
 
 // Illustrations des jeux (plus grandes, en couleur pleine).
-export function GameArt({ game }: { game: string }) {
+export function GameArt({ game }: { game: JeuId }) {
   switch (game) {
     case 'dactylo':
       return (
@@ -221,6 +223,6 @@ export function GameArt({ game }: { game: string }) {
         </svg>
       )
     default:
-      return null
+      return jamais(game)
   }
 }

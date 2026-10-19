@@ -16,6 +16,7 @@ import { Memoire } from './games/memoire/Memoire'
 import { PetitBac } from './games/petitbac/PetitBac'
 import { construireBanque } from './games/quiz/engine'
 import { Quiz } from './games/quiz/Quiz'
+import { jamais } from './games/jeux'
 
 type Screen =
   | { name: 'accueil' }
@@ -125,29 +126,44 @@ export function App() {
         onResult: addResultat,
         onQuit: () => setScreen({ name: 'hub', profileId: active.id })
       }
-      if (screen.jeu === 'dactylo') content = (
-        <Dactylo
-          {...commun}
-          listes={listesAvecPhrasesEnfants(data.listes, data.phrasesEnfants)}
-          onMedaille={(n) => addMedaille(active.id, n)}
-          onPhrase={addPhraseEnfant}
-        />
-      )
-      else if (screen.jeu === 'memoire') content = (
-          <Memoire
-            {...commun}
-            listes={data.mots}
-            phrases={data.phrasesMemoire}
-            onProgression={(m) => saveProgressionMemoire(active.id, m)}
-          />
-        )
-      else if (screen.jeu === 'espace') content = <Espace {...commun} />
-      else if (screen.jeu === 'quiz') content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
-      else if (screen.jeu === 'petitbac') content = <PetitBac {...commun} reglages={data.petitBac} />
-      else content = <Couleurs {...commun} reglages={data.couleurs} />
+      switch (screen.jeu) {
+        case 'dactylo':
+          content = (
+            <Dactylo
+              {...commun}
+              listes={listesAvecPhrasesEnfants(data.listes, data.phrasesEnfants)}
+              onMedaille={(n) => addMedaille(active.id, n)}
+              onPhrase={addPhraseEnfant}
+            />
+          )
+          break
+        case 'memoire':
+          content = (
+            <Memoire
+              {...commun}
+              listes={data.mots}
+              phrases={data.phrasesMemoire}
+              onProgression={(m) => saveProgressionMemoire(active.id, m)}
+            />
+          )
+          break
+        case 'espace':
+          content = <Espace {...commun} />
+          break
+        case 'quiz':
+          content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
+          break
+        case 'petitbac':
+          content = <PetitBac {...commun} reglages={data.petitBac} />
+          break
+        case 'couleurs':
+          content = <Couleurs {...commun} reglages={data.couleurs} />
+          break
+        default:
+          jamais(screen.jeu)
+      }
       break
     }
-      break
     case 'editeur': {
       const retour = screen.retour
       const existing = screen.profileId ? profileOf(screen.profileId) : undefined

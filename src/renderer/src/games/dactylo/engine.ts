@@ -103,6 +103,11 @@ export function effacer(e: EtatPhrase): EtatPhrase {
   return { ...e, tape: e.tape.slice(0, -1) }
 }
 
+// Pause : le temps passé en pause ne compte pas dans la phrase en cours.
+export function decalerDebut(e: EtatPhrase, ms: number): EtatPhrase {
+  return e.debut === null || e.fin !== null ? e : { ...e, debut: e.debut + ms }
+}
+
 export function dureePhrase(e: EtatPhrase, now: number): number {
   if (e.debut === null) return 0
   return (e.fin ?? now) - e.debut

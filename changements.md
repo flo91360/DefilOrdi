@@ -14,13 +14,13 @@ des changements ».
 
 ## Prochaine version
 
-- Mots à retenir et Chasse aux lettres (correction) : quand l'enfant cliquait sur « Arrêter » juste après la fin de la partie, la partie était enregistrée deux fois dans les statistiques (et, dans Mots à retenir, une fois comme ratée). Elle n'est plus enregistrée qu'une fois, et l'écran de fin s'affiche normalement.
-- Dactylo (correction) : un enfant qui clique sur « Arrêter » pendant le « Bravo » de la dernière phrase reçoit bien sa médaille.
-- Espace ergothérapeute : le code par défaut (0000) n'est plus affiché aux enfants sur le pavé de code, sauf avant la création du tout premier profil. Tant que le code est 0000, l'espace ergo demande d'en choisir un autre avant de s'ouvrir.
-- Sauvegarde : le logiciel garde tout seul des copies datées des données sur le PC (une par jour d'utilisation, et avant chaque restauration ou mise à jour). Les 30 plus récentes sont conservées, dans le dossier des données, sous-dossier « sauvegardes » ; chacune peut être rechargée avec « Restaurer une sauvegarde ».
-- Sauvegarde : restaurer une sauvegarde faite avec une version plus récente de DefilOrdi affiche un avertissement. Les parties des jeux que cette version ne connaît pas sont ignorées au lieu d'apparaître comme de fausses parties de Dactylo.
-- Couleurs de l'enfant : le texte des boutons est plus lisible sur les couleurs claires (orange, vert, turquoise, bleu clair, rose), où il passe en foncé.
-- Notes de version : elles ne parlent plus d'une version portable qui n'est pas proposée, et chaque version ne décrit plus que ses propres changements.
+- Statistiques : nouveau bouton « Bilan imprimable ». Il résume les progrès d'un enfant sur une période au choix (tout, 12 derniers mois, 3 derniers mois, dernier mois, ou des dates précises) : pour chaque jeu, le nombre de parties et l'évolution de ses mesures entre le début et la fin de la période, avec une courbe. Une zone « Observations » permet d'ajouter un commentaire avant d'imprimer. Pour obtenir un PDF, choisir l'imprimante « Microsoft Print to PDF ».
+- Statistiques : nouveau bouton « Tout exporter (Excel) », qui enregistre toutes les parties de l'enfant dans un seul tableau, jeu par jeu. Un message confirme que le tableau est enregistré, ou prévient s'il n'a pas pu l'être.
+- Statistiques : les jeux s'affichent dans le même ordre et avec le même nom que sur l'écran des jeux (le quiz s'appelle partout « Quiz de l'ordinateur »).
+- Tous les jeux sauf la Chasse aux lettres, qui avait déjà sa pause : si l'enfant quitte la fenêtre pendant une partie (autre programme, fenêtre réduite), le jeu se met en pause. Le temps ne compte pas pendant la pause, et l'enfant reprend en cliquant sur « Reprendre ».
+- Petit bac : « Arrêter » enregistre maintenant la grille commencée dans les statistiques, comme dans les autres jeux (seule la première lettre des mots est vérifiée).
+- Réglages : le volume est enregistré quand le curseur s'arrête, et non plus à chaque cran.
+- Améliorations internes : tests automatiques qui jouent de vraies parties dans le logiciel, et code des statistiques et de l'apparence réorganisé.
 
 ## 0.8.16
 

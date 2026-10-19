@@ -21,6 +21,8 @@ le code et les commentaires aussi.
 - `src/renderer/src/avatar/` : personnage SVG par calques.
 - `src/renderer/src/sounds.ts` : sons synthétisés (Web Audio), pas de fichiers.
 - `src/renderer/src/theme.ts` : couleurs de l'enfant en variables CSS.
+- `src/renderer/src/styles.css` : n'importe que `styles/*.css` (un fichier par
+  écran ou jeu), dans l'ordre de leur numéro, qui compte pour la cascade.
 - `src/renderer/src/games/dactylo/` : jeu Dactylo ; `engine.ts` contient toute
   la logique et les règles de comptage (testées dans `tests/engine.test.ts`) ;
   `seuils.ts` réunit dans `SEUILS_DACTYLO` les seuils des smileys du score de
@@ -36,6 +38,9 @@ le code et les commentaires aussi.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
+  `games/pause.tsx` : pause automatique quand la fenêtre perd le focus
+  (`usePauseAuto`, `useChrono`, `EcranPause`), utilisée par tous les jeux sauf
+  la Chasse aux lettres, qui a sa propre pause (Échap).
   Couleurs piégées : bouton Indice (`indiceUtile`, `nbPropositions`,
   `propositionsIndice`), réglé pour tous les profils par `couleurs` dans les
   données (section Réglages de l'espace ergo) ; textes agrandis via la classe
@@ -76,17 +81,24 @@ le code et les commentaires aussi.
   lettres réglées par l'ergothérapeute : `petitBac` dans les données, éditeur
   dans `screens/PetitBacEditor.tsx`.
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
-  statistiques par jeu dans `screens/ErgoStats.tsx`.
+  statistiques dans `screens/ErgoStats.tsx` (onglets, exports, accès au bilan)
+  et `screens/stats/` : un fichier par jeu (colonnes de l'export, écran,
+  indicateurs du bilan), `parJeu.tsx` (tout ce qui dépend du jeu), `commun.tsx`,
+  `calculBilan.ts` (calcul du bilan imprimable, testé dans `tests/bilan.test.ts`) et
+  `Bilan.tsx`.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
   presser pour chaque caractère) et son affichage.
 - `src/shared/phrases.ts` : listes de phrases et de mots d'origine (uniquement des
   caractères tapables sur un clavier AZERTY Windows).
 - Espace ergo : `screens/ErgoSpace.tsx`, `ErgoStats.tsx`, `PhrasesEditor.tsx`,
   `QuizEditor.tsx`, `PetitBacEditor.tsx`.
+- `e2e/` : tests de parcours Playwright sur `npm run dev:web` (`*.e2e.ts`,
+  `e2e/outils.ts` pour préparer les données).
 
 ## Commandes
 
-`npm run typecheck`, `npm test`, `npm run dev:web`, `npm run dist:portable`
+`npm run typecheck`, `npm test`, `npm run test:e2e` (Playwright ; dans le
+conteneur, Chromium est déjà installé), `npm run dev:web`, `npm run dist:portable`
 (exe portable pour essai local, marche sous Linux sans wine, jamais livré),
 `npm run dist:win` (installeur complet seul ; l'installeur NSIS a besoin de
 wine 32 bits sous Linux, il est fabriqué par la CI Windows
@@ -97,7 +109,11 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
 
 - Données d'enfants : rien ne doit quitter le PC (pas de réseau, pas de télémétrie).
 - Les sons d'erreur restent doux, jamais punitifs.
-- Les jeux sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
+- Les jeux sont déclarés dans `JEUX` (`src/renderer/src/games/jeux.ts`, nom,
+  description, ordre). Ajouter un jeu à l'union `Resultat` fait échouer le
+  typecheck partout où il manque (`switch` terminés par `jamais(...)`).
+- « Arrêter » enregistre la partie commencée dans tous les jeux (si quelque
+  chose a été joué).
 - Fin de partie : une partie n'est enregistrée qu'une fois. Une fin différée
   (le temps d'un « Bravo ») annule son minuteur au démontage et rend
   « Arrêter » sans effet.

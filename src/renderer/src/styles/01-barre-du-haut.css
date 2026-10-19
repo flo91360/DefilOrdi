@@ -1,0 +1,53 @@
+/* ---------- Barre du haut ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 32px;
+  flex-shrink: 0;
+}
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.logo strong {
+  font-weight: 900;
+  color: var(--accent-ink);
+}
+
+.logo-keys {
+  display: flex;
+  gap: 4px;
+}
+
+.logo-keys span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.logo-keys span:last-child {
+  background: var(--accent);
+  color: var(--on-accent);
+}

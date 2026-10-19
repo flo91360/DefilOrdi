@@ -1,0 +1,113 @@
+/* ---------- Éléments communs aux jeux ---------- */
+
+.progress-dot.faux {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.liste-badge-neutre {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.liste-exemple.wrap {
+  white-space: normal;
+}
+
+.choix-note {
+  margin: 24px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.reponse-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.reponse-input {
+  width: min(100%, 560px);
+  padding: 16px 24px;
+  font: inherit;
+  font-size: 34px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  user-select: text;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.reponse-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px var(--accent-soft), var(--shadow);
+}
+
+.reponse-input::placeholder {
+  color: #b5b9c3;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.reponse-input.reponse-juste {
+  border-color: var(--success);
+  background: #f0faf4;
+}
+
+.reponse-input.reponse-faux {
+  border-color: var(--danger);
+  animation: shake 0.3s ease;
+}
+
+.reponse-retour {
+  min-height: 30px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.reponse-retour.juste {
+  color: var(--success);
+  font-weight: 900;
+}
+
+.reponse-retour.faux {
+  color: var(--danger);
+}
+
+/* Pause automatique (fenêtre quittée pendant une partie) */
+.pause-ecran {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(31, 35, 48, 0.94); /* la partie ne se voit plus pendant la pause */
+}
+
+.pause-carte {
+  max-width: 440px;
+  padding: 28px 32px;
+  border-radius: 20px;
+  background: var(--surface);
+  text-align: center;
+  font-size: 18px;
+}
+
+.pause-titre {
+  margin: 0 0 8px;
+  font-size: 30px;
+}

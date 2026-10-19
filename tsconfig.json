@@ -15,5 +15,5 @@
     "isolatedModules": true,
     "types": ["node"]
   },
-  "include": ["src/**/*", "tests/**/*", "electron.vite.config.ts", "vite.web.config.ts"]
+  "include": ["src/**/*", "tests/**/*", "e2e/**/*", "electron.vite.config.ts", "vite.web.config.ts", "playwright.config.ts"]
 }

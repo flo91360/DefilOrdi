@@ -1,0 +1,54 @@
+/* ---------- Chasse aux lettres : écran de jeu ---------- */
+
+.espace-titre {
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+.espace-topbar .live-stats {
+  margin-left: 0;
+}
+
+.espace.theme-western,
+.theme-western .espace-topbar {
+  background: #3b2412;
+}
+
+.theme-western .espace-clavier {
+  background: #2a190c;
+}
+
+.espace.theme-ocean,
+.theme-ocean .espace-topbar {
+  background: #06263d;
+}
+
+.theme-ocean .espace-clavier {
+  background: #041b2c;
+}
+
+.espace-decompte {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(64px, 14vh, 140px);
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 0 40px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  animation: decompte 0.75s ease-out;
+}
+
+@keyframes decompte {
+  from {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

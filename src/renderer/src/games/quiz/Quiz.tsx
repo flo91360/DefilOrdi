@@ -5,6 +5,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { pourcentage } from '../commun'
 import { formatDuree } from '../dactylo/engine'
+import { EcranPause, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import { type ElementQuiz, melangerChoix, questionsDisponibles, tirerPartie } from './engine'
 import { RelierVue } from './RelierVue'
@@ -187,6 +188,10 @@ function Partie({
   const [reponses, setReponses] = useState<Reponse[]>([])
   const [corrigee, setCorrigee] = useState<{ juste: boolean; choix?: number; detail?: string } | null>(null)
   const debut = useRef(Date.now())
+  // Pause automatique : le temps de la pause ne compte pas dans la durée du quiz.
+  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+    debut.current += d
+  })
   const index = reponses.length - (corrigee ? 1 : 0)
   const q = questions[index]
   const justes = reponses.filter((r) => r.juste).length
@@ -273,6 +278,7 @@ function Partie({
           </div>
         )}
       </main>
+      {enPause && <EcranPause onReprendre={reprendre} />}
     </div>
   )
 }

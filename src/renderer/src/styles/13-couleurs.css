@@ -1,0 +1,275 @@
+/* ---------- Couleurs piégées ---------- */
+
+.mode-card {
+  align-items: flex-start;
+}
+
+.mode-exemple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #262b38;
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.mode-fleche {
+  color: #8a90a0;
+}
+
+.mode-reponse {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.stroop-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vh, 36px);
+  padding: 0 32px 32px;
+  min-height: 0;
+}
+
+.consigne {
+  padding: 10px 26px;
+  border-radius: 999px;
+  font-size: 26px;
+  font-weight: 700;
+  animation: fade 0.25s ease;
+}
+
+.consigne strong {
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.consigne-mot {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.consigne-couleur {
+  background: var(--accent-2-soft);
+  color: var(--accent-2-ink);
+}
+
+.stroop-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: min(100%, 1000px);
+}
+
+.stroop-spacer {
+  width: 106px;
+  flex-shrink: 0;
+}
+
+.stroop-card {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: clamp(160px, 28vh, 260px);
+  border-radius: 28px;
+  background: #262b38;
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.2s ease;
+}
+
+.stroop-mot {
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+/* Textes agrandis pour Couleurs piégées (meilleure lisibilité). */
+
+.couleurs-jeu .game-heading {
+  font-size: 36px;
+}
+
+.couleurs-jeu .topbar .btn {
+  min-height: 56px;
+  font-size: 22px;
+}
+
+.couleurs-jeu .choix-title {
+  font-size: 46px;
+}
+
+.couleurs-jeu .choix-nombre {
+  font-size: 24px;
+}
+
+.couleurs-jeu .chip {
+  min-width: 64px;
+  height: 56px;
+  font-size: 24px;
+}
+
+.couleurs-jeu .liste-grid {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.couleurs-jeu .liste-nom {
+  font-size: 32px;
+}
+
+.couleurs-jeu .liste-exemple {
+  font-size: 23px;
+}
+
+.couleurs-jeu .liste-badge {
+  font-size: 18px;
+}
+
+.couleurs-jeu .mode-exemple {
+  font-size: 30px;
+}
+
+.couleurs-jeu .choix-note {
+  font-size: 23px;
+}
+
+.couleurs-jeu .live-stat {
+  min-width: 120px;
+}
+
+.couleurs-jeu .live-stat-value {
+  font-size: 32px;
+}
+
+.couleurs-jeu .live-stat-label {
+  font-size: 16px;
+}
+
+.couleurs-jeu .stroop-main {
+  overflow-y: auto;
+}
+
+.couleurs-jeu .consigne {
+  padding: 14px 36px;
+  font-size: clamp(28px, 3.6vw, 44px);
+  text-align: center;
+}
+
+.couleurs-jeu .stroop-card {
+  min-width: 0;
+  min-height: clamp(180px, 32vh, 320px);
+  /* La taille du mot suit la largeur de la carte : jamais de débordement. */
+  container-type: inline-size;
+}
+
+.couleurs-jeu .stroop-mot {
+  font-size: clamp(64px, min(18cqi, 26vh), 190px);
+  white-space: nowrap;
+}
+
+.couleurs-jeu .reponse-input {
+  width: min(100%, 680px);
+  font-size: 46px;
+}
+
+.couleurs-jeu .reponse-input::placeholder {
+  font-size: 28px;
+}
+
+.couleurs-jeu .reponse-retour {
+  min-height: 40px;
+  font-size: 27px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.couleurs-jeu .reponse-retour svg {
+  width: 30px;
+  height: 30px;
+}
+
+.couleurs-jeu .fin-title {
+  font-size: 54px;
+}
+
+.couleurs-jeu .fin-message {
+  font-size: 30px;
+}
+
+.couleurs-jeu .fin-stats {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.couleurs-jeu .stat-value {
+  font-size: 58px;
+}
+
+.couleurs-jeu .stat-label {
+  font-size: 24px;
+}
+
+.couleurs-jeu .stat-detail {
+  font-size: 19px;
+}
+
+.couleurs-jeu .btn-lg {
+  min-height: 64px;
+  font-size: 24px;
+}
+
+/* Bouton Indice et propositions */
+
+.indice-zone {
+  display: flex;
+  justify-content: center;
+  min-height: 64px;
+  width: 100%;
+}
+
+.indice-bouton {
+  min-height: 64px;
+  padding: 0 30px;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.indice-bouton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.indice-reste {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.indice-propositions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  max-width: 100%;
+  animation: fade 0.25s ease;
+}
+
+.indice-titre {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+
+.indice-mot {
+  padding: 8px 26px;
+  border-radius: 999px;
+  border: 3px dashed var(--accent);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 34px;
+  font-weight: 900;
+  box-shadow: var(--shadow);
+}
