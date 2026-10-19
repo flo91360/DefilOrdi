@@ -6,7 +6,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
-import { EcranPause, useChrono, usePauseAuto } from '../pause'
+import { BoutonPause, EcranPause, useChrono, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
 import {
   CLICS_VALIDATION,
@@ -81,6 +81,7 @@ export function Couleurs({ profile, resultats, reglages, onResult, onQuit }: Pro
       profileId: profile.id,
       jeu: 'couleurs',
       date: new Date().toISOString(),
+      complete,
       mode,
       manches: reponses.length,
       justes: reponses.filter((x) => x.juste).length,
@@ -270,7 +271,7 @@ function Partie({
   onFinRef.current = onFin
   // Pause automatique : le temps de la pause ne compte ni dans le chrono ni
   // dans le temps de réponse de la manche.
-  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+  const { enPause, reprendre, mettreEnPause } = usePauseAuto(true, (d) => {
     debut.current += d
   })
   const { ecoule } = useChrono(chrono && !enPause, 250)
@@ -331,6 +332,7 @@ function Partie({
         <button className="btn btn-ghost" onClick={() => onQuitter(reponsesRef.current)}>
           <IconBack /> Arrêter
         </button>
+        <BoutonPause onClick={mettreEnPause} />
         {chrono ? (
           <div className="progress" aria-label="Temps restant">
             <strong>

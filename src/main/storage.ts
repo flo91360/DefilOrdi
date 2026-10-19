@@ -16,6 +16,9 @@ export class Storage {
   private readonly previous: string
   readonly copies: string
   private queue: Promise<void> = Promise.resolve()
+  // Vrai si le dernier fichier lu venait d'une version plus récente du
+  // logiciel : l'interface prévient alors l'ergothérapeute.
+  plusRecente = false
 
   constructor(
     readonly dir: string,
@@ -29,8 +32,9 @@ export class Storage {
   async load(): Promise<AppData> {
     await fs.mkdir(this.dir, { recursive: true })
     const main = await readJson(this.file)
+    this.plusRecente = main.ok && estPlusRecente(main.value)
     if (main.ok) {
-      if (estPlusRecente(main.value)) await this.copier('version-plus-recente')
+      if (this.plusRecente) await this.copier('version-plus-recente')
       else if (estPlusAncienne(main.value)) await this.copier('avant-mise-a-jour')
       else if (!(await this.copieDuJour())) await this.copier('demarrage')
       return normalizeAppData(main.value)

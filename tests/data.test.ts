@@ -14,7 +14,7 @@ describe('normalizeAppData', () => {
     const p = { ...profil('a1', 'Léa'), niveau: 3, classe: 'CE2' as const, age: 8 }
     const data = normalizeAppData({ version: 1, profiles: [p], settings: { codeErgo: '4321', volume: 0.5 } })
     expect(data.profiles).toEqual([p])
-    expect(data.settings).toEqual({ codeErgo: '4321', volume: 0.5 })
+    expect(data.settings).toEqual({ codeErgo: '4321', volume: 0.5, relirePhrasesEnfants: true })
   })
 
   it('remplace les champs invalides et écarte les profils inutilisables', () => {
@@ -282,5 +282,19 @@ describe('sauvegarde d’une autre version du logiciel', () => {
     expect(estPlusAncienne({ version: DATA_VERSION - 1, profiles: [] })).toBe(true)
     expect(estPlusAncienne({ profiles: [] })).toBe(true)
     expect(estPlusAncienne({ version: DATA_VERSION, profiles: [] })).toBe(false)
+  })
+})
+
+describe('relecture des phrases et parties arrêtées', () => {
+  it('relit les phrases des enfants par défaut, y compris pour les anciennes sauvegardes', () => {
+    expect(defaultAppData().settings.relirePhrasesEnfants).toBe(true)
+    expect(normalizeAppData({ version: 5, profiles: [], settings: { codeErgo: '1234' } }).settings.relirePhrasesEnfants).toBe(true)
+    expect(normalizeAppData({ version: 5, profiles: [], settings: { relirePhrasesEnfants: false } }).settings.relirePhrasesEnfants).toBe(false)
+  })
+
+  it('considère les anciennes parties comme terminées et garde une partie arrêtée', () => {
+    const r = (id: string, extra: object) => ({ id, profileId: 'p', jeu: 'quiz', date: '2026-10-01T10:00:00Z', questions: 10, justes: 5, ...extra })
+    const d = normalizeAppData({ version: 5, profiles: [profil('p', 'Léo')], resultats: [r('a', {}), r('b', { complete: false })] })
+    expect(d.resultats.map((x) => x.complete)).toEqual([true, false])
   })
 })

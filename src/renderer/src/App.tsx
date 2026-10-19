@@ -8,6 +8,7 @@ import { ProfilePicker } from './screens/ProfilePicker'
 import { Hub } from './screens/Hub'
 import { ProfileEditor } from './screens/ProfileEditor'
 import { ErgoSpace } from './screens/ErgoSpace'
+import { Modal } from './components/Modal'
 import { PinPad } from './components/PinPad'
 import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
@@ -30,13 +31,16 @@ export function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'accueil' })
   const [askCode, setAskCode] = useState(false)
   const [saveError, setSaveError] = useState(false)
+  // Données enregistrées par une version plus récente : prévenir avant toute modification.
+  const [versionPlusRecente, setVersionPlusRecente] = useState(false)
   const dataRef = useRef<AppData | null>(null)
   dataRef.current = data
 
   useEffect(() => {
-    api.load().then((d) => {
+    api.load().then(({ data: d, plusRecente }) => {
       setVolume(d.settings.volume)
       setData(d)
+      setVersionPlusRecente(plusRecente)
     })
   }, [])
 
@@ -134,6 +138,7 @@ export function App() {
               listes={listesAvecPhrasesEnfants(data.listes, data.phrasesEnfants)}
               onMedaille={(n) => addMedaille(active.id, n)}
               onPhrase={addPhraseEnfant}
+              relecture={data.settings.relirePhrasesEnfants}
             />
           )
           break
@@ -209,6 +214,29 @@ export function App() {
           }}
           onCancel={() => setAskCode(false)}
         />
+      )}
+      {versionPlusRecente && (
+        <Modal title="Version plus récente des données" onClose={() => setVersionPlusRecente(false)} width={560}>
+          <div className="modal-body">
+            <p>
+              Les données de ce PC ont été enregistrées par une version plus récente de DefilOrdi. Si vous continuez avec
+              cette version-ci, les jeux et réglages qu’elle ne connaît pas seront perdus.
+            </p>
+            <p>
+              Le mieux est d’installer la dernière version de DefilOrdi. Une copie des données telles qu’elles étaient a été
+              gardée dans le dossier des données, sous-dossier « sauvegardes ».
+            </p>
+            <p className="muted">Si vous êtes un enfant, demande à ton ergothérapeute.</p>
+          </div>
+          <div className="modal-actions">
+            <button className="btn btn-ghost" onClick={() => setVersionPlusRecente(false)}>
+              Continuer quand même
+            </button>
+            <button className="btn btn-primary" onClick={() => window.close()} autoFocus>
+              Fermer DefilOrdi
+            </button>
+          </div>
+        </Modal>
       )}
       {saveError && (
         <div className="toast toast-error" role="alert">

@@ -5,7 +5,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { pourcentage } from '../commun'
 import { formatDuree } from '../dactylo/engine'
-import { EcranPause, usePauseAuto } from '../pause'
+import { BoutonPause, EcranPause, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import { type ElementQuiz, melangerChoix, questionsDisponibles, tirerPartie } from './engine'
 import { RelierVue } from './RelierVue'
@@ -70,6 +70,7 @@ export function Quiz({ profile, banque, resultats, onResult, onQuit }: Props) {
       profileId: profile.id,
       jeu: 'quiz',
       date: new Date().toISOString(),
+      complete,
       themeNom: NOMS_THEMES[theme],
       dureeMs,
       questions: reponses.length,
@@ -189,7 +190,7 @@ function Partie({
   const [corrigee, setCorrigee] = useState<{ juste: boolean; choix?: number; detail?: string } | null>(null)
   const debut = useRef(Date.now())
   // Pause automatique : le temps de la pause ne compte pas dans la durée du quiz.
-  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+  const { enPause, reprendre, mettreEnPause } = usePauseAuto(true, (d) => {
     debut.current += d
   })
   const index = reponses.length - (corrigee ? 1 : 0)
@@ -230,6 +231,7 @@ function Partie({
         <button className="btn btn-ghost" onClick={() => onQuitter(reponses, Date.now() - debut.current)}>
           <IconBack /> Arrêter
         </button>
+        <BoutonPause onClick={mettreEnPause} />
         <div className="progress" aria-label={`Question ${index + 1} sur ${questions.length}`}>
           {questions.map((_, i) => (
             <span

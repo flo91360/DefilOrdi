@@ -78,3 +78,7 @@ export const INDICATEURS_COULEURS: Indicateur<ResultatCouleurs>[] = [
   { nom: 'Pièges déjoués', unite: '%', valeur: (r) => pourcentage(r.piegesJustes, r.pieges) },
   { nom: 'Temps moyen de réponse', unite: 's', valeur: (r) => Math.round(r.dureeMs / Math.max(1, r.manches) / 100) / 10, plusPetitMieux: true }
 ]
+
+// Bilan : chaque mode a sa difficulté (et le mode timer, sa durée).
+export const GROUPE_COULEURS = (r: ResultatCouleurs) =>
+  r.mode === 'timer' ? `${MODES_COULEURS_LABELS.timer}, ${r.minutes} min` : MODES_COULEURS_LABELS[r.mode]

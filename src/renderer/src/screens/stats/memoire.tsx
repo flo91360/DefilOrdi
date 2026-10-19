@@ -151,3 +151,6 @@ export const INDICATEURS_MEMOIRE: Indicateur<ResultatMemoire>[] = [
   { nom: 'Mots retrouvés', unite: 'mots', valeur: (r) => r.trouves },
   { nom: 'Réussite', unite: '%', valeur: (r) => pourcentage(r.trouves, r.mots) }
 ]
+
+// Bilan : on compare les parties d'un même palier (3 mots, 4 mots… phrase).
+export const GROUPE_MEMOIRE = (r: ResultatMemoire) => (r.palier > 0 ? `Palier ${nomPalier(r.palier)}` : 'Palier inconnu')

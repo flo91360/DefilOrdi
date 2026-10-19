@@ -15,16 +15,27 @@ export function controlerPhrase(texte: string, niveau: number, dico: Dictionnair
   return problemes
 }
 
+// Statut d'une phrase d'enfant après le contrôle. Refusée par le contrôle :
+// à vérifier, avec les remarques. Acceptée : partagée tout de suite, sauf si
+// l'ergothérapeute relit les phrases avant de les partager (à vérifier, sans
+// remarque), pour qu'aucune phrase blessante n'arrive chez les autres enfants.
+export function statutPhrase(problemes: string[], relecture: boolean): Pick<PhraseEnfant, 'statut' | 'motifs'> {
+  if (problemes.length > 0) return { statut: 'a_verifier', motifs: problemes }
+  return relecture ? { statut: 'a_verifier', motifs: [] } : { statut: 'valide', motifs: [] }
+}
+
 // Proposé juste après l'affichage de la médaille : une médaille, une phrase.
 export function PhrasePerso({
   profile,
   niveau,
   motsConnus,
+  relecture,
   onPhrase
 }: {
   profile: Profile
   niveau: number
   motsConnus: string[]
+  relecture: boolean
   onPhrase: (p: PhraseEnfant) => void
 }) {
   const [texte, setTexte] = useState('')
@@ -39,7 +50,7 @@ export function PhrasePerso({
     const p = controlerPhrase(t, niveau, dico)
     const base = { id: uid(), texte: t, niveau, profileId: profile.id, prenom: profile.prenom, date: new Date().toISOString() }
     if (p.length === 0) {
-      onPhrase({ ...base, statut: 'valide', motifs: [] })
+      onPhrase({ ...base, ...statutPhrase(p, relecture) })
       setProblemes([])
       setEtat('ajoutee')
       return
@@ -49,15 +60,24 @@ export function PhrasePerso({
     if (profile.dactylo.sonErreur) playSound(profile.sonEchec)
     if (!dejaSignalees.includes(t)) {
       setDejaSignalees([...dejaSignalees, t])
-      onPhrase({ ...base, statut: 'a_verifier', motifs: p })
+      onPhrase({ ...base, ...statutPhrase(p, relecture) })
     }
   }
 
   if (etat === 'ajoutee') {
     return (
       <div className="phrase-perso" role="status">
-        <strong>Merci ! Ta phrase est ajoutée au niveau {niveau}.</strong>
-        <p>Elle pourra être tirée dans les parties de tous les joueurs.</p>
+        {relecture ? (
+          <>
+            <strong>Merci ! Ta phrase est envoyée à ton ergothérapeute.</strong>
+            <p>Quand elle l’aura lue, ta phrase pourra être tirée dans les parties de tous les joueurs.</p>
+          </>
+        ) : (
+          <>
+            <strong>Merci ! Ta phrase est ajoutée au niveau {niveau}.</strong>
+            <p>Elle pourra être tirée dans les parties de tous les joueurs.</p>
+          </>
+        )}
       </div>
     )
   }

@@ -190,3 +190,15 @@
 th.num {
   text-align: right;
 }
+
+/* Historique : partie arrêtée avant la fin */
+.partie-arretee {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 700;
+}

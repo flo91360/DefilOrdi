@@ -51,8 +51,9 @@ test('Petit bac : « Arrêter » enregistre la grille commencée', async ({ page
   await premiere.fill('chat')
   await page.getByRole('button', { name: 'Arrêter' }).click()
   await expect(page.getByText('Salut Léo !')).toBeVisible()
-  const [r] = (await donnees(page)).resultats as { jeu: string; justes: number; reponses: { mot: string }[] }[]
+  const [r] = (await donnees(page)).resultats as { jeu: string; complete: boolean; justes: number; reponses: { mot: string }[] }[]
   expect(r.jeu).toBe('petitbac')
+  expect(r.complete).toBe(false)
   expect(r.justes).toBe(1)
   expect(r.reponses.map((x) => x.mot)).toContain('chat')
 })
@@ -84,4 +85,19 @@ test('Dactylo : la frappe est ignorée pendant la pause', async ({ page }) => {
   await page.getByRole('button', { name: 'Reprendre' }).click()
   await expect(page.getByLabel('Zone de frappe')).toBeFocused()
   await expect(page.locator('.phrase .ch-ok, .phrase .ch-faux')).toHaveCount(0)
+})
+
+test('Quiz : bouton Pause et touche Échap', async ({ page }) => {
+  await ouvrir(page)
+  await jouer(page, 'Quiz de l’ordinateur')
+  await page.locator('.liste-card').first().click()
+  const pause = page.getByRole('dialog', { name: 'Pause' })
+  await page.getByRole('button', { name: 'Pause' }).click()
+  await expect(pause).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(pause).toBeHidden()
+  await page.keyboard.press('Escape')
+  await expect(pause).toBeVisible()
+  await page.getByRole('button', { name: 'Reprendre' }).click()
+  await expect(pause).toBeHidden()
 })

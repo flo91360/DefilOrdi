@@ -5,12 +5,12 @@ import type { JeuId, Profile, QuestionPerso, Resultat } from '../../../../shared
 import { jamais, nomJeu, ORDRE_JEUX } from '../../games/jeux'
 import { vitesse } from '../../games/dactylo/engine'
 import { type Indicateur, versCsv } from './commun'
-import { COLONNES_COULEURS, INDICATEURS_COULEURS, StatsCouleurs } from './couleurs'
-import { COLONNES_DACTYLO, INDICATEURS_DACTYLO, StatsDactylo } from './dactylo'
-import { COLONNES_ESPACE, INDICATEURS_ESPACE, StatsEspace } from './espace'
-import { colonnesMemoire, INDICATEURS_MEMOIRE, resumerProgressions, StatsMemoire } from './memoire'
-import { COLONNES_PETITBAC, INDICATEURS_PETITBAC, StatsPetitBac } from './petitbac'
-import { COLONNES_QUIZ, INDICATEURS_QUIZ, StatsQuiz } from './quiz'
+import { COLONNES_COULEURS, GROUPE_COULEURS, INDICATEURS_COULEURS, StatsCouleurs } from './couleurs'
+import { COLONNES_DACTYLO, GROUPE_DACTYLO, INDICATEURS_DACTYLO, StatsDactylo } from './dactylo'
+import { COLONNES_ESPACE, GROUPE_ESPACE, INDICATEURS_ESPACE, StatsEspace } from './espace'
+import { colonnesMemoire, GROUPE_MEMOIRE, INDICATEURS_MEMOIRE, resumerProgressions, StatsMemoire } from './memoire'
+import { COLONNES_PETITBAC, GROUPE_PETITBAC, INDICATEURS_PETITBAC, StatsPetitBac } from './petitbac'
+import { COLONNES_QUIZ, GROUPE_QUIZ, INDICATEURS_QUIZ, StatsQuiz } from './quiz'
 
 export type ResultatDe<J extends JeuId> = Extract<Resultat, { jeu: J }>
 
@@ -76,6 +76,28 @@ export function indicateursDu(jeu: JeuId): Indicateur<Resultat>[] {
       return tous(INDICATEURS_QUIZ)
     case 'petitbac':
       return tous(INDICATEURS_PETITBAC)
+    default:
+      return jamais(jeu)
+  }
+}
+
+// Bilan : groupe d'une partie. Seules les parties d'un même groupe (même mode,
+// même liste, même palier…) sont comparées entre elles.
+export function groupeDu(jeu: JeuId): (r: Resultat) => string {
+  const tous = <R extends Resultat>(f: (r: R) => string) => f as unknown as (r: Resultat) => string
+  switch (jeu) {
+    case 'dactylo':
+      return tous(GROUPE_DACTYLO)
+    case 'couleurs':
+      return tous(GROUPE_COULEURS)
+    case 'memoire':
+      return tous(GROUPE_MEMOIRE)
+    case 'espace':
+      return tous(GROUPE_ESPACE)
+    case 'quiz':
+      return tous(GROUPE_QUIZ)
+    case 'petitbac':
+      return tous(GROUPE_PETITBAC)
     default:
       return jamais(jeu)
   }

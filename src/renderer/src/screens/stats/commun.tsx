@@ -25,8 +25,8 @@ export function secondes(ms: number): string {
 
 export function versCsv<R extends Resultat>(parties: R[], colonnes: Colonne<R>[]): string {
   const lignes = [
-    ['Date', ...colonnes.map((c) => c.titre)],
-    ...parties.map((r) => [dateLongue(r.date), ...colonnes.map((c) => c.valeur(r))])
+    ['Date', 'Terminée', ...colonnes.map((c) => c.titre)],
+    ...parties.map((r) => [dateLongue(r.date), r.complete ? 'Oui' : 'Non (arrêtée)', ...colonnes.map((c) => c.valeur(r))])
   ]
   return lignes.map((l) => l.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\r\n')
 }
@@ -123,7 +123,14 @@ export function Historique<R extends Resultat>({
         <tbody>
           {[...parties].reverse().map((r) => (
             <tr key={r.id}>
-              <td>{dateLongue(r.date)}</td>
+              <td>
+                {dateLongue(r.date)}
+                {!r.complete && (
+                  <span className="partie-arretee" title="Partie arrêtée avant la fin avec le bouton « Arrêter »">
+                    arrêtée
+                  </span>
+                )}
+              </td>
               {visibles.map((c) => (
                 <td key={c.titre} className={c.num ? 'num' : undefined}>
                   {c.valeur(r)}

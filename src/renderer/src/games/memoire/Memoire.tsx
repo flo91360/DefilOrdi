@@ -14,7 +14,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
-import { EcranPause, usePauseAuto } from '../pause'
+import { BoutonPause, EcranPause, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, ReponseInput, StatTile } from '../ui'
 import {
   avancerProgression,
@@ -134,6 +134,7 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
       profileId: profile.id,
       jeu: 'memoire',
       date: new Date().toISOString(),
+      complete,
       listeNom: phrase ? 'Phrase' : (jeu.liste?.nom ?? ''),
       mots: jeu.mots.length,
       trouves: trouves.filter(Boolean).length,
@@ -320,7 +321,7 @@ function useMemorisation(nbMots: number) {
   const [etape, setEtape] = useState<'memoriser' | 'rappel'>('memoriser')
   const [reste, setReste] = useState(duree)
   const debutRappel = useRef(0)
-  const { enPause, reprendre } = usePauseAuto(true, (d) => {
+  const { enPause, reprendre, mettreEnPause } = usePauseAuto(true, (d) => {
     debutRappel.current += d
   })
 
@@ -342,7 +343,7 @@ function useMemorisation(nbMots: number) {
 
   const dureeRappel = () => (etape === 'rappel' ? Date.now() - debutRappel.current : 0)
   const ecranPause = enPause ? <EcranPause onReprendre={reprendre} /> : null
-  return { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause }
+  return { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause, mettreEnPause }
 }
 
 function EcranMemoriser({
@@ -353,7 +354,8 @@ function EcranMemoriser({
   reste,
   duree,
   onPret,
-  onArreter
+  onArreter,
+  onPause
 }: {
   titre: string
   mots: string[]
@@ -363,10 +365,13 @@ function EcranMemoriser({
   duree: number
   onPret: () => void
   onArreter: () => void
+  onPause: () => void
 }) {
   return (
     <div className="screen dactylo">
-      <GameTopbar onBack={onArreter} backLabel="Arrêter" />
+      <GameTopbar onBack={onArreter} backLabel="Arrêter">
+        <BoutonPause onClick={onPause} />
+      </GameTopbar>
       <main className="memoire-main">
         <h2 className="memoire-titre">{titre}</h2>
         {phrase ? (
@@ -412,13 +417,15 @@ function EnteteRappel({
   titre,
   compteur,
   label,
-  onArreter
+  onArreter,
+  onPause
 }: {
   profile: Profile
   titre: string
   compteur: string
   label: string
   onArreter: () => void
+  onPause: () => void
 }) {
   return (
     <>
@@ -426,6 +433,7 @@ function EnteteRappel({
         <button className="btn btn-ghost" onClick={onArreter}>
           <IconBack /> Arrêter
         </button>
+        <BoutonPause onClick={onPause} />
         <div className="live-stats">
           <div className="live-stat">
             <span className="live-stat-value">{compteur}</span>
@@ -445,7 +453,7 @@ function EnteteRappel({
 
 // Paliers 3 à 7 : les mots sont retapés un par un, dans n'importe quel ordre.
 function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: PartieProps) {
-  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause } = useMemorisation(mots.length)
+  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause, mettreEnPause } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux' | 'info'; texte: string } | null>(null)
@@ -521,6 +529,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
           duree={duree}
           onPret={commencerRappel}
           onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
+          onPause={mettreEnPause}
         />
       </>
     )
@@ -534,6 +543,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
         compteur={`${trouves.filter(Boolean).length} / ${mots.length}`}
         label="Trouvés"
         onArreter={() => arreter(() => onQuitter(trouves, erreurs, dureeRappel()))}
+        onPause={mettreEnPause}
       />
       <main className="memoire-main">
         <div className="mots-grille">
@@ -616,7 +626,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
 // majuscules et ponctuation ne comptent pas. L'enfant peut réessayer : les
 // mots bien placés de son meilleur essai s'affichent.
 function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) {
-  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause } = useMemorisation(mots.length)
+  const { duree, etape, reste, commencerRappel, dureeRappel, enPause, ecranPause, mettreEnPause } = useMemorisation(mots.length)
   const [trouves, setTrouves] = useState<boolean[]>(() => mots.map(() => false))
   const [erreurs, setErreurs] = useState(0)
   const [message, setMessage] = useState<{ type: 'juste' | 'faux'; texte: string } | null>(null)
@@ -665,6 +675,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
           duree={duree}
           onPret={commencerRappel}
           onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
+          onPause={mettreEnPause}
         />
       </>
     )
@@ -678,6 +689,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
         compteur={`${trouves.filter(Boolean).length} / ${mots.length}`}
         label="Mots"
         onArreter={() => arreter(() => onQuitter(trouves, erreurs, dureeRappel()))}
+        onPause={mettreEnPause}
       />
       <main className="memoire-main">
         <div className="mots-grille">

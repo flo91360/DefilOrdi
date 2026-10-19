@@ -69,3 +69,6 @@ export function StatsQuiz({
 }
 
 export const INDICATEURS_QUIZ: Indicateur<ResultatQuiz>[] = [{ nom: 'Réussite', unite: '%', valeur: (r) => pourcentage(r.justes, r.questions) }]
+
+// Bilan : un thème par groupe.
+export const GROUPE_QUIZ = (r: ResultatQuiz) => r.themeNom

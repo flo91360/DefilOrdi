@@ -111,3 +111,6 @@ export const INDICATEURS_DACTYLO: Indicateur<ResultatDactylo>[] = [
   { nom: 'Vitesse', unite: 'frappes justes/min', valeur: vitesse },
   { nom: 'Précision', unite: '%', valeur: precision }
 ]
+
+// Bilan : des listes de niveaux différents ne se comparent pas entre elles.
+export const GROUPE_DACTYLO = (r: ResultatDactylo) => `Liste « ${r.listeNom} »`

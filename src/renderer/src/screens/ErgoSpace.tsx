@@ -118,7 +118,9 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
           {section === 'enfants' && (
             <PhrasesEnfantsEditor
               phrases={data.phrasesEnfants}
+              relecture={data.settings.relirePhrasesEnfants}
               onChange={(phrasesEnfants) => onChange({ ...data, phrasesEnfants })}
+              onRelecture={(relirePhrasesEnfants) => onChange({ ...data, settings: { ...data.settings, relirePhrasesEnfants } })}
             />
           )}
           {section === 'quiz' && (

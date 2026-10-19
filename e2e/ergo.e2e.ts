@@ -20,6 +20,7 @@ const quiz = {
   id: 'q1',
   profileId: PROFIL.id,
   jeu: 'quiz',
+  complete: true,
   date: '2026-09-10T10:00:00.000Z',
   themeNom: 'Le matériel',
   dureeMs: 90000,
@@ -84,4 +85,27 @@ test('Réglages : le volume est enregistré une fois le curseur arrêté', async
   for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight')
   await expect(page.getByText('20 %')).toBeVisible()
   await expect.poll(async () => (await donnees(page)).settings.volume).toBe(0.2)
+})
+
+test('Données d’une version plus récente : l’ergo est prévenue au démarrage', async ({ page }) => {
+  await ouvrir(page, { version: 99 })
+  const alerte = page.getByRole('dialog', { name: 'Version plus récente des données' })
+  await expect(alerte).toBeVisible()
+  await page.getByRole('button', { name: 'Continuer quand même' }).click()
+  await expect(alerte).toBeHidden()
+  await expect(page.getByText(PROFIL.prenom)).toBeVisible()
+})
+
+test('Phrases des enfants : relues avant d’être partagées, réglage modifiable', async ({ page }) => {
+  const phrase = { id: 'ph1', texte: 'le chat dort', niveau: 1, profileId: PROFIL.id, prenom: PROFIL.prenom, date: '2026-10-01T10:00:00.000Z', statut: 'a_verifier', motifs: [] }
+  await ouvrir(page, { phrasesEnfants: [phrase] })
+  await entrerErgo(page)
+  await page.getByLabel('Sections').getByRole('button', { name: /Phrases des enfants/ }).click()
+  await expect(page.getByText('Phrase correcte : elle attend votre accord')).toBeVisible()
+  const relecture = page.getByRole('checkbox', { name: /Relire chaque phrase/ })
+  await expect(relecture).toBeChecked()
+  await relecture.uncheck()
+  await expect.poll(async () => (await donnees(page)).settings.relirePhrasesEnfants).toBe(false)
+  await page.getByRole('button', { name: 'Valider cette phrase' }).click()
+  await expect(page.getByText('Phrases ajoutées (1)')).toBeVisible()
 })

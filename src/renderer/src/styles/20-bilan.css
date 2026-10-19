@@ -46,7 +46,22 @@
 
 .bilan-jeu {
   margin-top: 22px;
+}
+
+.bilan-groupe {
+  margin-top: 12px;
   break-inside: avoid;
+}
+
+.bilan-groupe h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+/* À l'impression, un titre ne reste pas seul en bas de page. */
+.bilan-jeu h2,
+.bilan-groupe h3 {
+  break-after: avoid;
 }
 
 .bilan-jeu h2,
