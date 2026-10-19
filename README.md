@@ -25,8 +25,9 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
 - Création et modification de profil : prénom, personnage (humain ou robot,
   personnalisable), deux couleurs préférées qui colorent l'interface, son de
   réussite et son d'erreur.
-- Espace ergothérapeute protégé par un code à 4 chiffres (**0000 par défaut**,
-  à changer dans *Réglages*).
+- Espace ergothérapeute protégé par un code à 4 chiffres. À l'installation, il
+  vaut **0000** : à la première ouverture, l'espace ergo demande d'en choisir un
+  autre (modifiable ensuite dans *Réglages*).
 
 **Étape 2 — jeu Dactylo**
 
@@ -141,15 +142,37 @@ ordinateur », car le programme n'est pas signé numériquement : cliquer sur
   réussies / 5 par minute (convention habituelle).
 - Le chronomètre d'une phrase part à la première frappe et s'arrête quand elle
   est entièrement juste ; les pauses entre les phrases ne comptent pas.
+
+**Dans tous les jeux**
+
+- Pause : bouton « Pause » ou touche Échap, et pause automatique quand l'enfant
+  quitte la fenêtre ; le temps ne compte pas pendant la pause.
+- « Arrêter » enregistre la partie commencée ; elle est signalée « arrêtée »
+  dans les statistiques et ne compte pas dans le bilan.
+
+**Statistiques et bilan**
+
+- Pour chaque enfant : courbes, historique, export Excel d'un jeu ou de toutes
+  les parties en un seul tableau.
+- **Bilan imprimable** sur une période au choix : pour chaque jeu, évolution des
+  mesures entre le début et la fin de la période, en comparant seulement les
+  parties d'un même mode, d'une même liste ou d'un même palier ; zone
+  « Observations » ; impression ou PDF (« Microsoft Print to PDF »).
+- **Phrases des enfants** : par défaut, chaque phrase écrite par un enfant
+  attend l'accord de l'ergothérapeute avant d'être proposée aux autres.
 - Les majuscules accentuées (É, À…) ne se tapent pas simplement sur un clavier
   Windows : la majuscule sans accent est acceptée.
 
 ## Données et confidentialité
 
 Toutes les données restent sur le PC, dans `%APPDATA%\DefilOrdi\donnees.json`.
-Rien n'est envoyé sur Internet. Seul le prénom de l'enfant est enregistré.
+Rien n'est envoyé sur Internet. Pour chaque enfant sont enregistrés son prénom,
+sa classe, son âge s'il est indiqué, ses réglages et ses parties.
 L'espace ergothérapeute permet d'enregistrer une sauvegarde (par exemple sur une
-clé USB) et de la restaurer sur ce PC ou sur un autre.
+clé USB) et de la restaurer sur ce PC ou sur un autre. Le logiciel garde aussi
+tout seul des copies datées dans le sous-dossier `sauvegardes` (une par jour
+d'utilisation, et avant chaque restauration ou mise à jour ; les 30 plus
+récentes).
 
 ## Développement
 
@@ -161,6 +184,7 @@ npm run dev          # lance l'application Electron en mode développement
 npm run dev:web      # lance seulement l'interface dans un navigateur (données dans localStorage)
 npm run typecheck
 npm test
+npm run test:e2e     # tests de parcours dans Chromium (Playwright), sur l'interface seule
 npm run dist:win     # fabrique l'installeur dans dist/ (sous Linux : nécessite wine 32 bits)
 npm run dist:portable  # essai local uniquement : .exe portable (fonctionne sous Linux sans wine), jamais livré
 ```

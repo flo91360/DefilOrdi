@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { QUESTIONS } from '../src/renderer/src/games/quiz/questions'
 import { donnees, jouer, ouvrir, quitterFenetre } from './outils'
 
 test('Mots à retenir : « Arrêter » juste après la fin n’enregistre la partie qu’une fois', async ({ page }) => {
@@ -63,7 +64,7 @@ test('Couleurs piégées timer : le chrono s’arrête pendant la pause automati
   await jouer(page, 'Couleurs piégées')
   await page.locator('.mode-card', { hasText: 'timer' }).click()
   const chrono = page.getByLabel('Temps restant')
-  await page.waitForTimeout(1200)
+  await expect(chrono).not.toHaveText(/1:00/) // le chrono tourne
   await quitterFenetre(page)
   const pendant = await chrono.innerText()
   await page.waitForTimeout(2000)
@@ -100,4 +101,26 @@ test('Quiz : bouton Pause et touche Échap', async ({ page }) => {
   await expect(pause).toBeVisible()
   await page.getByRole('button', { name: 'Reprendre' }).click()
   await expect(pause).toBeHidden()
+})
+
+test('Quiz : une partie complète est enregistrée avec ses bonnes réponses', async ({ page }) => {
+  // Deux questions de l'ergothérapeute seulement : les questions fournies sont masquées.
+  const question = (id: string, texte: string, reponse: boolean) => ({
+    id, type: 'vraifaux', theme: 'materiel', niveau: 1, question: texte, explication: '', icone: '', reponse, choix: ['', '', '', ''], bonne: 0
+  })
+  const reponses: Record<string, string> = { 'La souris sert à pointer.': 'Vrai', 'Un écran sert à taper du texte.': 'Faux' }
+  await ouvrir(page, {
+    questionsPerso: [question('p1', 'La souris sert à pointer.', true), question('p2', 'Un écran sert à taper du texte.', false)],
+    questionsMasquees: QUESTIONS.map((q) => q.id)
+  })
+  await jouer(page, 'Quiz de l’ordinateur')
+  await page.locator('.liste-card', { hasText: 'Le matériel' }).click()
+  for (let i = 0; i < 2; i++) {
+    const texte = (await page.locator('.quiz-texte').innerText()).trim()
+    await page.getByRole('button', { name: reponses[texte] }).click()
+    await page.getByRole('button', { name: i === 0 ? 'Question suivante' : 'Voir mon score' }).click()
+  }
+  await expect(page.getByText('Bravo Léo !')).toBeVisible()
+  const [r] = (await donnees(page)).resultats as { jeu: string; complete: boolean; questions: number; justes: number }[]
+  expect(r).toMatchObject({ jeu: 'quiz', complete: true, questions: 2, justes: 2 })
 })

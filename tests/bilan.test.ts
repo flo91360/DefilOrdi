@@ -3,6 +3,7 @@ import type { Resultat, ResultatDactylo, ResultatQuiz } from '../src/shared/data
 import { JEUX, nomJeu, ORDRE_JEUX } from '../src/renderer/src/games/jeux'
 import { calculerBilan, jourLocal } from '../src/renderer/src/screens/stats/calculBilan'
 import { csvComplet, partiesDe, resumePartie } from '../src/renderer/src/screens/stats/parJeu'
+import { celluleCsv } from '../src/renderer/src/screens/stats/commun'
 import { newProfile } from '../src/shared/data'
 
 // Midi UTC : même jour local quel que soit le fuseau du PC de test (à 12 h près).
@@ -140,5 +141,16 @@ describe('export complet', () => {
     expect(blocs[2].split('\r\n')[0]).toBe('"Quiz de l’ordinateur"')
     expect(blocs).toHaveLength(3)
     expect(partiesDe('quiz', [dactylo('2026-09-01', 1), quiz('2026-09-02', 7)])).toHaveLength(1)
+  })
+})
+
+describe('cellules de l’export Excel', () => {
+  it('garde comme texte ce qu’Excel prendrait pour une formule', () => {
+    expect(celluleCsv('- Révisions')).toBe("'- Révisions")
+    expect(celluleCsv('=1+1')).toBe("'=1+1")
+    expect(celluleCsv('+33')).toBe("'+33")
+    expect(celluleCsv('@chat')).toBe("'@chat")
+    expect(celluleCsv('Premiers mots')).toBe('Premiers mots')
+    expect(celluleCsv(-3)).toBe('-3')
   })
 })

@@ -28,7 +28,14 @@ export function versCsv<R extends Resultat>(parties: R[], colonnes: Colonne<R>[]
     ['Date', 'Terminée', ...colonnes.map((c) => c.titre)],
     ...parties.map((r) => [dateLongue(r.date), r.complete ? 'Oui' : 'Non (arrêtée)', ...colonnes.map((c) => c.valeur(r))])
   ]
-  return lignes.map((l) => l.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\r\n')
+  return lignes.map((l) => l.map((v) => `"${celluleCsv(v).replace(/"/g, '""')}"`).join(';')).join('\r\n')
+}
+
+// Excel lit comme une formule un texte qui commence par =, +, - ou @ (une
+// liste « - Révisions » devenait « #NOM? ») : une apostrophe devant le garde
+// comme texte. Les nombres restent des nombres.
+export function celluleCsv(v: string | number): string {
+  return typeof v === 'string' && /^[=+\-@\t\r]/.test(v) ? `'${v}` : String(v)
 }
 
 export function points<R extends Resultat>(parties: R[], y: (r: R) => number, detail: (r: R) => string): Point[] {

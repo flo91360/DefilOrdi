@@ -91,7 +91,23 @@ export class Storage {
     const tmp = `${this.file}.tmp`
     await fs.writeFile(tmp, JSON.stringify(data, null, 2), 'utf8')
     await fs.copyFile(this.file, this.previous).catch(() => {})
-    await fs.rename(tmp, this.file)
+    await remplacer(tmp, this.file)
+  }
+}
+
+// Sous Windows, un antivirus ou l'indexation peut verrouiller le fichier un
+// court instant : le remplacement est retenté avant d'abandonner.
+export const ESSAIS_REMPLACEMENT = 4
+
+export async function remplacer(source: string, cible: string, attenteMs = 100, renommer = fs.rename): Promise<void> {
+  for (let essai = 1; ; essai++) {
+    try {
+      return await renommer(source, cible)
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException).code
+      if (essai >= ESSAIS_REMPLACEMENT || (code !== 'EPERM' && code !== 'EBUSY' && code !== 'EACCES')) throw e
+      await new Promise((r) => setTimeout(r, attenteMs * essai))
+    }
   }
 }
 

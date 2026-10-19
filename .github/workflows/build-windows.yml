@@ -25,13 +25,13 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           # Tout l'historique et les tags : nécessaires au journal des modifications.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -48,6 +48,11 @@ jobs:
       - run: npm test
 
       # Tests de parcours dans Chromium (interface seule, sans Electron).
+      # Chromium (240 Mo) est gardé en cache tant que Playwright ne change pas.
+      - uses: actions/cache@v5
+        with:
+          path: ~/AppData/Local/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install chromium
       - run: npm run test:e2e
       - run: npm run dist:win
@@ -60,7 +65,7 @@ jobs:
         shell: bash
         run: node scripts/changelog.mjs dist
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: DefilOrdi-windows
           path: |
