@@ -5,11 +5,12 @@
 // Usage : node scripts/verifier-changements.mjs <référence de la branche cible>
 // (par exemple origin/main). Sort en erreur si package.json change de version
 // sans que la section « ## Prochaine version » (ou « ## <version> ») de
-// changements.md ait changé.
+// changements.md ait changé, ou si « ## Prochaine version » reprend des puces
+// de la version déjà publiée (section complétée au lieu d'être remplacée).
 
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { lireSections } from './sections.mjs'
+import { lireSections, pucesReprises } from './sections.mjs'
 
 const base = process.argv[2]
 if (!base) {
@@ -37,6 +38,17 @@ const avant = lireSections(fichierA(base, 'changements.md'))
 const apres = lireSections(readFileSync('changements.md', 'utf8'))
 const cles = ['prochaine version', version.toLowerCase()]
 const decrite = cles.some((cle) => (apres.get(cle) ?? '') !== '' && apres.get(cle) !== avant.get(cle))
+
+// La section « Prochaine version » doit être remplacée, pas complétée : sur la
+// branche cible, elle décrit la version déjà publiée.
+const reprises = (apres.get(version.toLowerCase()) ?? '') !== '' ? [] : pucesReprises(avant.get('prochaine version'), apres.get('prochaine version'))
+if (decrite && reprises.length > 0) {
+  console.log(
+    `::error file=changements.md::La section « ## Prochaine version » reprend ${reprises.length} puce(s) de la version déjà publiée : la remplacer entièrement par ce que cette livraison change.`
+  )
+  console.error(['Puces déjà publiées avec la version précédente :', ...reprises.map((p) => `- ${p}`)].join('\n'))
+  process.exit(1)
+}
 
 if (decrite) {
   console.log(`Version ${version} : description trouvée dans changements.md.`)

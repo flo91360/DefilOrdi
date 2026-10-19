@@ -292,6 +292,25 @@ interface PartieProps {
   onQuitter: (trouves: boolean[], erreurs: number, dureeMs: number) => void
 }
 
+// Fin de partie : immédiate, ou différée le temps de voir « Bravo ». Dès que
+// la fin est décidée, « Arrêter » est ignoré (la partie ne doit être
+// enregistrée qu'une fois) et le minuteur est annulé si l'écran disparaît.
+function useFin() {
+  const fini = useRef(false)
+  const minuteur = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(minuteur.current), [])
+  const finir = (action: () => void, delaiMs = 0) => {
+    if (fini.current) return
+    fini.current = true
+    if (delaiMs > 0) minuteur.current = setTimeout(action, delaiMs)
+    else action()
+  }
+  const arreter = (action: () => void) => {
+    if (!fini.current) action()
+  }
+  return { fini, finir, arreter }
+}
+
 // Mémorisation puis rappel : partie commune aux mots et à la phrase.
 function useMemorisation(nbMots: number) {
   const duree = dureeMemorisation(nbMots)
@@ -429,13 +448,10 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
   // Indice : un seul par partie, pour le dernier mot à retrouver (sans effet sur les mesures).
   const [indice, setIndice] = useState<number | null>(null)
   const sonErreur = useSonErreur(profile)
-  const fini = useRef(false)
+  const { fini, finir: terminer, arreter } = useFin()
 
-  const finir = (t: boolean[], e: number, d: number) => {
-    if (fini.current) return
-    fini.current = true
-    onFin(t, e, d, t.length > 0 && t.every(Boolean))
-  }
+  const finir = (t: boolean[], e: number, d: number, delaiMs = 0) =>
+    terminer(() => onFin(t, e, d, t.length > 0 && t.every(Boolean)), delaiMs)
 
   const trouver = (index: number) => {
     const t = trouves.map((x, i) => x || i === index)
@@ -446,7 +462,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
     playSound(profile.sonReussite)
     if (t.every(Boolean)) {
       const d = dureeRappel()
-      setTimeout(() => finir(t, erreurs, d), 900)
+      finir(t, erreurs, d, 900)
     }
   }
 
@@ -495,7 +511,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
         reste={reste}
         duree={duree}
         onPret={commencerRappel}
-        onArreter={() => onQuitter(trouves, 0, 0)}
+        onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
       />
     )
   }
@@ -507,7 +523,7 @@ function Partie({ profile, mots, palier, images, aideDys, onFin, onQuitter }: Pa
         titre="Quels étaient les mots ?"
         compteur={`${trouves.filter(Boolean).length} / ${mots.length}`}
         label="Trouvés"
-        onArreter={() => onQuitter(trouves, erreurs, dureeRappel())}
+        onArreter={() => arreter(() => onQuitter(trouves, erreurs, dureeRappel()))}
       />
       <main className="memoire-main">
         <div className="mots-grille">
@@ -595,13 +611,9 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
   const [message, setMessage] = useState<{ type: 'juste' | 'faux'; texte: string } | null>(null)
   const [indice, setIndice] = useState(false) // indice donné quand rien n'est trouvé
   const sonErreur = useSonErreur(profile)
-  const fini = useRef(false)
+  const { fini, finir: terminer, arreter } = useFin()
 
-  const finir = (t: boolean[], e: number, d: number, ok: boolean) => {
-    if (fini.current) return
-    fini.current = true
-    onFin(t, e, d, ok)
-  }
+  const finir = (t: boolean[], e: number, d: number, ok: boolean, delaiMs = 0) => terminer(() => onFin(t, e, d, ok), delaiMs)
 
   const valider = (saisie: string) => {
     if (fini.current) return
@@ -616,7 +628,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
       setMessage({ type: 'juste', texte: 'Bravo, c’est toute la phrase !' })
       playSound(profile.sonReussite)
       const d = dureeRappel()
-      setTimeout(() => finir(v.trouves, e, d, true), 900)
+      finir(v.trouves, e, d, true, 900)
     } else {
       setMessage({
         type: 'faux',
@@ -639,7 +651,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
         reste={reste}
         duree={duree}
         onPret={commencerRappel}
-        onArreter={() => onQuitter(trouves, 0, 0)}
+        onArreter={() => arreter(() => onQuitter(trouves, 0, 0))}
       />
     )
   }
@@ -651,7 +663,7 @@ function PartiePhrase({ profile, mots, phrase, onFin, onQuitter }: PartieProps) 
         titre="Quelle était la phrase ?"
         compteur={`${trouves.filter(Boolean).length} / ${mots.length}`}
         label="Mots"
-        onArreter={() => onQuitter(trouves, erreurs, dureeRappel())}
+        onArreter={() => arreter(() => onQuitter(trouves, erreurs, dureeRappel()))}
       />
       <main className="memoire-main">
         <div className="mots-grille">

@@ -298,6 +298,7 @@ function Partie({
   const scene = useRef(theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire, police: policeCss(profile.policeLettres) }))
   const pause = useRef(false)
   const fini = useRef(false)
+  const minuteurFin = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const enCompte = useRef(true)
   const dernierSon = useRef(0)
   const [decompte, setDecompte] = useState<number | null>(3)
@@ -374,7 +375,7 @@ function Partie({
           if (estTerminee(etat.current, reglages)) {
             fini.current = true
             playSound(profile.sonReussite)
-            setTimeout(() => callbacks.current.onFin(etat.current), 1100)
+            minuteurFin.current = setTimeout(() => callbacks.current.onFin(etat.current), 1100)
           }
         }
         scene.current.avancer(dt, etat.current.lettres)
@@ -443,6 +444,9 @@ function Partie({
     }
   }, [reglages, theme, profile.dactylo.sonErreur, profile.sonEchec, profile.sonReussite])
 
+  // L'écran disparaît avant la fin différée : la partie n'est pas enregistrée deux fois.
+  useEffect(() => () => clearTimeout(minuteurFin.current), [])
+
   // Le message de palier s'efface tout seul.
   useEffect(() => {
     if (!annonce) return
@@ -457,7 +461,7 @@ function Partie({
   return (
     <div className={`screen espace ${theme.classe}`}>
       <header className="topbar espace-topbar">
-        <button className="btn btn-ghost btn-dark" onClick={() => callbacks.current.onQuitter(etat.current)}>
+        <button className="btn btn-ghost btn-dark" onClick={() => !fini.current && callbacks.current.onQuitter(etat.current)}>
           <IconBack /> Arrêter
         </button>
         <button className="btn btn-ghost btn-dark" onClick={() => basculerPause()} disabled={decompte !== null}>

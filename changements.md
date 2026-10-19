@@ -14,20 +14,13 @@ des changements ».
 
 ## Prochaine version
 
-- Quiz, mises en situation : l'enfant peut maintenant valider sa réponse en appuyant sur le raccourci clavier de l'action demandée, en plus du clic sur l'écran, qui fonctionne comme avant. Cela concerne : mettre en gras (Ctrl+G), centrer le texte (Ctrl+E), annuler (Ctrl+Z), enregistrer (Ctrl+S) et ouvrir un nouveau document (Ctrl+N).
-- Quiz, mises en situation : une fois la réponse donnée, le message de correction précise « Ça peut aussi se faire avec Ctrl+S » (ou le raccourci concerné). Rien n'est indiqué avant la réponse, ni dans la question ni sur l'écran.
-- Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
-- Points reliés : la vérification se fait seulement une fois les 10 liaisons faites, avec la correction des erreurs. La partie n'est réussie qu'avec 10 liaisons justes sur 10.
-- Points reliés : les 10 actions sont tirées au hasard dans une liste de 26 actions, pour que les parties varient. La liste est fournie dans un document à relire (docs/points-relies-actions.md).
-- Quiz, « Tout mélanger » : le thème « Points reliés » peut apparaître, au plus une fois par partie.
-- Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
-- Couleurs piégées : les réponses possibles ne sont plus affichées sous la consigne. Les couleurs proposées n'apparaissent que si l'enfant clique sur le bouton « Indice ».
-- Couleurs piégées : nouveau 4e mode, « Couleurs piégées timer ». Il fonctionne comme « Les deux » (le mot ou la couleur de l'encre), mais contre la montre : l'enfant choisit 1, 2 ou 3 minutes et réussit un maximum de manches. Le temps restant s'affiche en haut de l'écran.
-- Couleurs piégées timer : à la fin du temps, le score est le nombre de bonnes réponses. Une erreur n'est pas comptée et n'entraîne aucune autre pénalité.
-- Couleurs piégées timer : le bouton « Indice » reste disponible, à raison d'un indice par minute (2 indices pour une partie de 2 minutes). Si le nombre d'indices est réglé à 0 dans l'espace ergo, le bouton reste retiré.
-- Couleurs piégées timer : l'écran de fin annonce un nouveau record quand l'enfant bat son meilleur score pour la même durée.
-- Statistiques de Couleurs piégées : les parties chronométrées s'affichent sous la forme « Couleurs piégées timer », durée en minutes et nombre de bonnes réponses. Un encadré « Records » donne le meilleur score pour chaque durée. L'export Excel contient les mêmes informations.
-- Couleurs piégées, modes « Les deux » et timer : la consigne (écrire le mot ou la couleur de l'encre) est tirée au hasard à chaque manche, pour que l'enfant ne puisse pas deviner la suite.
+- Mots à retenir et Chasse aux lettres (correction) : quand l'enfant cliquait sur « Arrêter » juste après la fin de la partie, la partie était enregistrée deux fois dans les statistiques (et, dans Mots à retenir, une fois comme ratée). Elle n'est plus enregistrée qu'une fois, et l'écran de fin s'affiche normalement.
+- Dactylo (correction) : un enfant qui clique sur « Arrêter » pendant le « Bravo » de la dernière phrase reçoit bien sa médaille.
+- Espace ergothérapeute : le code par défaut (0000) n'est plus affiché aux enfants sur le pavé de code, sauf avant la création du tout premier profil. Tant que le code est 0000, l'espace ergo demande d'en choisir un autre avant de s'ouvrir.
+- Sauvegarde : le logiciel garde tout seul des copies datées des données sur le PC (une par jour d'utilisation, et avant chaque restauration ou mise à jour). Les 30 plus récentes sont conservées, dans le dossier des données, sous-dossier « sauvegardes » ; chacune peut être rechargée avec « Restaurer une sauvegarde ».
+- Sauvegarde : restaurer une sauvegarde faite avec une version plus récente de DefilOrdi affiche un avertissement. Les parties des jeux que cette version ne connaît pas sont ignorées au lieu d'apparaître comme de fausses parties de Dactylo.
+- Couleurs de l'enfant : le texte des boutons est plus lisible sur les couleurs claires (orange, vert, turquoise, bleu clair, rose), où il passe en foncé.
+- Notes de version : elles ne parlent plus d'une version portable qui n'est pas proposée, et chaque version ne décrit plus que ses propres changements.
 
 ## 0.8.16
 

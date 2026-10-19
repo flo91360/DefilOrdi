@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
 import {
   type AppData,
+  CODE_DEFAUT,
+  COPIES_MAX,
   INDICES_PAR_PARTIE,
   isValidCode,
   NIVEAUX,
@@ -55,6 +57,15 @@ export function ErgoSpace({ data, onChange, onEditProfile, onExit }: Props) {
   // Recliquer sur une section la remet à zéro (ex. retour à la liste des patients).
   const [visite, setVisite] = useState(0)
   const aVerifier = data.phrasesEnfants.filter((p) => p.statut === 'a_verifier').length
+
+  // Rien n'est affiché (ni profils ni statistiques) tant que le code par défaut n'est pas changé.
+  if (data.settings.codeErgo === CODE_DEFAUT) {
+    return (
+      <div className="screen ergo">
+        <ChoixCodeObligatoire data={data} onChange={onChange} onExit={onExit} />
+      </div>
+    )
+  }
 
   return (
     <div className="screen ergo">
@@ -286,7 +297,8 @@ function Patients({ data, onChange, onEditProfile }: Omit<Props, 'onExit'>) {
   )
 }
 
-function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
+// Saisie d'un nouveau code à 4 chiffres (Réglages, et premier accès avec le code par défaut).
+function FormulaireCode({ onCode }: { onCode: (code: string) => void }) {
   const [code1, setCode1] = useState('')
   const [code2, setCode2] = useState('')
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null)
@@ -294,7 +306,8 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
   const changeCode = () => {
     if (!isValidCode(code1)) return setMessage({ ok: false, text: 'Le code doit faire exactement 4 chiffres.' })
     if (code1 !== code2) return setMessage({ ok: false, text: 'Les deux codes ne sont pas identiques.' })
-    onChange({ ...data, settings: { ...data.settings, codeErgo: code1 } })
+    if (code1 === CODE_DEFAUT) return setMessage({ ok: false, text: 'Choisissez un autre code que 0000.' })
+    onCode(code1)
     setCode1('')
     setCode2('')
     setMessage({ ok: true, text: 'Nouveau code enregistré.' })
@@ -302,6 +315,53 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
 
   const digitsOnly = (v: string) => v.replace(/\D/g, '').slice(0, 4)
 
+  return (
+    <>
+      <div className="code-row">
+        <label>
+          Nouveau code
+          <input className="input code-input" inputMode="numeric" type="password" value={code1} onChange={(e) => setCode1(digitsOnly(e.target.value))} autoFocus />
+        </label>
+        <label>
+          Confirmer
+          <input
+            className="input code-input"
+            inputMode="numeric"
+            type="password"
+            value={code2}
+            onChange={(e) => setCode2(digitsOnly(e.target.value))}
+            onKeyDown={(e) => e.key === 'Enter' && changeCode()}
+          />
+        </label>
+        <button className="btn btn-primary" onClick={changeCode}>
+          Changer le code
+        </button>
+      </div>
+      {message && <p className={message.ok ? 'success' : 'error'}>{message.text}</p>}
+    </>
+  )
+}
+
+// Code encore à 0000 : l'ergothérapeute en choisit un avant d'entrer, pour
+// qu'un enfant ne puisse pas ouvrir son espace.
+function ChoixCodeObligatoire({ data, onChange, onExit }: Pick<Props, 'data' | 'onChange' | 'onExit'>) {
+  return (
+    <Modal title="Choisissez votre code" onClose={onExit} width={560}>
+      <p className="modal-body">
+        Le code de l’espace ergothérapeute est encore celui par défaut (0000), que les enfants peuvent deviner. Choisissez
+        un code à 4 chiffres que les enfants ne connaissent pas : il sera demandé à chaque ouverture de cet espace.
+      </p>
+      <FormulaireCode onCode={(codeErgo) => onChange({ ...data, settings: { ...data.settings, codeErgo } })} />
+      <div className="modal-actions">
+        <button className="btn btn-ghost" onClick={onExit}>
+          Retour aux joueurs
+        </button>
+      </div>
+    </Modal>
+  )
+}
+
+function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
   return (
     <section>
       <h1 className="ergo-title">Réglages</h1>
@@ -329,30 +389,7 @@ function Reglages({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
 
       <div className="card">
         <h2 className="card-title">Code de l’espace ergothérapeute</h2>
-        {data.settings.codeErgo === '0000' && (
-          <p className="warning">Le code est encore celui par défaut (0000). Pensez à le changer.</p>
-        )}
-        <div className="code-row">
-          <label>
-            Nouveau code
-            <input className="input code-input" inputMode="numeric" type="password" value={code1} onChange={(e) => setCode1(digitsOnly(e.target.value))} />
-          </label>
-          <label>
-            Confirmer
-            <input
-              className="input code-input"
-              inputMode="numeric"
-              type="password"
-              value={code2}
-              onChange={(e) => setCode2(digitsOnly(e.target.value))}
-              onKeyDown={(e) => e.key === 'Enter' && changeCode()}
-            />
-          </label>
-          <button className="btn btn-primary" onClick={changeCode}>
-            Changer le code
-          </button>
-        </div>
-        {message && <p className={message.ok ? 'success' : 'error'}>{message.text}</p>}
+        <FormulaireCode onCode={(codeErgo) => onChange({ ...data, settings: { ...data.settings, codeErgo } })} />
       </div>
     </section>
   )
@@ -414,7 +451,7 @@ function ReglagesIndice({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
 }
 
 function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
-  const [pending, setPending] = useState<AppData | null>(null)
+  const [pending, setPending] = useState<{ data: AppData; plusRecente: boolean } | null>(null)
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null)
 
   const exporter = async () => {
@@ -426,7 +463,7 @@ function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
   const importer = async () => {
     const res = await api.importBackup().catch(() => null)
     if (!res || res.status === 'invalide') setMessage({ ok: false, text: 'Ce fichier n’est pas une sauvegarde DefilOrdi valide.' })
-    else if (res.status === 'ok') setPending(res.data)
+    else if (res.status === 'ok') setPending({ data: res.data, plusRecente: res.plusRecente })
   }
 
   return (
@@ -436,6 +473,13 @@ function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
         Toutes les données restent sur ce PC, rien n’est envoyé sur Internet. Faites régulièrement une sauvegarde sur une
         clé USB pour ne rien perdre si le PC tombe en panne, ou pour transférer les profils sur un autre PC.
       </p>
+      {isDesktop && (
+        <p className="ergo-help">
+          Le logiciel garde aussi tout seul des copies datées sur ce PC (une par jour d’utilisation, et avant chaque
+          restauration ou mise à jour), dans le dossier des données, sous-dossier « sauvegardes ». Les {COPIES_MAX} plus
+          récentes sont conservées ; chacune peut être rechargée avec « Restaurer une sauvegarde ».
+        </p>
+      )}
       <div className="card backup-actions">
         <button className="btn btn-primary" onClick={exporter}>
           <IconDownload /> Enregistrer une sauvegarde
@@ -456,8 +500,15 @@ function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
           title="Restaurer cette sauvegarde ?"
           message={
             <>
-              La sauvegarde contient <strong>{pending.profiles.length}</strong> profil(s). Elle remplacera toutes les données
+              La sauvegarde contient <strong>{pending.data.profiles.length}</strong> profil(s). Elle remplacera toutes les données
               actuelles de ce PC ({data.profiles.length} profil(s)).
+              {isDesktop && ' Une copie des données actuelles est gardée dans le dossier des données, sous-dossier « sauvegardes ».'}
+              {pending.plusRecente && (
+                <p className="warning">
+                  Cette sauvegarde a été faite avec une version plus récente de DefilOrdi : les jeux et réglages que cette
+                  version ne connaît pas ne seront pas repris. Installez plutôt la dernière version sur ce PC.
+                </p>
+              )}
             </>
           }
           confirmLabel="Restaurer"
@@ -465,7 +516,7 @@ function Sauvegarde({ data, onChange }: Pick<Props, 'data' | 'onChange'>) {
           onCancel={() => setPending(null)}
           onConfirm={() => {
             // Le code de l'espace ergothérapeute reste celui de ce PC.
-            onChange({ ...pending, settings: { ...pending.settings, codeErgo: data.settings.codeErgo } })
+            onChange({ ...pending.data, settings: { ...pending.data.settings, codeErgo: data.settings.codeErgo } })
             setPending(null)
             setMessage({ ok: true, text: 'Sauvegarde restaurée.' })
           }}

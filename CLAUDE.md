@@ -7,7 +7,9 @@ le code et les commentaires aussi.
 ## Structure
 
 - `src/main/` : processus principal Electron (fenêtre, IPC, `storage.ts` qui
-  écrit `%APPDATA%\DefilOrdi\donnees.json` de façon atomique).
+  écrit `%APPDATA%\DefilOrdi\donnees.json` de façon atomique et garde des
+  copies datées dans `sauvegardes/` : premier démarrage du jour, données d'une
+  autre version, avant restauration ; `COPIES_MAX` gardées).
 - `src/preload/` : expose `window.defilordi` (interface `DefilOrdiApi` dans
   `src/shared/api.ts`).
 - `src/shared/data.ts` : modèle des données et `normalizeAppData`, par lequel
@@ -96,6 +98,11 @@ wine 32 bits sous Linux, il est fabriqué par la CI Windows
 - Données d'enfants : rien ne doit quitter le PC (pas de réseau, pas de télémétrie).
 - Les sons d'erreur restent doux, jamais punitifs.
 - Les jeux sont déclarés dans `GAMES` (`src/renderer/src/screens/Hub.tsx`).
+- Fin de partie : une partie n'est enregistrée qu'une fois. Une fin différée
+  (le temps d'un « Bravo ») annule son minuteur au démontage et rend
+  « Arrêter » sans effet.
+- Code de l'espace ergo : tant qu'il vaut `CODE_DEFAUT` (0000), l'espace ergo
+  impose d'en choisir un autre avant de s'afficher.
 - Chaque livraison : augmenter `version` dans `package.json` ; la CI publie la
   Release `v<version>` quand une nouvelle version arrive sur main (une version
   déjà publiée n'est pas remplacée). Elle crée d'abord le tag annoté
@@ -132,6 +139,7 @@ dans `CHANGELOG.md` et dans les notes de la Release.
   `## 0.8.2`), prioritaire sur le reste ; ne jamais modifier les tags.
 - Sur une PR, la CI échoue si `version` change dans `package.json` sans que
   la section `## Prochaine version` (ou `## <version>`) de `changements.md`
-  change (`scripts/verifier-changements.mjs`). `AGENTS.md` renvoie à ce
+  change, ou si elle reprend des puces de la version déjà publiée
+  (`scripts/verifier-changements.mjs`). `AGENTS.md` renvoie à ce
   fichier pour les agents qui ne lisent pas `CLAUDE.md` (Codex, utilisé par
   PlaniFiKateur).

@@ -58,7 +58,6 @@ jobs:
           name: DefilOrdi-windows
           path: |
             dist/DefilOrdi-Installation-*.exe
-            dist/DefilOrdi-Portable-*.exe
             dist/NOTES.md
             dist/CHANGELOG.md
           if-no-files-found: error
@@ -98,7 +97,7 @@ jobs:
         shell: bash
         run: |
           {
-            echo "Télécharger **DefilOrdi-Installation-${{ steps.version.outputs.version }}.exe** (recommandé) ou la version portable."
+            echo "Télécharger **DefilOrdi-Installation-${{ steps.version.outputs.version }}.exe** et l'ouvrir pour installer ou mettre à jour DefilOrdi."
             echo "Au premier lancement, si Windows affiche « Windows a protégé votre ordinateur » : *Informations complémentaires* puis *Exécuter quand même*."
             echo
             echo "# Modifications"
@@ -115,7 +114,6 @@ jobs:
           body_path: dist/release-body.md
           files: |
             dist/DefilOrdi-Installation-*.exe
-            dist/DefilOrdi-Portable-*.exe
             dist/CHANGELOG.md
 
       # CHANGELOG.md à la racine du dépôt : recopié sur main après chaque
