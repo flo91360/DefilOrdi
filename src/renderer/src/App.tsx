@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type AppData, type JeuId, type PhraseEnfant, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
+import { type AppData, CODE_DEFAUT, type JeuId, type PhraseEnfant, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
 import { listesAvecPhrasesEnfants } from '../../shared/phrases'
 import { api } from './api'
 import { themeStyle } from './theme'
@@ -184,7 +184,9 @@ export function App() {
       {askCode && (
         <PinPad
           expected={data.settings.codeErgo}
-          showDefaultHint={data.settings.codeErgo === '0000'}
+          // Le code par défaut n'est rappelé qu'avant la création du premier profil
+          // (installation) : ensuite, un enfant pourrait le lire.
+          showDefaultHint={data.settings.codeErgo === CODE_DEFAUT && data.profiles.length === 0}
           onSuccess={() => {
             setAskCode(false)
             setScreen({ name: 'ergo' })

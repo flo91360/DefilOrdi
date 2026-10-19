@@ -260,3 +260,27 @@ describe('médailles du profil', () => {
     expect(normalizeMedailles([{ niveau: 2, date: d }, { niveau: 2, date: d }, { niveau: 9, date: d }, { niveau: 1 }])).toHaveLength(2)
   })
 })
+
+describe('sauvegarde d’une autre version du logiciel', () => {
+  it('ignore les parties d’un jeu inconnu au lieu d’en faire des parties Dactylo', async () => {
+    const { DATA_VERSION } = await import('../src/shared/data')
+    const d = normalizeAppData({
+      version: DATA_VERSION + 1,
+      profiles: [profil('p', 'Léo')],
+      resultats: [
+        { id: 'r1', profileId: 'p', jeu: 'nouveaujeu', date: '2026-10-01T10:00:00Z', dureeMs: 5000 },
+        { id: 'r2', profileId: 'p', date: '2026-10-01T10:00:00Z', dureeMs: 5000, frappes: 10 }
+      ]
+    })
+    expect(d.resultats.map((r) => [r.id, r.jeu])).toEqual([['r2', 'dactylo']])
+  })
+
+  it('reconnaît des données plus récentes ou plus anciennes que ce logiciel', async () => {
+    const { DATA_VERSION, estPlusAncienne, estPlusRecente } = await import('../src/shared/data')
+    expect(estPlusRecente({ version: DATA_VERSION + 1, profiles: [] })).toBe(true)
+    expect(estPlusRecente({ version: DATA_VERSION, profiles: [] })).toBe(false)
+    expect(estPlusAncienne({ version: DATA_VERSION - 1, profiles: [] })).toBe(true)
+    expect(estPlusAncienne({ profiles: [] })).toBe(true)
+    expect(estPlusAncienne({ version: DATA_VERSION, profiles: [] })).toBe(false)
+  })
+})

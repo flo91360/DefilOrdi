@@ -306,6 +306,9 @@ export interface ResultatPetitBac {
 export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz | ResultatPetitBac
 export type JeuId = Resultat['jeu']
 
+// Code de l'espace ergothérapeute à l'installation : à changer au premier accès.
+export const CODE_DEFAUT = '0000'
+
 export interface Settings {
   codeErgo: string
   volume: number
@@ -442,7 +445,7 @@ export function defaultAppData(): AppData {
     petitBac: defaultPetitBac(),
     couleurs: defaultCouleurs(),
     resultats: [],
-    settings: { codeErgo: '0000', volume: 0.7 }
+    settings: { codeErgo: CODE_DEFAUT, volume: 0.7 }
   }
 }
 
@@ -710,7 +713,9 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
         .slice(0, CATEGORIES_MAX)
     }
   }
-  // Sans « jeu » : résultat de l'étape 2, forcément Dactylo.
+  // Sans « jeu » : résultat de l'étape 2, forcément Dactylo. Un jeu inconnu
+  // (sauvegarde d'une version plus récente) est ignoré, pas pris pour Dactylo.
+  if (v.jeu !== undefined && v.jeu !== 'dactylo') return null
   const erreursParTouche = compteurs(v.erreursParTouche)
   return {
     ...base,
@@ -783,6 +788,20 @@ export function normalizeAppData(v: unknown): AppData {
       volume
     }
   }
+}
+
+// Copies de sécurité automatiques gardées sur le PC (sous-dossier « sauvegardes »).
+export const COPIES_MAX = 30
+
+// Données écrites par une version plus récente du logiciel : certaines
+// informations (nouveaux jeux, nouveaux réglages) ne seront pas conservées.
+export function estPlusRecente(v: unknown): boolean {
+  return isObj(v) && typeof v.version === 'number' && v.version > DATA_VERSION
+}
+
+// Données d'une version plus ancienne, migrées à la lecture.
+export function estPlusAncienne(v: unknown): boolean {
+  return isObj(v) && (typeof v.version !== 'number' || v.version < DATA_VERSION)
 }
 
 // Une sauvegarde importée doit au minimum ressembler à un fichier DefilOrdi.

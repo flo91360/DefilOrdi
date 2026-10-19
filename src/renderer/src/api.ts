@@ -1,5 +1,5 @@
 import type { DefilOrdiApi } from '../../shared/api'
-import { type AppData, defaultAppData, looksLikeAppData, normalizeAppData } from '../../shared/data'
+import { type AppData, defaultAppData, estPlusRecente, looksLikeAppData, normalizeAppData } from '../../shared/data'
 
 declare global {
   interface Window {
@@ -42,7 +42,7 @@ const browserApi: DefilOrdiApi = {
         if (!file) return resolve({ status: 'annule' })
         try {
           const raw: unknown = JSON.parse(await file.text())
-          resolve(looksLikeAppData(raw) ? { status: 'ok', data: normalizeAppData(raw) } : { status: 'invalide' })
+          resolve(looksLikeAppData(raw) ? { status: 'ok', data: normalizeAppData(raw), plusRecente: estPlusRecente(raw) } : { status: 'invalide' })
         } catch {
           resolve({ status: 'invalide' })
         }

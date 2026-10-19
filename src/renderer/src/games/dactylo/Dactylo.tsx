@@ -289,6 +289,14 @@ function Partie({
     return () => clearTimeout(t)
   }, [reussie, index, phrases, profile.sonReussite])
 
+  // « Arrêter » pendant la pause qui suit la dernière phrase réussie : la
+  // partie est complète, elle compte comme terminée (médaille comprise).
+  const arreter = () => {
+    const e = etatsRef.current
+    if (e.length === phrases.length && e.every((x) => x.fin !== null)) onFinRef.current(e)
+    else onQuitter(e)
+  }
+
   const garderFocus = useCallback(() => {
     requestAnimationFrame(() => inputRef.current?.focus())
   }, [])
@@ -356,7 +364,7 @@ function Partie({
   return (
     <div className="screen dactylo" onMouseDown={garderFocus}>
       <header className="topbar">
-        <button className="btn btn-ghost" onMouseDown={(e) => e.stopPropagation()} onClick={() => onQuitter(etatsRef.current)}>
+        <button className="btn btn-ghost" onMouseDown={(e) => e.stopPropagation()} onClick={arreter}>
           <IconBack /> Arrêter
         </button>
         <div className="progress" aria-label={`Phrase ${index + 1} sur ${phrases.length}`}>

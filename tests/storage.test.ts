@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { defaultAppData, newProfile } from '../src/shared/data'
+import { COPIES_MAX, DATA_VERSION, defaultAppData, newProfile } from '../src/shared/data'
 import { Storage } from '../src/main/storage'
 
 let dir: string
@@ -44,5 +44,57 @@ describe('Storage', () => {
     const s = new Storage(dir)
     await Promise.all(['A', 'B', 'C'].map((p) => s.save(withProfile(p))))
     expect((await s.load()).profiles[0].prenom).toBe('C')
+  })
+
+  it('fait une copie datée au premier démarrage de la journée seulement', async () => {
+    await new Storage(dir).save(withProfile('Léa'))
+    const jour = (h: number) => () => new Date(Date.UTC(2026, 9, 19, h))
+    await new Storage(dir, jour(8)).load()
+    await new Storage(dir, jour(9)).load()
+    const s = new Storage(dir, () => new Date(Date.UTC(2026, 9, 20, 8)))
+    await s.load()
+    const copies = await s.listeCopies()
+    expect(copies).toHaveLength(2)
+    expect(copies.every((f) => f.endsWith('-demarrage.json'))).toBe(true)
+    const copie = JSON.parse(await fs.readFile(join(s.copies, copies[0]), 'utf8'))
+    expect(copie.profiles[0].prenom).toBe('Léa')
+  })
+
+  it('garde le fichier d’origine avant une mise à jour ou s’il vient d’une version plus récente', async () => {
+    const ancien = { ...withProfile('Léa'), version: DATA_VERSION - 1 }
+    await fs.writeFile(join(dir, 'donnees.json'), JSON.stringify(ancien), 'utf8')
+    const s = new Storage(dir)
+    await s.load()
+    await fs.writeFile(join(dir, 'donnees.json'), JSON.stringify({ ...ancien, version: DATA_VERSION + 1, nouveauJeu: { a: 1 } }), 'utf8')
+    await s.load()
+    const copies = await s.listeCopies()
+    expect(copies.some((f) => f.endsWith('-avant-mise-a-jour.json'))).toBe(true)
+    const recente = copies.find((f) => f.endsWith('-version-plus-recente.json'))!
+    expect(JSON.parse(await fs.readFile(join(s.copies, recente), 'utf8')).nouveauJeu).toEqual({ a: 1 })
+  })
+
+  it('copie les données actuelles avant une restauration, après les écritures en attente', async () => {
+    const s = new Storage(dir)
+    void s.save(withProfile('Tom'))
+    await s.copier('avant-restauration')
+    const [copie] = await s.listeCopies()
+    expect(copie).toMatch(/-avant-restauration\.json$/)
+    expect(JSON.parse(await fs.readFile(join(s.copies, copie), 'utf8')).profiles[0].prenom).toBe('Tom')
+  })
+
+  it(`ne garde que les ${COPIES_MAX} copies les plus récentes`, async () => {
+    let t = Date.UTC(2026, 0, 1)
+    const s = new Storage(dir, () => new Date((t += 60_000)))
+    await s.save(withProfile('Léa'))
+    for (let i = 0; i < COPIES_MAX + 5; i++) await s.copier('avant-restauration')
+    const copies = await s.listeCopies()
+    expect(copies).toHaveLength(COPIES_MAX)
+    expect(copies[0]).toContain('T00-06-00')
+  })
+
+  it('ne fait rien sans fichier de données', async () => {
+    const s = new Storage(dir)
+    await s.copier('avant-restauration')
+    expect(await s.listeCopies()).toEqual([])
   })
 })

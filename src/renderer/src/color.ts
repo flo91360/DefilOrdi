@@ -25,9 +25,20 @@ function luminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
-// Couleur de texte lisible (noir ou blanc) sur un fond donné.
+const TEXTE_FONCE = '#1f2330'
+const TEXTE_CLAIR = '#ffffff'
+
+// Rapport de contraste entre deux couleurs (de 1 à 21).
+export function contraste(a: string, b: string): number {
+  const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m)
+  return (x + 0.05) / (y + 0.05)
+}
+
+// Couleur de texte lisible (foncé ou blanc) sur un fond donné : celle qui
+// contraste le plus (un seuil fixe laissait du blanc sur l'orange ou le
+// turquoise, à moins de 3:1).
 export function textOn(bg: string): string {
-  return luminance(bg) > 0.4 ? '#1f2330' : '#ffffff'
+  return contraste(bg, TEXTE_FONCE) >= contraste(bg, TEXTE_CLAIR) ? TEXTE_FONCE : TEXTE_CLAIR
 }
 
 // Version de la couleur assez foncée pour du texte sur fond clair.

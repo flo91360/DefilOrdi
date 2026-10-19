@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron'
 import type { ImportResult } from '../shared/api'
-import { type AppData, looksLikeAppData, normalizeAppData } from '../shared/data'
+import { type AppData, estPlusRecente, looksLikeAppData, normalizeAppData } from '../shared/data'
 import { Storage } from './storage'
 
 const storage = new Storage(app.getPath('userData'))
@@ -74,7 +74,9 @@ function registerIpc(): void {
     try {
       const raw: unknown = JSON.parse(await fs.readFile(res.filePaths[0], 'utf8'))
       if (!looksLikeAppData(raw)) return { status: 'invalide' }
-      return { status: 'ok', data: normalizeAppData(raw) }
+      // Copie des données actuelles avant qu'elles soient remplacées.
+      await storage.copier('avant-restauration')
+      return { status: 'ok', data: normalizeAppData(raw), plusRecente: estPlusRecente(raw) }
     } catch {
       return { status: 'invalide' }
     }
