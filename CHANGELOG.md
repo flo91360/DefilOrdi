@@ -1,5 +1,12 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.26 (2026-10-19)
+
+- Démarrage : si les données du PC ne peuvent pas être lues, un message l'explique et propose de réessayer, au lieu de rester bloqué sur « Chargement… ».
+- Enregistrement : quand Windows bloque le fichier des données un court instant (antivirus par exemple), le logiciel réessaie au lieu d'afficher tout de suite une erreur.
+- Statistiques, export Excel : un nom de liste ou une réponse qui commence par « - », « + » ou « = » s'affiche tel quel dans Excel, au lieu de « #NOM? ».
+- Améliorations internes, sans changement visible.
+
 ## 0.8.25 (2026-10-19)
 
 - Phrases des enfants : chaque phrase écrite par un enfant attend maintenant votre accord avant d'être proposée aux autres enfants, même si le correcteur l'a acceptée. Le correcteur vérifie l'orthographe et les règles du niveau, mais pas le sens : une phrase blessante pour un autre enfant pouvait être partagée. La relecture peut être désactivée dans la section « Phrases des enfants ».
