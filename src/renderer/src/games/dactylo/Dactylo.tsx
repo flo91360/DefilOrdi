@@ -7,7 +7,7 @@ import { geste } from '../../keyboard/azerty'
 import { Keyboard } from '../../keyboard/Keyboard'
 import { playSound } from '../../sounds'
 import { uid } from '../../uid'
-import { EcranPause, usePauseAuto } from '../pause'
+import { BoutonPause, EcranPause, usePauseAuto } from '../pause'
 import { StatTile } from '../ui'
 import {
   choisirPhrases,
@@ -50,6 +50,7 @@ interface Props {
   onResult: (r: ResultatDactylo) => void
   onMedaille: (niveau: number) => void
   onPhrase: (p: PhraseEnfant) => void
+  relecture: boolean // phrases des enfants relues par l'ergothérapeute avant d'être partagées
   onQuit: () => void
 }
 
@@ -58,7 +59,7 @@ type Phase =
   | { nom: 'jeu'; liste: ListePhrases; phrases: string[] }
   | { nom: 'fin'; liste: ListePhrases; resultat: ResultatDactylo; record: boolean; scores: ScorePhrase[]; medaille: number | null }
 
-export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onPhrase, onQuit }: Props) {
+export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onPhrase, relecture, onQuit }: Props) {
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState(5)
 
@@ -83,6 +84,7 @@ export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onPh
       profileId: profile.id,
       jeu: 'dactylo',
       date: new Date().toISOString(),
+      complete,
       listeNom: liste.nom,
       phrases: faites.length,
       ...s
@@ -124,6 +126,7 @@ export function Dactylo({ profile, listes, resultats, onResult, onMedaille, onPh
         medaille={phase.medaille}
         motsConnus={listes.flatMap((l) => l.phrases)}
         onPhrase={onPhrase}
+        relecture={relecture}
         onRejouer={() => lancer(phase.liste)}
         onAutre={() => setPhase({ nom: 'choix' })}
         onQuit={onQuit}
@@ -269,7 +272,7 @@ function Partie({
   onFinRef.current = onFin
   // Pause automatique : la frappe est ignorée et le temps de la pause ne
   // compte pas dans la phrase en cours.
-  const { enPause, reprendre } = usePauseAuto(true, (d) => setEtats((all) => all.map((e) => decalerDebut(e, d))))
+  const { enPause, reprendre, mettreEnPause } = usePauseAuto(true, (d) => setEtats((all) => all.map((e) => decalerDebut(e, d))))
   const pauseRef = useRef(enPause)
   pauseRef.current = enPause
 
@@ -376,6 +379,7 @@ function Partie({
         <button className="btn btn-ghost" onMouseDown={(e) => e.stopPropagation()} onClick={arreter}>
           <IconBack /> Arrêter
         </button>
+        <BoutonPause onClick={mettreEnPause} />
         <div className="progress" aria-label={`Phrase ${index + 1} sur ${phrases.length}`}>
           {phrases.map((_, i) => (
             <span
@@ -498,6 +502,7 @@ function Fin({
   medaille,
   motsConnus,
   onPhrase,
+  relecture,
   onRejouer,
   onAutre,
   onQuit
@@ -509,6 +514,7 @@ function Fin({
   medaille: number | null
   motsConnus: string[]
   onPhrase: (p: PhraseEnfant) => void
+  relecture: boolean // phrases des enfants relues par l'ergothérapeute avant d'être partagées
   onRejouer: () => void
   onAutre: () => void
   onQuit: () => void
@@ -553,7 +559,7 @@ function Fin({
             </div>
           </div>
         )}
-        {medaille !== null && <PhrasePerso profile={profile} niveau={medaille} motsConnus={motsConnus} onPhrase={onPhrase} />}
+        {medaille !== null && <PhrasePerso profile={profile} niveau={medaille} motsConnus={motsConnus} relecture={relecture} onPhrase={onPhrase} />}
         <div className="fin-stats">
           <StatTile value={String(vitesse(resultat))} label="frappes par minute" detail={`${motsParMinute(resultat)} mots/min`}
             smiley={<SmileyIcone smiley={smileyVitesse(vitesse(resultat), profile.classe)} quoi="Vitesse moyenne" size={40} />}

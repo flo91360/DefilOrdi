@@ -99,6 +99,7 @@ describe('Petit bac : données', () => {
       id: 'pb',
       profileId: 'a1',
       date: '2026-10-13T10:00:00.000Z',
+      complete: true,
       jeu: 'petitbac',
       lettre: 'A',
       tempsLimite: 120,

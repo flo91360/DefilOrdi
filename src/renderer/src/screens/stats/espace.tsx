@@ -68,3 +68,6 @@ export const INDICATEURS_ESPACE: Indicateur<ResultatEspace>[] = [
   { nom: 'Lettres attrapées par minute', unite: '/min', valeur: (r) => cadence(r.detruites, r.dureeMs) },
   { nom: 'Lettres justes', unite: '%', valeur: tirsReussis }
 ]
+
+// Bilan : mode de jeu et série de lettres changent la difficulté.
+export const GROUPE_ESPACE = (r: ResultatEspace) => `${NOMS_MODES[r.mode]} · ${r.serieNom}`

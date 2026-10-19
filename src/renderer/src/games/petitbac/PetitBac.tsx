@@ -13,7 +13,7 @@ import { playSound } from '../../sounds'
 import { uid } from '../../uid'
 import { formatDuree } from '../dactylo/engine'
 import { pourcentage } from '../commun'
-import { EcranPause, useChrono, usePauseAuto } from '../pause'
+import { BoutonPause, EcranPause, useChrono, usePauseAuto } from '../pause'
 import { Chips, FinHero, GameTopbar, StatTile } from '../ui'
 import {
   choisirCategories,
@@ -63,11 +63,12 @@ export function PetitBac({ profile, reglages, resultats, onResult, onQuit }: Pro
     setPhase({ nom: 'jeu', grille: { lettre, categories: choisirCategories(reglages.categories, nb), tempsLimite: temps } })
   }
 
-  const resultatDe = (grille: Grille, reponses: ReponseBac[], dureeMs: number): ResultatPetitBac => ({
+  const resultatDe = (grille: Grille, reponses: ReponseBac[], dureeMs: number, complete: boolean): ResultatPetitBac => ({
     id: uid(),
     profileId: profile.id,
     jeu: 'petitbac',
     date: new Date().toISOString(),
+    complete,
     lettre: grille.lettre,
     tempsLimite: grille.tempsLimite,
     dureeMs,
@@ -84,7 +85,8 @@ export function PetitBac({ profile, reglages, resultats, onResult, onQuit }: Pro
         resultatDe(
           grille,
           grille.categories.map((categorie, i) => ({ categorie, mot: mots[i], valide: etatReponse(mots[i], grille.lettre) === 'ok' })),
-          dureeMs
+          dureeMs,
+          false
         )
       )
     }
@@ -95,7 +97,7 @@ export function PetitBac({ profile, reglages, resultats, onResult, onQuit }: Pro
     const anciens = resultats.filter(
       (r): r is ResultatPetitBac => r.jeu === 'petitbac' && r.profileId === profile.id && r.categories === grille.categories.length
     )
-    const r = resultatDe(grille, reponses, dureeMs)
+    const r = resultatDe(grille, reponses, dureeMs, true)
     onResult(r)
     if (r.justes > 0) playSound(profile.sonReussite)
     const meilleur = Math.max(0, ...anciens.map((a) => a.justes))
@@ -229,7 +231,7 @@ function Partie({
   const [focus, setFocus] = useState<number | null>(null)
   const fini = useRef(false)
   // Pause automatique (fenêtre quittée) : le chronomètre s'arrête.
-  const { enPause, reprendre } = usePauseAuto(!tirage)
+  const { enPause, reprendre, mettreEnPause } = usePauseAuto(!tirage)
   const { ecoule: ecouleChrono, lire } = useChrono(!tirage && !enPause)
   const inputs = useRef<(HTMLInputElement | null)[]>([])
   const boutonFini = useRef<HTMLButtonElement>(null)
@@ -325,6 +327,7 @@ function Partie({
         <button className="btn btn-ghost" onClick={arreter}>
           <IconBack /> Arrêter
         </button>
+        {!tirage && <BoutonPause onClick={mettreEnPause} />}
         <div className="live-stats">
           <div className="live-stat">
             <span className="live-stat-value">

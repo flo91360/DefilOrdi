@@ -15,9 +15,10 @@ const browserApi: DefilOrdiApi = {
   async load() {
     try {
       const text = localStorage.getItem(KEY)
-      return text ? normalizeAppData(JSON.parse(text)) : defaultAppData()
+      const raw: unknown = text ? JSON.parse(text) : null
+      return { data: raw ? normalizeAppData(raw) : defaultAppData(), plusRecente: estPlusRecente(raw) }
     } catch {
-      return defaultAppData()
+      return { data: defaultAppData(), plusRecente: false }
     }
   },
   async save(data: AppData) {

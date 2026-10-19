@@ -9,7 +9,9 @@ le code et les commentaires aussi.
 - `src/main/` : processus principal Electron (fenêtre, IPC, `storage.ts` qui
   écrit `%APPDATA%\DefilOrdi\donnees.json` de façon atomique et garde des
   copies datées dans `sauvegardes/` : premier démarrage du jour, données d'une
-  autre version, avant restauration ; `COPIES_MAX` gardées).
+  autre version, avant restauration ; `COPIES_MAX` gardées). Données d'une
+  version plus récente : `load` le signale (`plusRecente`) et l'interface
+  prévient au démarrage.
 - `src/preload/` : expose `window.defilordi` (interface `DefilOrdiApi` dans
   `src/shared/api.ts`).
 - `src/shared/data.ts` : modèle des données et `normalizeAppData`, par lequel
@@ -33,14 +35,19 @@ le code et les commentaires aussi.
   mots des listes) dans `src/shared/orthographe.ts`, tests dans
   `tests/regles.test.ts`. Stockées dans `phrasesEnfants` (statut `a_verifier` =
   notification pour l'ergo, section « Phrases des enfants »), fusionnées aux
-  listes du même niveau par `listesAvecPhrasesEnfants`. Option
+  listes du même niveau par `listesAvecPhrasesEnfants`. Réglage
+  `settings.relirePhrasesEnfants` (activé par défaut) : même acceptée par le
+  correcteur, une phrase reste à vérifier (sans motif) jusqu'à l'accord de
+  l'ergo (`statutPhrase`), pour qu'aucune phrase blessante n'atteigne les
+  autres enfants. Option
   `afficherErreurs` des réglages Dactylo de l'enfant.
 - `src/renderer/src/games/couleurs/` (Stroop) et `games/memoire/` (Mots à
   retenir) : chacun a son `engine.ts` testé dans `tests/jeux.test.ts`.
   `games/ui.tsx` et `games/commun.ts` : morceaux partagés par les jeux.
-  `games/pause.tsx` : pause automatique quand la fenêtre perd le focus
-  (`usePauseAuto`, `useChrono`, `EcranPause`), utilisée par tous les jeux sauf
-  la Chasse aux lettres, qui a sa propre pause (Échap).
+  `games/pause.tsx` : pause quand la fenêtre perd le focus, ou demandée avec
+  le bouton « Pause » (`BoutonPause`) ou Échap (`usePauseAuto`, `useChrono`,
+  `EcranPause`), utilisée par tous les jeux sauf la Chasse aux lettres, qui a
+  sa propre pause (Échap).
   Couleurs piégées : bouton Indice (`indiceUtile`, `nbPropositions`,
   `propositionsIndice`), réglé pour tous les profils par `couleurs` dans les
   données (section Réglages de l'espace ergo) ; textes agrandis via la classe
@@ -85,7 +92,10 @@ le code et les commentaires aussi.
   et `screens/stats/` : un fichier par jeu (colonnes de l'export, écran,
   indicateurs du bilan), `parJeu.tsx` (tout ce qui dépend du jeu), `commun.tsx`,
   `calculBilan.ts` (calcul du bilan imprimable, testé dans `tests/bilan.test.ts`) et
-  `Bilan.tsx`.
+  `Bilan.tsx`. Le bilan ne compare que les parties terminées d'un même groupe
+  (`GROUPE_<JEU>` de chaque fichier : mode, liste, palier…). Chaque résultat
+  porte `complete` (faux = partie arrêtée), signalé dans l'historique et
+  l'export.
 - `src/renderer/src/keyboard/` : clavier AZERTY (disposition, doigts, touches à
   presser pour chaque caractère) et son affichage.
 - `src/shared/phrases.ts` : listes de phrases et de mots d'origine (uniquement des

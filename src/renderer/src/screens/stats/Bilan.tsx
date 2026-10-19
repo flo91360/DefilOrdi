@@ -22,6 +22,8 @@ const dateJour = (jour: string) => {
   return new Date(a, m - 1, j).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+const pluriel = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusieurs : un}`
+
 const formatValeur = (v: number, unite: string) => `${String(v).replace('.', ',')}${unite === '%' ? ' %' : unite === 's' ? ' s' : ''}`
 
 export function Bilan({ profile, resultats, onRetour }: { profile: Profile; resultats: Resultat[]; onRetour: () => void }) {
@@ -87,8 +89,9 @@ export function Bilan({ profile, resultats, onRetour }: { profile: Profile; resu
         ) : (
           <>
             <p className="bilan-resume">
-              <strong>{bilan.parties}</strong> partie{bilan.parties > 1 ? 's' : ''} sur <strong>{bilan.jours}</strong> jour
-              {bilan.jours > 1 ? 's' : ''} d’utilisation, {formatDuree(bilan.dureeMs)} de jeu au total
+              <strong>{bilan.parties}</strong> partie{bilan.parties > 1 ? 's' : ''}
+              {bilan.arretees > 0 && ` (dont ${bilan.arretees} arrêtée${bilan.arretees > 1 ? 's' : ''} avant la fin)`} sur{' '}
+              <strong>{bilan.jours}</strong> jour{bilan.jours > 1 ? 's' : ''} d’utilisation, {formatDuree(bilan.dureeMs)} de jeu au total
               {bilan.medailles > 0 && `, ${bilan.medailles} médaille${bilan.medailles > 1 ? 's' : ''} gagnée${bilan.medailles > 1 ? 's' : ''} en Dactylo`}.
             </p>
             {bilan.jeux.map((j) => {
@@ -98,42 +101,52 @@ export function Bilan({ profile, resultats, onRetour }: { profile: Profile; resu
                   <h2>
                     {nomJeu(j.jeu)}{' '}
                     <span className="bilan-jeu-info">
-                      · {j.parties.length} partie{j.parties.length > 1 ? 's' : ''}, du {dateJour(jourLocal(j.parties[0].date))} au{' '}
-                      {dateJour(jourLocal(j.parties[j.parties.length - 1].date))}
+                      · {pluriel(j.parties.length, 'partie terminée', 'parties terminées')}
+                      {j.parties.length > 0 &&
+                        `, du ${dateJour(jourLocal(j.parties[0].date))} au ${dateJour(jourLocal(j.parties[j.parties.length - 1].date))}`}
+                      {j.arretees > 0 && ` · ${pluriel(j.arretees, 'partie arrêtée', 'parties arrêtées')} avant la fin, non comptée${j.arretees > 1 ? 's' : ''}`}
                     </span>
                   </h2>
-                  <table className="bilan-table">
-                    <thead>
-                      <tr>
-                        <th>Mesure</th>
-                        <th className="num">Début de période</th>
-                        <th className="num">Fin de période</th>
-                        <th className="num">Évolution</th>
-                        <th className="num">Meilleur</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {j.lignes.map((l) => (
-                        <LigneTableau key={l.nom} ligne={l} />
-                      ))}
-                    </tbody>
-                  </table>
-                  {j.parties.length > 1 && (
-                    <div className="bilan-courbe">
-                      <LineChart
-                        titre={`${principal.nom} (${principal.unite})`}
-                        unite={principal.unite === '%' ? ' %' : ''}
-                        max={principal.unite === '%' ? 100 : undefined}
-                        points={points(j.parties, principal.valeur, () => nomJeu(j.jeu))}
-                      />
+                  {j.groupes.map((g) => (
+                    <div key={g.nom} className="bilan-groupe">
+                      <h3>
+                        {g.nom} <span className="bilan-jeu-info">· {pluriel(g.parties.length, 'partie', 'parties')}</span>
+                      </h3>
+                      <table className="bilan-table">
+                        <thead>
+                          <tr>
+                            <th>Mesure</th>
+                            <th className="num">Début de période</th>
+                            <th className="num">Fin de période</th>
+                            <th className="num">Évolution</th>
+                            <th className="num">Meilleur</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {g.lignes.map((l) => (
+                            <LigneTableau key={l.nom} ligne={l} />
+                          ))}
+                        </tbody>
+                      </table>
+                      {g.parties.length > 1 && (
+                        <div className="bilan-courbe">
+                          <LineChart
+                            titre={`${principal.nom} (${principal.unite})`}
+                            unite={principal.unite === '%' ? ' %' : ''}
+                            max={principal.unite === '%' ? 100 : undefined}
+                            points={points(g.parties, principal.valeur, () => g.nom)}
+                          />
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </section>
               )
             })}
             <p className="bilan-note">
-              Début et fin de période : moyenne des 3 premières et des 3 dernières parties de la période (moins s’il y a
-              peu de parties).
+              Les parties sont comparées seulement à celles du même mode, de la même liste ou du même palier. Début et fin
+              de période : moyenne des 3 premières et des 3 dernières parties terminées (moins s’il y a peu de parties).
+              Les parties arrêtées avant la fin ne sont pas comptées dans les mesures.
             </p>
           </>
         )}

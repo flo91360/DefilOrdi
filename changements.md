@@ -14,13 +14,28 @@ des changements ».
 
 ## Prochaine version
 
-- Statistiques : nouveau bouton « Bilan imprimable ». Il résume les progrès d'un enfant sur une période au choix (tout, 12 derniers mois, 3 derniers mois, dernier mois, ou des dates précises) : pour chaque jeu, le nombre de parties et l'évolution de ses mesures entre le début et la fin de la période, avec une courbe. Une zone « Observations » permet d'ajouter un commentaire avant d'imprimer. Pour obtenir un PDF, choisir l'imprimante « Microsoft Print to PDF ».
-- Statistiques : nouveau bouton « Tout exporter (Excel) », qui enregistre toutes les parties de l'enfant dans un seul tableau, jeu par jeu. Un message confirme que le tableau est enregistré, ou prévient s'il n'a pas pu l'être.
-- Statistiques : les jeux s'affichent dans le même ordre et avec le même nom que sur l'écran des jeux (le quiz s'appelle partout « Quiz de l'ordinateur »).
-- Tous les jeux sauf la Chasse aux lettres, qui avait déjà sa pause : si l'enfant quitte la fenêtre pendant une partie (autre programme, fenêtre réduite), le jeu se met en pause. Le temps ne compte pas pendant la pause, et l'enfant reprend en cliquant sur « Reprendre ».
-- Petit bac : « Arrêter » enregistre maintenant la grille commencée dans les statistiques, comme dans les autres jeux (seule la première lettre des mots est vérifiée).
-- Réglages : le volume est enregistré quand le curseur s'arrête, et non plus à chaque cran.
-- Améliorations internes : tests automatiques qui jouent de vraies parties dans le logiciel, et code des statistiques et de l'apparence réorganisé.
+- Phrases des enfants : chaque phrase écrite par un enfant attend maintenant votre accord avant d'être proposée aux autres enfants, même si le correcteur l'a acceptée. Le correcteur vérifie l'orthographe et les règles du niveau, mais pas le sens : une phrase blessante pour un autre enfant pouvait être partagée. La relecture peut être désactivée dans la section « Phrases des enfants ».
+- Bilan imprimable : les parties sont comparées seulement à celles du même mode, de la même liste ou du même palier (par exemple « Écrire le mot » d'un côté, « Couleurs piégées timer » de l'autre). Un changement de difficulté ne passe plus pour un progrès ou un recul.
+- Statistiques : les parties arrêtées avant la fin avec « Arrêter » sont signalées dans l'historique (« arrêtée ») et dans l'export Excel. Le bilan ne les compte plus dans ses mesures et indique combien il y en a.
+- Démarrage : si les données de ce PC ont été enregistrées par une version plus récente de DefilOrdi, un message prévient avant de continuer et rappelle qu'une copie des données a été gardée.
+- Dactylo, Mots à retenir, Couleurs piégées, Petit bac et Quiz : nouveau bouton « Pause » en haut de l'écran. La touche Échap met aussi le jeu en pause et le relance, comme dans la Chasse aux lettres.
+- Journal des modifications : les versions 0.8.20, 0.8.21 et 0.8.22 ne répètent plus les nouveautés des versions précédentes.
+
+## 0.8.22
+
+- Quiz, mises en situation : l'enfant peut maintenant valider sa réponse en appuyant sur le raccourci clavier de l'action demandée, en plus du clic sur l'écran, qui fonctionne comme avant. Cela concerne : mettre en gras (Ctrl+G), centrer le texte (Ctrl+E), annuler (Ctrl+Z), enregistrer (Ctrl+S) et ouvrir un nouveau document (Ctrl+N).
+- Quiz, mises en situation : une fois la réponse donnée, le message de correction précise « Ça peut aussi se faire avec Ctrl+S » (ou le raccourci concerné). Rien n'est indiqué avant la réponse, ni dans la question ni sur l'écran.
+
+## 0.8.21
+
+- Quiz : nouveau thème « Points reliés », séparé des autres thèmes. L'enfant voit les 9 logiciels (PowerPoint, Word, XMind, PDF X-Change Editor, Exchange, Souris, Scan, Clé USB, Outil capture) et 10 actions ; il clique sur une action, puis sur le logiciel qui convient.
+- Points reliés : la vérification se fait seulement une fois les 10 liaisons faites, avec la correction des erreurs. La partie n'est réussie qu'avec 10 liaisons justes sur 10.
+- Points reliés : les 10 actions sont tirées au hasard dans une liste de 26 actions, pour que les parties varient. La liste complète est fournie à part, pour relecture.
+- Quiz, « Tout mélanger » : le thème « Points reliés » peut apparaître, au plus une fois par partie.
+
+## 0.8.20
+
+- Mots à retenir : quand l'enfant ne se souvient d'aucun mot et clique sur « Je ne me souviens plus », la partie ne s'arrête plus. Un indice s'affiche : la première lettre d'un mot, le nombre de lettres et l'image si elle existe (avec une phrase, la première lettre du premier mot et le nombre de mots). Un second clic sur le bouton termine la partie.
 
 ## 0.8.16
 

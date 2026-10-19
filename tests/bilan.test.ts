@@ -13,6 +13,7 @@ const dactylo = (jour: string, frappes: number): ResultatDactylo => ({
   profileId: 'p',
   jeu: 'dactylo',
   date: date(jour),
+  complete: true,
   listeNom: 'Liste',
   phrases: 5,
   dureeMs: 60000,
@@ -27,6 +28,7 @@ const quiz = (jour: string, justes: number): ResultatQuiz => ({
   profileId: 'p',
   jeu: 'quiz',
   date: date(jour),
+  complete: true,
   themeNom: 'Le matériel',
   dureeMs: 30000,
   questions: 10,
@@ -63,19 +65,20 @@ describe('bilan imprimable', () => {
     expect(b.parties).toBe(8)
     expect(b.jours).toBe(7)
     expect(b.jeux.map((j) => j.jeu)).toEqual(['dactylo', 'quiz'])
-    const vitesse = b.jeux[0].lignes[0]
+    expect(b.jeux[0].groupes.map((g) => g.nom)).toEqual(['Liste « Liste »'])
+    const vitesse = b.jeux[0].groupes[0].lignes[0]
     expect(vitesse).toMatchObject({ nom: 'Vitesse', debut: 120, fin: 200, meilleur: 220, progres: true })
   })
 
   it('ne parle pas d’évolution avec une seule partie', () => {
     const b = calculerBilan(resultats, '2026-09-01', '2026-09-30')
-    expect(b.jeux[1].lignes[0]).toMatchObject({ debut: 60, fin: 60, progres: null })
+    expect(b.jeux[1].groupes[0].lignes[0]).toMatchObject({ debut: 60, fin: 60, progres: null })
   })
 
   it('ne garde que les parties de la période, bornes comprises', () => {
     const b = calculerBilan(resultats, '2026-09-02', '2026-09-03')
     expect(b.parties).toBe(2)
-    expect(b.jeux[0].lignes[0]).toMatchObject({ debut: 120, fin: 140 })
+    expect(b.jeux[0].groupes[0].lignes[0]).toMatchObject({ debut: 120, fin: 140 })
     expect(calculerBilan(resultats, '2026-10-01', '2026-10-31').jeux).toEqual([])
   })
 
@@ -86,12 +89,39 @@ describe('bilan imprimable', () => {
 
   it('traite un temps plus court comme un progrès', () => {
     const couleurs = (jour: string, dureeMs: number): Resultat => ({
-      id: jour, profileId: 'p', jeu: 'couleurs', date: date(jour), mode: 'mot', manches: 10, justes: 10,
+      id: jour, profileId: 'p', jeu: 'couleurs', date: date(jour), complete: true, mode: 'mot', manches: 10, justes: 10,
       dureeMs, piegesJustes: 0, pieges: 0, indices: 0, minutes: 0
     })
     const b = calculerBilan([couleurs('2026-09-01', 30000), couleurs('2026-09-02', 20000)], '2026-09-01', '2026-09-30')
-    const temps = b.jeux[0].lignes.find((l) => l.unite === 's')!
+    const temps = b.jeux[0].groupes[0].lignes.find((l) => l.unite === 's')!
     expect(temps).toMatchObject({ debut: 3, fin: 2, meilleur: 2, progres: true })
+  })
+
+  it('compare les parties d’un même mode, pas des modes différents', () => {
+    const couleurs = (jour: string, mode: 'mot' | 'timer', justes: number): Resultat => ({
+      id: jour, profileId: 'p', jeu: 'couleurs', date: date(jour), complete: true, mode, manches: 10, justes,
+      dureeMs: 30000, piegesJustes: 0, pieges: 0, indices: 0, minutes: mode === 'timer' ? 1 : 0
+    })
+    // L'enfant alterne un mode facile (10/10) et le mode timer (4/10), sans progresser ni régresser.
+    const parties = ['01', '02', '03', '04', '05', '06'].map((j, i) => couleurs(`2026-09-${j}`, i % 2 ? 'timer' : 'mot', i % 2 ? 4 : 10))
+    const b = calculerBilan(parties, '2026-09-01', '2026-09-30')
+    const groupes = b.jeux[0].groupes
+    expect(groupes.map((g) => [g.nom, g.parties.length])).toEqual([
+      ['Écrire le mot', 3],
+      ['Couleurs piégées timer, 1 min', 3]
+    ])
+    for (const g of groupes) expect(g.lignes[0].progres).toBeNull()
+  })
+
+  it('ne compte pas les parties arrêtées avant la fin dans les mesures', () => {
+    const arrete = { ...quiz('2026-09-08', 0), id: 'q-arrete', complete: false }
+    const b = calculerBilan([...resultats, arrete], '2026-09-01', '2026-09-30')
+    expect(b.parties).toBe(9)
+    expect(b.arretees).toBe(1)
+    const q = b.jeux.find((j) => j.jeu === 'quiz')!
+    expect(q.arretees).toBe(1)
+    expect(q.parties).toHaveLength(1)
+    expect(q.groupes[0].lignes[0]).toMatchObject({ debut: 60, fin: 60 })
   })
 
   it('date les parties au jour local', () => {

@@ -65,8 +65,10 @@ describe('Storage', () => {
     await fs.writeFile(join(dir, 'donnees.json'), JSON.stringify(ancien), 'utf8')
     const s = new Storage(dir)
     await s.load()
+    expect(s.plusRecente).toBe(false)
     await fs.writeFile(join(dir, 'donnees.json'), JSON.stringify({ ...ancien, version: DATA_VERSION + 1, nouveauJeu: { a: 1 } }), 'utf8')
     await s.load()
+    expect(s.plusRecente).toBe(true)
     const copies = await s.listeCopies()
     expect(copies.some((f) => f.endsWith('-avant-mise-a-jour.json'))).toBe(true)
     const recente = copies.find((f) => f.endsWith('-version-plus-recente.json'))!

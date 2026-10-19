@@ -70,6 +70,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
       profileId: profile.id,
       jeu: 'espace',
       date: new Date().toISOString(),
+      complete,
       theme: theme.id,
       serieNom: reglages.serie.nom,
       dureeMs: Math.round(e.temps * 1000),

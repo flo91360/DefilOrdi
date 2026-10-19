@@ -130,6 +130,7 @@ export interface ResultatDactylo {
   profileId: string
   jeu: 'dactylo'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   listeNom: string
   phrases: number
   dureeMs: number
@@ -149,6 +150,7 @@ export interface ResultatCouleurs {
   profileId: string
   jeu: 'couleurs'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   mode: ModeCouleurs // écrire le mot, la couleur de l'encre, ou les deux au hasard
   manches: number
   justes: number
@@ -178,6 +180,7 @@ export interface ResultatMemoire {
   profileId: string
   jeu: 'memoire'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   listeNom: string
   mots: number // mots à retenir (palier phrase : mots de la phrase)
   trouves: number
@@ -202,6 +205,7 @@ export interface ResultatEspace {
   profileId: string
   jeu: 'espace'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   theme: ThemeChasse // décor choisi : fusée, cow-boy ou sous-marin
   serieNom: string
   dureeMs: number
@@ -221,6 +225,7 @@ export interface ResultatQuiz {
   profileId: string
   jeu: 'quiz'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   themeNom: string
   dureeMs: number
   questions: number
@@ -295,6 +300,7 @@ export interface ResultatPetitBac {
   profileId: string
   jeu: 'petitbac'
   date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
   lettre: string
   tempsLimite: number // secondes, 0 = sans limite
   dureeMs: number // temps pour remplir la grille
@@ -312,6 +318,9 @@ export const CODE_DEFAUT = '0000'
 export interface Settings {
   codeErgo: string
   volume: number
+  // Phrases des enfants : relues par l'ergothérapeute avant d'être proposées
+  // aux autres enfants (sinon, une phrase acceptée par le correcteur l'est tout de suite).
+  relirePhrasesEnfants: boolean
 }
 
 // Phrase personnelle écrite par un enfant après une médaille. « valide » : elle
@@ -445,7 +454,7 @@ export function defaultAppData(): AppData {
     petitBac: defaultPetitBac(),
     couleurs: defaultCouleurs(),
     resultats: [],
-    settings: { codeErgo: CODE_DEFAUT, volume: 0.7 }
+    settings: { codeErgo: CODE_DEFAUT, volume: 0.7, relirePhrasesEnfants: true }
   }
 }
 
@@ -638,7 +647,8 @@ function normalizeReponseBac(v: unknown): ReponseBac | null {
 function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null {
   if (!isObj(v) || typeof v.id !== 'string' || typeof v.profileId !== 'string') return null
   if (!profileIds.has(v.profileId) || typeof v.date !== 'string' || Number.isNaN(Date.parse(v.date))) return null
-  const base = { id: v.id, profileId: v.profileId, date: v.date, dureeMs: count(v.dureeMs) }
+  // Les parties d'avant ce champ sont considérées comme terminées.
+  const base = { id: v.id, profileId: v.profileId, date: v.date, dureeMs: count(v.dureeMs), complete: v.complete !== false }
   if (v.jeu === 'couleurs') {
     const manches = count(v.manches)
     const pieges = Math.min(count(v.pieges), manches)
@@ -785,7 +795,9 @@ export function normalizeAppData(v: unknown): AppData {
     resultats,
     settings: {
       codeErgo: isValidCode(s.codeErgo) ? s.codeErgo : d.settings.codeErgo,
-      volume
+      volume,
+      // Absent (ancienne sauvegarde) : relecture activée, le choix le plus prudent.
+      relirePhrasesEnfants: s.relirePhrasesEnfants !== false
     }
   }
 }

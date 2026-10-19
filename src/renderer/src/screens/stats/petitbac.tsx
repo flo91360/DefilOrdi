@@ -100,3 +100,7 @@ export const INDICATEURS_PETITBAC: Indicateur<ResultatPetitBac>[] = [
   { nom: 'Mots acceptés', unite: '%', valeur: (r) => pourcentage(r.justes, r.categories) },
   { nom: 'Temps moyen par catégorie', unite: 's', valeur: (r) => Math.round(r.dureeMs / Math.max(1, r.categories) / 100) / 10, plusPetitMieux: true }
 ]
+
+// Bilan : nombre de catégories et temps limite changent la difficulté.
+export const GROUPE_PETITBAC = (r: ResultatPetitBac) =>
+  `${r.categories} catégorie${r.categories > 1 ? 's' : ''}, ${formatTemps(r.tempsLimite).toLowerCase()}`

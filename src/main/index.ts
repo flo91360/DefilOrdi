@@ -45,7 +45,10 @@ function createWindow(): BrowserWindow {
 }
 
 function registerIpc(): void {
-  ipcMain.handle('data:load', () => storage.load())
+  ipcMain.handle('data:load', async () => {
+    const data = await storage.load()
+    return { data, plusRecente: storage.plusRecente }
+  })
   ipcMain.handle('data:save', (_e, data: AppData) => storage.save(data))
 
   ipcMain.handle('data:export', async (e, data: AppData) => {
