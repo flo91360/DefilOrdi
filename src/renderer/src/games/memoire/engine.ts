@@ -34,9 +34,21 @@ export function dureeMemorisation(nbMots: number): number {
   return nbMots * 2500 + 2000
 }
 
-export function choisirMots(liste: string[], n: number, random: () => number = Math.random): string[] {
+// `exclus` : mots de la série précédente. Ils ne sont retirés que s'il n'y a
+// pas assez d'autres mots ; dans ce cas, on complète avec le moins possible
+// de mots exclus (jamais de blocage, même avec une liste très courte).
+export function choisirMots(
+  liste: string[],
+  n: number,
+  random: () => number = Math.random,
+  exclus: string[] = []
+): string[] {
   const uniques = [...new Map(liste.map((m) => [normaliserReponse(m), m.trim()])).values()].filter((m) => m !== '')
-  return melanger(uniques, random).slice(0, n)
+  const interdits = new Set(exclus.map(normaliserReponse))
+  const neufs = melanger(uniques.filter((m) => !interdits.has(normaliserReponse(m))), random)
+  if (neufs.length >= n) return neufs.slice(0, n)
+  const anciens = melanger(uniques.filter((m) => interdits.has(normaliserReponse(m))), random)
+  return melanger([...neufs, ...anciens.slice(0, n - neufs.length)], random)
 }
 
 // --- Progression -----------------------------------------------------------

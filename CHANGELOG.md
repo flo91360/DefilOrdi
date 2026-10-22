@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.28 — 2026-10-22
+<!-- planifikateur:944f3dbd-20ae-4730-b300-6eec202814b9 -->
+
+- **je souhaite avoir plus de mot dans les mot à retenir** : J'ai corrigé l'échec du contrôle GitHub. La section « Prochaine version » de `changements.md` n'avait pas été réécrite. Elle décrit maintenant les deux changements en français clair : les listes de 30 mots et le tirage qui évite les mots de la série précédente. Le script `scripts/verifier-changements.mjs` accepte cette description. Je n'ai pas relancé les tests, car je n'ai pas touché au code. Je n'ai pas modifié `CHANGELOG.md`.
+
 ## 0.8.27 (2026-10-22)
 
 - Chasse aux lettres, mode « 3 vies » : la consigne et l'affichage des vies au départ suivent maintenant le nombre de vies réellement donné par le jeu (3), pour que le texte ne puisse plus différer du jeu. Le déroulement des parties ne change pas.

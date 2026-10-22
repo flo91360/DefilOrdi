@@ -14,7 +14,8 @@ des changements ».
 
 ## Prochaine version
 
-- Chasse aux lettres, mode « 3 vies » : la consigne et l'affichage des vies au départ suivent maintenant le nombre de vies réellement donné par le jeu (3), pour que le texte ne puisse plus différer du jeu. Le déroulement des parties ne change pas.
+- Mots à retenir : les listes d'origine (Mots courts, Animaux, À la maison, Mots plus longs) passent de 16 à 30 mots chacune, tous avec leur image. Elles s'appliquent à une nouvelle installation ou à « Restaurer les listes d'origine » ; les listes déjà enregistrées ou modifiées ne changent pas.
+- Mots à retenir : les mots vus dans la série précédente ne reviennent plus tout de suite dans la série suivante. Si la liste est trop courte pour cela, le jeu complète avec le moins possible de mots déjà vus.
 
 ## 0.8.22
 

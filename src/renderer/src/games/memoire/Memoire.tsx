@@ -80,6 +80,8 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
   const [phase, setPhase] = useState<Phase>({ nom: 'choix' })
   const [nombre, setNombre] = useState<Palier>(nombreParNiveau(profile.niveau) as Palier)
   const compteur = useRef(0)
+  // Mots de la série précédente, pour ne pas les retirer tout de suite.
+  const derniersMots = useRef<string[]>([])
   // Option choisie avant la partie (pas un réglage du profil) : aide visuelle
   // pendant la mémorisation des paliers 3 à 7 mots.
   const [images, setImages] = useState<(typeof CHOIX_IMAGES)[number]>('oui')
@@ -95,7 +97,8 @@ export function Memoire({ profile, listes, phrases, resultats, onResult, onProgr
   const lancer = (liste: ListePhrases | null, etat: ProgressionMemoire) => {
     compteur.current += 1
     const phrase = estPhrase(etat.palier) ? choisirPhrase(phrases) : ''
-    const mots = phrase ? motsDePhrase(phrase) : choisirMots(liste?.phrases ?? [], etat.palier)
+    const mots = phrase ? motsDePhrase(phrase) : choisirMots(liste?.phrases ?? [], etat.palier, Math.random, derniersMots.current)
+    derniersMots.current = mots
     setPhase({ nom: 'jeu', n: compteur.current, liste, mots, phrase, etat })
   }
 
