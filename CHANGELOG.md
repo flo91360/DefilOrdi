@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.28 — 2026-10-22
+<!-- planifikateur:944f3dbd-20ae-4730-b300-6eec202814b9 -->
+
+- **je souhaite avoir plus de mot dans les mot à retenir** : Les 4 listes de mots d'origine de « Mots à retenir » comptent maintenant 30 mots chacune. Les nouveaux mots sont tapables sur un clavier AZERTY. Chacun a déjà son emoji dans le dictionnaire de images.ts, donc je n'ai rien ajouté à ce dictionnaire. Le typecheck et les tests passent (173 tests). Je n'ai pas lancé `npm run build`. - **Listes** : elles passent de 16 à 30 mots dans `src/shared/phrases.ts`. Seules les listes d'origine changent (nouvelle installation ou « restaurer les listes d'origine »). Les listes déjà enregistrées ou modifiées par l'ergothérapeute ne sont pas touchées. - **Tirage** : `choisirMots` accepte maintenant les mots de la série précédente. Ceux-ci ne sont retirés que s'il n'y a pas assez d'autres mots dans la liste. Dans ce cas, la série est complétée avec le minimum de mots précédents, sans blocage. - **Mémorisation** : `Memoire.tsx` garde les mots de la dernière série jouée. Cette mémoire n'est pas enregistrée dans le profil, donc elle repart de zéro à chaque ouverture du jeu. - **Inchangé** : les règles de difficulté progressive et la vérification des réponses. - **Tests ajoutés** : sur 50 séries consécutives, aucun mot ne revient dans la suivante. Un cas de liste trop courte vérifie qu'il n'y a pas de blocage. Les listes d'origine doivent compter au moins 28 mots, sans doublon et tapables.
+
 ## 0.8.27 (2026-10-22)
 
 - Chasse aux lettres, mode « 3 vies » : la consigne et l'affichage des vies au départ suivent maintenant le nombre de vies réellement donné par le jeu (3), pour que le texte ne puisse plus différer du jeu. Le déroulement des parties ne change pas.

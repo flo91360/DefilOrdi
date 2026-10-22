@@ -104,7 +104,10 @@ export function defaultListesMots(): ListePhrases[] {
       id: 'mots-1',
       nom: 'Mots courts',
       niveau: 1,
-      phrases: ['chat', 'lune', 'pomme', 'bus', 'lit', 'sac', 'main', 'pain', 'loup', 'robe', 'mur', 'nez', 'lac', 'four', 'jus', 'pont']
+      phrases: [
+        'chat', 'lune', 'pomme', 'bus', 'lit', 'sac', 'main', 'pain', 'loup', 'robe', 'mur', 'nez', 'lac', 'four', 'jus', 'pont',
+        'rose', 'porte', 'ballon', 'gant', 'fleur', 'bateau', 'étoile', 'arbre', 'dent', 'pied', 'lait', 'bol', 'clou', 'vélo'
+      ]
     },
     {
       id: 'mots-2',
@@ -112,7 +115,9 @@ export function defaultListesMots(): ListePhrases[] {
       niveau: 2,
       phrases: [
         'lapin', 'tigre', 'cheval', 'souris', 'girafe', 'mouton', 'requin', 'canard',
-        'renard', 'tortue', 'zèbre', 'hibou', 'singe', 'baleine', 'poule', 'abeille'
+        'renard', 'tortue', 'zèbre', 'hibou', 'singe', 'baleine', 'poule', 'abeille',
+        'ours', 'panda', 'koala', 'vache', 'cochon', 'chèvre', 'grenouille', 'serpent',
+        'crocodile', 'dauphin', 'pingouin', 'perroquet', 'escargot', 'fourmi'
       ]
     },
     {
@@ -121,7 +126,9 @@ export function defaultListesMots(): ListePhrases[] {
       niveau: 3,
       phrases: [
         'fenêtre', 'escalier', 'cuisine', 'téléphone', 'oreiller', 'armoire', 'lumière', 'tapis',
-        'bougie', 'étagère', 'grenier', 'cheminée', 'réveil', 'fauteuil', 'baignoire', 'placard'
+        'bougie', 'étagère', 'grenier', 'cheminée', 'réveil', 'fauteuil', 'baignoire', 'placard',
+        'salon', 'chambre', 'jardin', 'canapé', 'miroir', 'balai', 'douche', 'horloge',
+        'bureau', 'coussin', 'tableau', 'poubelle', 'radio', 'lampe'
       ]
     },
     {
@@ -131,7 +138,9 @@ export function defaultListesMots(): ListePhrases[] {
       phrases: [
         'bibliothèque', 'hélicoptère', 'parapluie', 'anniversaire', 'dictionnaire', 'ordinateur',
         'thermomètre', 'champignon', 'astronaute', 'chocolatier', 'boulangerie', 'trampoline',
-        'kangourou', 'aquarium', 'calendrier', 'papillon'
+        'kangourou', 'aquarium', 'calendrier', 'papillon',
+        'ambulance', 'restaurant', 'supermarché', 'cinéma', 'piscine', 'camion', 'tracteur',
+        'locomotive', 'montgolfière', 'planète', 'télescope', 'microscope', 'guitare', 'volcan'
       ]
     }
   ]

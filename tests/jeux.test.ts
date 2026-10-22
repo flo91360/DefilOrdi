@@ -117,6 +117,24 @@ describe('Mots à retenir', () => {
     expect(mots).toHaveLength(3)
   })
 
+  it('ne retire pas tout de suite les mots de la série précédente', () => {
+    const liste = Array.from({ length: 12 }, (_, i) => `mot${String.fromCharCode(97 + i)}`)
+    let precedents: string[] = []
+    for (let i = 0; i < 50; i++) {
+      const mots = choisirMots(liste, 5, Math.random, precedents)
+      expect(mots).toHaveLength(5)
+      for (const m of mots) expect(precedents).not.toContain(m)
+      precedents = mots
+    }
+  })
+
+  it('complète avec des mots précédents si la liste est trop courte, sans bloquer', () => {
+    const mots = choisirMots(['chat', 'lune', 'pomme', 'bus'], 3, Math.random, ['chat', 'lune', 'pomme'])
+    expect(mots).toHaveLength(3)
+    expect(mots).toContain('bus')
+    expect(choisirMots(['chat', 'lune'], 5, Math.random, ['chat', 'lune']).sort()).toEqual(['chat', 'lune'])
+  })
+
   it('reconnaît les mots trouvés, déjà trouvés ou absents', () => {
     const mots = ['zèbre', 'lapin']
     expect(proposer(mots, [false, false], 'ZEBRE', 5)).toEqual({ type: 'trouve', index: 0 })

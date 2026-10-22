@@ -2,11 +2,20 @@ import { describe, expect, it } from 'vitest'
 import { normaliserReponse } from '../src/renderer/src/games/commun'
 import { GROUPES_IMAGES, IMAGES_REPLI, imageConnue, imageDuMot } from '../src/renderer/src/games/memoire/images'
 import { defaultListesMots } from '../src/shared/phrases'
+import { estTapable } from '../src/shared/regles'
 
 describe('Images des mots (Mots à retenir)', () => {
   it('donne une image connue à tous les mots d’origine', () => {
     for (const liste of defaultListesMots()) {
       for (const mot of liste.phrases) expect(imageConnue(mot), mot).not.toBeNull()
+    }
+  })
+
+  it('compte une trentaine de mots tapables par liste d’origine', () => {
+    for (const liste of defaultListesMots()) {
+      expect(liste.phrases.length, liste.nom).toBeGreaterThanOrEqual(28)
+      expect(new Set(liste.phrases.map(normaliserReponse)).size, liste.nom).toBe(liste.phrases.length)
+      for (const mot of liste.phrases) expect([...mot].every(estTapable), mot).toBe(true)
     }
   })
 
