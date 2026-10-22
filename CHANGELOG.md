@@ -1,9 +1,8 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.27 — 2026-10-22
-<!-- planifikateur:7fcdae07-3993-448a-8abc-3182544308e7 -->
+## 0.8.27 (2026-10-22)
 
-- **dans je jeu chasse aux lettres** : J'ai réécrit la section « Prochaine version » de changements.md, que le contrôle GitHub exigeait. Elle décrit maintenant cette livraison en français clair, pour l'ergothérapeute. Je n'ai pas relancé les contrôles. Le code n'a pas changé depuis le tour précédent. Je n'ai trouvé aucun texte « 2 vies » dans le jeu. La consigne du mode « vies » et l'affichage des vies au départ s'appuient désormais sur le nombre de vies du moteur (`VIES_DEPART` = 3), au lieu d'un « 3 » écrit en dur.
+- Chasse aux lettres, mode « 3 vies » : la consigne et l'affichage des vies au départ suivent maintenant le nombre de vies réellement donné par le jeu (3), pour que le texte ne puisse plus différer du jeu. Le déroulement des parties ne change pas.
 
 ## 0.8.26 (2026-10-19)
 
