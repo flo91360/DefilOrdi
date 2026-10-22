@@ -14,10 +14,7 @@ des changements ».
 
 ## Prochaine version
 
-- Démarrage : si les données du PC ne peuvent pas être lues, un message l'explique et propose de réessayer, au lieu de rester bloqué sur « Chargement… ».
-- Enregistrement : quand Windows bloque le fichier des données un court instant (antivirus par exemple), le logiciel réessaie au lieu d'afficher tout de suite une erreur.
-- Statistiques, export Excel : un nom de liste ou une réponse qui commence par « - », « + » ou « = » s'affiche tel quel dans Excel, au lieu de « #NOM? ».
-- Améliorations internes, sans changement visible.
+- Chasse aux lettres, mode « 3 vies » : la consigne et l'affichage des vies au départ suivent maintenant le nombre de vies réellement donné par le jeu (3), pour que le texte ne puisse plus différer du jeu. Le déroulement des parties ne change pas.
 
 ## 0.8.22
 
