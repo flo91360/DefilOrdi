@@ -25,6 +25,7 @@ import {
   SERIES,
   simultanees,
   tirer,
+  VIES_DEPART,
   VIES_MAX
 } from './engine'
 import { THEMES_JEU, type ThemeJeu } from './themes'
@@ -42,7 +43,7 @@ type Phase =
   | { nom: 'jeu'; theme: ThemeJeu; reglages: Reglages; clavier: boolean }
   | { nom: 'fin'; theme: ThemeJeu; reglages: Reglages; resultat: ResultatEspace; record: boolean }
 
-const VIES_DEPART_AFFICHEE = Math.min(VIES_MAX, 3)
+const VIES_DEPART_AFFICHEE = Math.min(VIES_MAX, VIES_DEPART)
 const CHOIX_CLAVIER = ['oui', 'non'] as const
 const formatClavier = (v: (typeof CHOIX_CLAVIER)[number]) => (v === 'oui' ? 'Avec le clavier' : 'Sans le clavier')
 const formatMinutes = (s: number) => `${s / 60} min`
@@ -180,7 +181,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
               {mode === 'chrono' && <Chips label="Durée" values={DUREES} value={duree} onChange={setDuree} format={formatMinutes} />}
               <p className="choix-note">
                 {theme.consigne} Échap met le jeu en pause.
-                {mode === 'vies' && ' Tu as 3 vies : une faute ou une lettre qui tombe en retire une. Le jeu s’accélère petit à petit.'}
+                {mode === 'vies' && ` Tu as ${VIES_DEPART} vies : une faute ou une lettre qui tombe en retire une. Le jeu s’accélère petit à petit.`}
                 {mode === 'pieges' &&
                   ' Comme le mode 3 vies, mais attention aux pièges (étoiles sombres) : ne les tape pas ! Tape les cadeaux dorés pour regagner une vie.'}
               </p>

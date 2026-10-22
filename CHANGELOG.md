@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.27 — 2026-10-22
+<!-- planifikateur:7fcdae07-3993-448a-8abc-3182544308e7 -->
+
+- **dans je jeu chasse aux lettres** : J'ai réécrit la section « Prochaine version » de changements.md, que le contrôle GitHub exigeait. Elle décrit maintenant cette livraison en français clair, pour l'ergothérapeute. Je n'ai pas relancé les contrôles. Le code n'a pas changé depuis le tour précédent. Je n'ai trouvé aucun texte « 2 vies » dans le jeu. La consigne du mode « vies » et l'affichage des vies au départ s'appuient désormais sur le nombre de vies du moteur (`VIES_DEPART` = 3), au lieu d'un « 3 » écrit en dur.
+
 ## 0.8.26 (2026-10-19)
 
 - Démarrage : si les données du PC ne peuvent pas être lues, un message l'explique et propose de réessayer, au lieu de rester bloqué sur « Chargement… ».
