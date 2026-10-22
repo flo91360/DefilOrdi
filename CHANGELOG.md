@@ -1,5 +1,10 @@
 # Journal des modifications de DefilOrdi
 
+## 0.8.27 — 2026-10-22
+<!-- planifikateur:7fcdae07-3993-448a-8abc-3182544308e7 -->
+
+- **dans je jeu chasse aux lettres** : Je n'ai trouvé aucun texte « 2 vies » dans le code, ni sur l'écran de fin, ni dans les consignes, ni dans la description du mode. L'écran de fin affiche déjà « 3 vies · palier N » (via NOMS_MODES), et le moteur donne bien 3 vies (VIES_DEPART = 3). Je n'ai donc pas pu reproduire le défaut décrit. Je n'ai lancé ni typecheck, ni tests, ni build : le worker s'en charge. Pour que le texte et le jeu ne puissent plus diverger, j'ai remplacé deux « 3 » écrits en dur dans Espace.tsx par `VIES_DEPART` : la consigne du mode « vies » et le nombre de vies affichées au départ. Le comportement du jeu ne change pas. Le libellé « 3 vies » de NOMS_MODES, dans engine.ts, reste écrit en dur. Si le « 2 vies » apparaît encore à l'écran, un texte vient peut-être d'une autre source ou d'une version plus ancienne. Dans ce cas, il faudrait une capture de l'écran concerné.
+
 ## 0.8.26 (2026-10-19)
 
 - Démarrage : si les données du PC ne peuvent pas être lues, un message l'explique et propose de réessayer, au lieu de rester bloqué sur « Chargement… ».
