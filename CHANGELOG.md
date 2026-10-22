@@ -1,9 +1,9 @@
 # Journal des modifications de DefilOrdi
 
-## 0.8.28 — 2026-10-22
-<!-- planifikateur:944f3dbd-20ae-4730-b300-6eec202814b9 -->
+## 0.8.28 (2026-10-22)
 
-- **je souhaite avoir plus de mot dans les mot à retenir** : J'ai corrigé l'échec du contrôle GitHub. La section « Prochaine version » de `changements.md` n'avait pas été réécrite. Elle décrit maintenant les deux changements en français clair : les listes de 30 mots et le tirage qui évite les mots de la série précédente. Le script `scripts/verifier-changements.mjs` accepte cette description. Je n'ai pas relancé les tests, car je n'ai pas touché au code. Je n'ai pas modifié `CHANGELOG.md`.
+- Mots à retenir : les listes d'origine (Mots courts, Animaux, À la maison, Mots plus longs) passent de 16 à 30 mots chacune, tous avec leur image. Elles s'appliquent à une nouvelle installation ou à « Restaurer les listes d'origine » ; les listes déjà enregistrées ou modifiées ne changent pas.
+- Mots à retenir : les mots vus dans la série précédente ne reviennent plus tout de suite dans la série suivante. Si la liste est trop courte pour cela, le jeu complète avec le moins possible de mots déjà vus.
 
 ## 0.8.27 (2026-10-22)
 
