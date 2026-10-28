@@ -74,6 +74,12 @@ le code et les commentaires aussi.
   d'affilée : vitesse puis lettres doubles) dans `engine.ts` ; pièges et
   cadeaux = `Lettre.type`, dessinés par `SceneTheme.dessinerSpecial`. Les
   records sont séparés par série, aventure et mode (`mesureRecord`).
+  Vitesse adaptative `Etat.vitesse` (ne dépend plus du niveau) : monte si la
+  lettre est attrapée tôt, baisse si tard ou tombée ; sous
+  `VITESSE_UNE_PAR_UNE`, les lettres arrivent une par une. Celle atteinte en fin
+  de partie terminée est mémorisée dans `Profile.vitesseChasse` (une seule par
+  enfant) ; `vitesseDeDepart` la reprend ou, à défaut, la déduit de la dernière
+  partie.
 - `src/renderer/src/games/quiz/` : quiz. `questions.ts` = banque de questions
   (identifiants stables, utilisés dans les statistiques) ; `scenes/` = faux
   écrans cliquables, chaque élément est une `Zone` nommée. `tests/quiz.test.tsx`

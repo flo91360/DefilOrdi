@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { vitesseObjetOcean } from '../src/renderer/src/games/espace/scenes/Ocean'
-import { avancer, cadence, estTerminee, type Etat, type Lettre, mesureRecord, nouvelEtat, simultanees, type Reglages, SERIES, tirer } from '../src/renderer/src/games/espace/engine'
+import {
+  avancer,
+  cadence,
+  estTerminee,
+  type Etat,
+  type Lettre,
+  mesureRecord,
+  nouvelEtat,
+  simultanees,
+  type Reglages,
+  SERIES,
+  tirer,
+  vitesseDeDepart
+} from '../src/renderer/src/games/espace/engine'
+import { newProfile, type ResultatEspace, VITESSE_CHASSE_DEPART, VITESSE_CHASSE_MAX, VITESSE_CHASSE_MIN } from '../src/shared/data'
 
 const reglages = (serieId = 'milieu', niveau = 1, dureeS = 60, mode: Reglages['mode'] = 'chrono'): Reglages => ({
   serie: SERIES.find((s) => s.id === serieId)!,
@@ -32,7 +46,7 @@ describe('Plongée sous-marine : vitesses', () => {
 describe('Chasse aux lettres (moteur)', () => {
   it('fait apparaître des lettres de la série, différentes entre elles', () => {
     const r = reglages()
-    const e = jouer(nouvelEtat(), r, 6)
+    const e = jouer(nouvelEtat(1.5), r, 6)
     expect(e.lettres.length).toBeGreaterThan(1)
     expect(e.lettres.every((l) => r.serie.lettres.includes(l.char))).toBe(true)
     expect(new Set(e.lettres.map((l) => l.char)).size).toBe(e.lettres.length)
@@ -182,7 +196,7 @@ describe('Chasse aux lettres (moteur)', () => {
       let e: Etat = { ...nouvelEtat(), vies: 2 }
       const vus = new Set<string>()
       for (let t = 0; t < 400 && e.vies > 0; t += 0.05) {
-        e = avancer({ ...e, vies: 2 }, 0.05, r).etat
+        e = avancer({ ...e, vies: 2, vitesse: 2 }, 0.05, r).etat
         e.lettres.forEach((l) => l.type && vus.add(l.type))
       }
       expect(vus).toEqual(new Set(['piege', 'cadeau']))
@@ -214,6 +228,103 @@ describe('Chasse aux lettres (moteur)', () => {
     it('préfère la vraie lettre au piège quand elles se ressemblent', () => {
       const e: Etat = { ...nouvelEtat(), lettres: [lettre(1, 'q', { type: 'piege', y: 0.9 }), lettre(2, 'q', { y: 0.2 })] }
       expect(tirer(e, 'q', r).evenement).toMatchObject({ type: 'detruite', lettre: { id: 2 } })
+    })
+  })
+
+  describe('vitesse adaptative', () => {
+    // Joue `secondes` en attrapant chaque lettre dès qu'elle atteint la position `y`.
+    function jouerEnTapant(e: Etat, r: Reglages, secondes: number, y: number): Etat {
+      let etat = e
+      for (let t = 0; t < secondes; t += 0.05) {
+        etat = avancer(etat, 0.05, r).etat
+        for (const l of etat.lettres) if (l.y >= y) etat = tirer(etat, l.char, r).etat
+      }
+      return etat
+    }
+
+    it('au premier départ, les lettres arrivent une par une, bien plus lentement qu’avant', () => {
+      const r = reglages('milieu', 1, 120)
+      let e = nouvelEtat()
+      expect(e.vitesse).toBe(VITESSE_CHASSE_DEPART)
+      let maxALEcran = 0
+      for (let t = 0; t < 60; t += 0.05) {
+        e = avancer(e, 0.05, r).etat
+        maxALEcran = Math.max(maxALEcran, e.lettres.length)
+      }
+      expect(maxALEcran).toBe(1)
+      // L'ancien niveau 1 faisait tomber une lettre en 10 s ; désormais bien plus.
+      const premiere = avancer({ ...nouvelEtat(), prochaine: 0 }, 0.05, r).etat.lettres[0]
+      expect(1 / premiere.vitesse).toBeGreaterThan(15)
+    })
+
+    it('la suivante arrive peu après qu’une lettre a été attrapée', () => {
+      const r = reglages('milieu', 1, 120)
+      const e = jouerEnTapant(nouvelEtat(), r, 30, 0.1)
+      expect(e.detruites).toBeGreaterThan(10)
+    })
+
+    it('un enfant rapide accélère, un enfant lent reste lent', () => {
+      const r = reglages('milieu', 1, 120)
+      const rapide = jouerEnTapant(nouvelEtat(), r, 60, 0.15)
+      expect(rapide.vitesse).toBeGreaterThan(1)
+      const lent = jouerEnTapant(nouvelEtat(), r, 60, 0.75)
+      expect(lent.vitesse).toBeLessThanOrEqual(VITESSE_CHASSE_DEPART)
+      const absent = jouer(nouvelEtat(), r, 60)
+      expect(absent.vitesse).toBe(VITESSE_CHASSE_MIN)
+    })
+
+    it('au-delà du rythme doux, plusieurs lettres peuvent être à l’écran', () => {
+      const e = jouer(nouvelEtat(2), reglages('milieu', 1, 120), 6)
+      expect(e.lettres.length).toBeGreaterThan(1)
+    })
+
+    it('la vitesse reste bornée', () => {
+      expect(nouvelEtat(99).vitesse).toBe(VITESSE_CHASSE_MAX)
+      expect(nouvelEtat(0).vitesse).toBe(VITESSE_CHASSE_MIN)
+      const e = jouerEnTapant(nouvelEtat(), reglages('milieu', 1, 600, 'vies'), 600, 0.02)
+      expect(e.vitesse).toBeLessThanOrEqual(VITESSE_CHASSE_MAX)
+    })
+
+    describe('vitesse de départ', () => {
+      const profil = { ...newProfile('p1', '2026-01-01T00:00:00.000Z', 'CM2'), prenom: 'Léa' }
+      const partie = (date: string, detruites: number, complete = true, extra: Partial<ResultatEspace> = {}): ResultatEspace => ({
+        id: date,
+        profileId: 'p1',
+        jeu: 'espace',
+        date,
+        complete,
+        theme: 'espace',
+        serieNom: 'Rangée du milieu',
+        dureeMs: 60000,
+        detruites,
+        manquees: 0,
+        erreurs: 0,
+        mode: 'chrono',
+        pieges: 0,
+        cadeaux: 0,
+        palier: 0,
+        lettresRatees: {},
+        ...extra
+      })
+
+      it('nouveau profil : vitesse douce', () => {
+        expect(vitesseDeDepart(profil, [])).toBe(VITESSE_CHASSE_DEPART)
+      })
+
+      it('reprend la vitesse mémorisée, quelles que soient les parties', () => {
+        expect(vitesseDeDepart({ ...profil, vitesseChasse: 1.3 }, [partie('2026-02-01', 5)])).toBe(1.3)
+      })
+
+      it('sans vitesse mémorisée, la déduit de la dernière partie terminée de l’enfant', () => {
+        const resultats = [
+          partie('2026-02-01', 40),
+          partie('2026-02-03', 20),
+          partie('2026-02-04', 50, false),
+          partie('2026-02-05', 50, true, { profileId: 'autre' })
+        ]
+        expect(vitesseDeDepart(profil, resultats)).toBeCloseTo(0.8)
+        expect(vitesseDeDepart(profil, [partie('2026-02-01', 2)])).toBe(VITESSE_CHASSE_MIN)
+      })
     })
   })
 

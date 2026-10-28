@@ -26,7 +26,8 @@ import {
   simultanees,
   tirer,
   VIES_DEPART,
-  VIES_MAX
+  VIES_MAX,
+  vitesseDeDepart
 } from './engine'
 import { THEMES_JEU, type ThemeJeu } from './themes'
 
@@ -34,6 +35,7 @@ interface Props {
   profile: Profile
   resultats: Resultat[]
   onResult: (r: ResultatEspace) => void
+  onVitesse: (vitesse: number) => void // vitesse atteinte en fin de partie terminée
   onQuit: () => void
 }
 
@@ -48,7 +50,7 @@ const CHOIX_CLAVIER = ['oui', 'non'] as const
 const formatClavier = (v: (typeof CHOIX_CLAVIER)[number]) => (v === 'oui' ? 'Avec le clavier' : 'Sans le clavier')
 const formatMinutes = (s: number) => `${s / 60} min`
 
-export function Espace({ profile, resultats, onResult, onQuit }: Props) {
+export function Espace({ profile, resultats, onResult, onVitesse, onQuit }: Props) {
   const siens = resultats.filter((r): r is ResultatEspace => r.jeu === 'espace' && r.profileId === profile.id)
   const dernier: ThemeChasse | null = siens.length > 0 ? siens.reduce((a, b) => (a.date > b.date ? a : b)).theme : null
   const [phase, setPhase] = useState<Phase>({ nom: 'aventure' })
@@ -58,7 +60,7 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
   const [avecClavier, setAvecClavier] = useState<'oui' | 'non'>('oui') // choix pour la partie seulement
 
   const lancer = (theme: ThemeJeu, serie: Serie, modeJeu: ModeChasse = mode) =>
-    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu, vitesseObjet: theme.vitesseObjet }, clavier: profile.dactylo.clavier && avecClavier === 'oui' })
+    setPhase({ nom: 'jeu', theme, reglages: { serie, dureeS: duree, niveau: profile.niveau, mode: modeJeu, vitesseObjet: theme.vitesseObjet, vitesseDepart: vitesseDeDepart(profile, resultats) }, clavier: profile.dactylo.clavier && avecClavier === 'oui' })
 
   const terminer = (theme: ThemeJeu, reglages: Reglages, e: Etat, complete: boolean) => {
     setAvecClavier('oui') // le choix ne vaut que pour la partie qui vient de se terminer
@@ -86,6 +88,8 @@ export function Espace({ profile, resultats, onResult, onQuit }: Props) {
     }
     onResult(r)
     if (!complete) return onQuit()
+    // Seule une partie terminée change la vitesse reprise à la partie suivante.
+    onVitesse(Math.round(e.vitesse * 100) / 100)
     const meilleur = Math.max(0, ...anciens.map((a) => mesureRecord(a.mode, a.detruites, a.dureeMs)))
     setPhase({ nom: 'fin', theme, reglages, resultat: r, record: anciens.length > 0 && mesureRecord(modeJeu, r.detruites, r.dureeMs) > meilleur })
   }
@@ -296,7 +300,7 @@ function Partie({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const zoneRef = useRef<HTMLDivElement>(null)
-  const etat = useRef<Etat>(nouvelEtat())
+  const etat = useRef<Etat>(nouvelEtat(reglages.vitesseDepart))
   const scene = useRef(theme.creer({ principale: profile.couleurPrincipale, secondaire: profile.couleurSecondaire, police: policeCss(profile.policeLettres) }))
   const pause = useRef(false)
   const fini = useRef(false)

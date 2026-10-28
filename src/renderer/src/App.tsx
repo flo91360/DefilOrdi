@@ -104,6 +104,12 @@ export function App() {
     if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, memoire } : p)) })
   }
 
+  // Chasse aux lettres : vitesse reprise à la partie suivante.
+  const saveVitesseChasse = (profileId: string, vitesseChasse: number) => {
+    const d = dataRef.current
+    if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, vitesseChasse } : p)) })
+  }
+
   // Médaille de Dactylo : ajoutée au coffre de l'enfant, doublons compris.
   const addMedaille = (profileId: string, niveau: number) => {
     const d = dataRef.current
@@ -176,7 +182,7 @@ export function App() {
           )
           break
         case 'espace':
-          content = <Espace {...commun} />
+          content = <Espace {...commun} onVitesse={(v) => saveVitesseChasse(active.id, v)} />
           break
         case 'quiz':
           content = <Quiz {...commun} banque={construireBanque(data.questionsPerso, data.questionsMasquees)} />
