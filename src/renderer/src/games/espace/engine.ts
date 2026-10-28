@@ -9,10 +9,18 @@
 // Dans tous les modes, 8 lettres réussies d'affilée sans erreur font monter
 // d'un palier : d'abord la vitesse, puis deux lettres à la fois.
 //
+// Vitesse adaptative (`Etat.vitesse`, 1 = ancien rythme de départ du niveau 1) :
+// elle monte quand l'enfant attrape vite les lettres, baisse doucement quand il
+// les attrape tard ou les laisse tomber. Tant qu'elle est basse, les lettres
+// arrivent une par une. La vitesse atteinte en fin de partie terminée est
+// mémorisée dans le profil (`vitesseChasse`) et reprise à la partie suivante.
+//
 // `y` est la progression de la lettre : 0 au départ, 1 à l'arrivée (sol, ou sous-marin
 // en haut de l'écran dans l'aventure sous-marine, où les objets remontent).
 // Les positions sont en proportions de l'écran (0 à 1) pour que la logique ne
 // dépende pas de la taille de la fenêtre.
+
+import { type Profile, type Resultat, type ResultatEspace, VITESSE_CHASSE_DEPART, VITESSE_CHASSE_MAX, VITESSE_CHASSE_MIN } from '../../../../shared/data'
 
 export interface Serie {
   id: string
@@ -53,7 +61,8 @@ const MAX_SIMULTANEES = 3
 export interface Reglages {
   serie: Serie
   dureeS: number
-  niveau: number
+  niveau: number // niveau du profil (n'influe plus sur la vitesse, qui s'adapte à l'enfant)
+  vitesseDepart?: number // vitesse au début de la partie (VITESSE_CHASSE_DEPART par défaut)
   // Facteur de vitesse propre à chaque objet (ex. poissons plus rapides), selon son identifiant.
   vitesseObjet?: (id: number) => number
   mode?: ModeChasse // chrono par défaut
@@ -84,6 +93,7 @@ export interface Etat {
   pieges: number // pièges tapés
   cadeaux: number // cadeaux récupérés
   lettresRatees: Record<string, number> // lettres tombées au sol + touches tapées par erreur alors qu'elle était visée
+  vitesse: number // vitesse adaptative (hors paliers), entre VITESSE_CHASSE_MIN et VITESSE_CHASSE_MAX
 }
 
 export type Evenement =
@@ -94,15 +104,26 @@ export type Evenement =
   | { type: 'passe'; lettre: Lettre } // un piège ou un cadeau est tombé : sans conséquence
   | { type: 'erreur'; touche: string }
 
-// Durée de chute et intervalle d'apparition au départ, selon le niveau.
-const CHUTE_S: Record<number, number> = { 1: 10, 2: 8, 3: 6.5, 4: 5.5 }
-const INTERVALLE_S: Record<number, number> = { 1: 2.4, 2: 1.9, 3: 1.5, 4: 1.2 }
+// Durée de chute et intervalle d'apparition à la vitesse 1 (divisés par la vitesse).
+const CHUTE_S = 10
+const INTERVALLE_S = 2.4
 const MAX_A_L_ECRAN = 7
+// Sous cette vitesse, une lettre n'apparaît qu'une fois l'écran vide, après une courte pause.
+export const VITESSE_UNE_PAR_UNE = 1
+const PAUSE_UNE_PAR_UNE_S = 0.8
+// Adaptation : position (0 = départ, 1 = arrivée) à laquelle la lettre est attrapée.
+const ATTRAPEE_VITE = 0.35 // avant : l'enfant est rapide, la vitesse monte
+const ATTRAPEE_TARD = 0.6 // après : elle baisse un peu
+const HAUSSE = 1.05
+const BAISSE_TARD = 0.97
+const BAISSE_TOMBEE = 0.93
+
+export const bornerVitesse = (v: number) => Math.min(VITESSE_CHASSE_MAX, Math.max(VITESSE_CHASSE_MIN, v))
 
 export const modeDe = (r: Reglages): ModeChasse => r.mode ?? 'chrono'
 export const aDesVies = (r: Reglages) => modeDe(r) !== 'chrono'
 
-export function nouvelEtat(): Etat {
+export function nouvelEtat(vitesse: number = VITESSE_CHASSE_DEPART): Etat {
   return {
     temps: 0,
     lettres: [],
@@ -116,7 +137,8 @@ export function nouvelEtat(): Etat {
     palier: 0,
     pieges: 0,
     cadeaux: 0,
-    lettresRatees: {}
+    lettresRatees: {},
+    vitesse: bornerVitesse(vitesse)
   }
 }
 
@@ -125,12 +147,16 @@ export function nouvelEtat(): Etat {
 export const accelerations = (palier: number) => Math.ceil(palier / 2)
 export const simultanees = (palier: number) => Math.min(MAX_SIMULTANEES, 1 + Math.floor(palier / 2))
 
-// Le chrono accélère doucement (jusqu'à 35 % à la fin) ; les modes à vies
-// n'ont pas de durée : seuls les paliers accélèrent le jeu.
-function acceleration(e: Etat, r: Reglages): number {
-  const palier = 1 + Math.min(1.4, 0.15 * accelerations(e.palier))
-  if (aDesVies(r)) return palier
-  return palier * (1 + 0.35 * Math.min(1, e.temps / r.dureeS))
+// Vitesse effective : vitesse adaptative de l'enfant, accélérée par les paliers.
+function acceleration(e: Etat): number {
+  return e.vitesse * (1 + Math.min(1.4, 0.15 * accelerations(e.palier)))
+}
+
+// Adaptation après une lettre attrapée à la position y (0 à 1).
+export function vitesseApresReussite(vitesse: number, y: number): number {
+  if (y < ATTRAPEE_VITE) return bornerVitesse(vitesse * HAUSSE)
+  if (y > ATTRAPEE_TARD) return bornerVitesse(vitesse * BAISSE_TARD)
+  return vitesse
 }
 
 export function estTerminee(e: Etat, r: Reglages): boolean {
@@ -180,11 +206,12 @@ export function avancer(e: Etat, dt: number, r: Reglages, random: () => number =
   if (estTerminee(e, r)) return { etat: e, evenements: [] }
   const evenements: Evenement[] = []
   const temps = aDesVies(r) ? e.temps + dt : Math.min(r.dureeS, e.temps + dt)
-  const acc = acceleration(e, r)
+  const acc = acceleration(e)
   let lettres: Lettre[] = []
   let manquees = e.manquees
   let serieReussie = e.serieReussie
   let vies = e.vies
+  let vitesse = e.vitesse
   const lettresRatees = { ...e.lettresRatees }
   for (const l of e.lettres) {
     const y = l.y + l.vitesse * dt
@@ -196,15 +223,19 @@ export function avancer(e: Etat, dt: number, r: Reglages, random: () => number =
       const apres = erreur({ ...e, serieReussie, vies }, r)
       serieReussie = apres.serieReussie
       vies = apres.vies
+      vitesse = bornerVitesse(vitesse * BAISSE_TOMBEE)
       evenements.push({ type: 'sol', lettre: l })
     }
   }
-  let etat: Etat = { ...e, temps, lettres, manquees, lettresRatees, serieReussie, vies }
+  let etat: Etat = { ...e, temps, lettres, manquees, lettresRatees, serieReussie, vies, vitesse }
   if (estTerminee(etat, r) && aDesVies(r)) return { etat, evenements }
   let prochaine = e.prochaine
   let compteur = e.compteur
+  // Rythme doux : la suivante attend que l'écran soit vide, puis une courte pause.
+  const uneParUne = e.vitesse < VITESSE_UNE_PAR_UNE
+  if (uneParUne && lettres.length > 0) prochaine = Math.max(prochaine, temps + PAUSE_UNE_PAR_UNE_S)
   // Le temps restant doit laisser à la lettre le temps de tomber à moitié.
-  const chute = (CHUTE_S[r.niveau] ?? 8) / acc
+  const chute = CHUTE_S / acc
   const encoreDuTemps = () => aDesVies(r) || r.dureeS - temps > chute / 2
   if (temps >= prochaine && lettres.length < MAX_A_L_ECRAN && encoreDuTemps()) {
     // Au palier « deux lettres », elles apparaissent ensemble.
@@ -218,7 +249,9 @@ export function avancer(e: Etat, dt: number, r: Reglages, random: () => number =
       etat = { ...etat, lettres }
     }
     // Quand elles viennent par deux, on laisse un peu plus de temps avant la suite.
-    prochaine += ((INTERVALLE_S[r.niveau] ?? 2) * (1 + 0.5 * (nb - 1))) / acc
+    // Une par une : c'est l'enfant qui donne le rythme (la suivante suit l'écran vide).
+    if (uneParUne) prochaine = temps + PAUSE_UNE_PAR_UNE_S
+    else prochaine += (INTERVALLE_S * (1 + 0.5 * (nb - 1))) / acc
   }
   if (temps >= prochaine) prochaine = temps + 0.3 // écran plein : on réessaie bientôt
   return { etat: { ...etat, prochaine, compteur }, evenements }
@@ -240,7 +273,7 @@ export function tirer(e: Etat, touche: string, r: Reglages): { etat: Etat; evene
   if (normales.length > 0) {
     const cible = plusBasse(normales)
     return {
-      etat: { ...e, lettres: e.lettres.filter((l) => l.id !== cible.id), detruites: e.detruites + 1, ...reussite(e, r) },
+      etat: { ...e, lettres: e.lettres.filter((l) => l.id !== cible.id), detruites: e.detruites + 1, ...reussite(e, r), vitesse: vitesseApresReussite(e.vitesse, cible.y) },
       evenement: { type: 'detruite', lettre: cible }
     }
   }
@@ -274,4 +307,18 @@ export function cadence(detruites: number, dureeMs: number): number {
 // dans les modes à vies (leur durée n'est pas fixe).
 export function mesureRecord(mode: ModeChasse, detruites: number, dureeMs: number): number {
   return mode === 'chrono' ? cadence(detruites, dureeMs) : detruites
+}
+
+// Vitesse de départ d'une partie : celle mémorisée dans le profil ; à défaut,
+// déduite de la dernière partie (lettres attrapées par minute), sinon la
+// vitesse douce d'un premier départ. À la vitesse 1, il tombe environ
+// 60 / INTERVALLE_S lettres par minute.
+export function vitesseDeDepart(profile: Profile, resultats: Resultat[]): number {
+  if (profile.vitesseChasse !== null) return bornerVitesse(profile.vitesseChasse)
+  const siennes = resultats.filter((r): r is ResultatEspace => r.jeu === 'espace' && r.profileId === profile.id && r.dureeMs >= 10000)
+  const terminees = siennes.filter((r) => r.complete)
+  const parmi = terminees.length > 0 ? terminees : siennes
+  if (parmi.length === 0) return VITESSE_CHASSE_DEPART
+  const derniere = parmi.reduce((a, b) => (a.date > b.date ? a : b))
+  return bornerVitesse((cadence(derniere.detruites, derniere.dureeMs) * INTERVALLE_S) / 60)
 }

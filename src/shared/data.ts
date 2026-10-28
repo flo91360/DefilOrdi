@@ -72,6 +72,21 @@ export interface Profile {
   dactylo: OptionsDactylo
   memoire: ProgressionMemoire
   medailles: Medaille[] // coffre à médailles de Dactylo, dans l'ordre d'obtention
+  // Chasse aux lettres : vitesse atteinte à la fin de la dernière partie
+  // terminée, reprise à la partie suivante (toutes aventures, séries et modes).
+  // null = pas encore mémorisée (déduite des parties existantes).
+  vitesseChasse: number | null
+}
+
+// Vitesse de la Chasse aux lettres : 1 = ancien rythme de départ du niveau 1.
+// En dessous de VITESSE_CHASSE_UNE_PAR_UNE, les lettres arrivent une par une.
+export const VITESSE_CHASSE_MIN = 0.5
+export const VITESSE_CHASSE_MAX = 2.5
+export const VITESSE_CHASSE_DEPART = 0.6 // premier départ d'un enfant
+
+export function normalizeVitesseChasse(v: unknown): number | null {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return null
+  return Math.min(VITESSE_CHASSE_MAX, Math.max(VITESSE_CHASSE_MIN, v))
 }
 
 // Médaille de Dactylo : niveau 1 (chocolat), 2 (bronze), 3 (argent), 4 (or).
@@ -433,7 +448,8 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
     niveau: 1,
     dactylo: defaultOptionsDactylo(),
     memoire: defaultProgressionMemoire(),
-    medailles: []
+    medailles: [],
+    vitesseChasse: null
   }
 }
 
@@ -504,7 +520,8 @@ function normalizeProfile(v: unknown, clavierMasque = false): Profile | null {
     niveau: typeof v.niveau === 'number' && NIVEAUX.includes(v.niveau) ? v.niveau : d.niveau,
     dactylo: clavierMasque ? { ...normalizeOptions(v.dactylo), clavier: false } : normalizeOptions(v.dactylo),
     memoire: normalizeProgressionMemoire(v.memoire),
-    medailles: normalizeMedailles(v.medailles)
+    medailles: normalizeMedailles(v.medailles),
+    vitesseChasse: normalizeVitesseChasse(v.vitesseChasse)
   }
 }
 

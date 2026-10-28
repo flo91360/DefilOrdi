@@ -298,3 +298,14 @@ describe('relecture des phrases et parties arrêtées', () => {
     expect(d.resultats.map((x) => x.complete)).toEqual([true, false])
   })
 })
+
+describe('vitesse de la Chasse aux lettres', () => {
+  const profil = { id: 'p1', prenom: 'Léa', classe: CLASSES[0] }
+  it('vaut null par défaut et reste bornée', () => {
+    expect(newProfile('p', '2026-01-01', CLASSES[0]).vitesseChasse).toBeNull()
+    expect(normalizeAppData({ profiles: [profil] }).profiles[0].vitesseChasse).toBeNull()
+    expect(normalizeAppData({ profiles: [{ ...profil, vitesseChasse: 'vite' }] }).profiles[0].vitesseChasse).toBeNull()
+    expect(normalizeAppData({ profiles: [{ ...profil, vitesseChasse: 1.2 }] }).profiles[0].vitesseChasse).toBe(1.2)
+    expect(normalizeAppData({ profiles: [{ ...profil, vitesseChasse: 40 }] }).profiles[0].vitesseChasse).toBe(2.5)
+  })
+})

@@ -14,8 +14,10 @@ des changements ».
 
 ## Prochaine version
 
-- Mots à retenir : les listes d'origine (Mots courts, Animaux, À la maison, Mots plus longs) passent de 16 à 30 mots chacune, tous avec leur image. Elles s'appliquent à une nouvelle installation ou à « Restaurer les listes d'origine » ; les listes déjà enregistrées ou modifiées ne changent pas.
-- Mots à retenir : les mots vus dans la série précédente ne reviennent plus tout de suite dans la série suivante. Si la liste est trop courte pour cela, le jeu complète avec le moins possible de mots déjà vus.
+- Chasse aux lettres : la première partie d'un enfant démarre beaucoup plus doucement, dans les trois aventures : les lettres arrivent une par une, la suivante seulement après que la précédente a été attrapée ou est tombée.
+- Chasse aux lettres : la vitesse s'adapte à l'enfant pendant la partie. Elle monte quand il attrape les lettres rapidement ; elle reste basse, ou redescend un peu, quand il met du temps ou laisse tomber des lettres. Les paliers (« Ça va plus vite ! », deux lettres à la fois) et les modes restent les mêmes.
+- Chasse aux lettres : la vitesse atteinte à la fin d'une partie terminée est retenue pour chaque enfant, et la partie suivante reprend à ce rythme, quelle que soit l'aventure, la série de lettres ou le mode. Une partie arrêtée en cours ne change pas cette vitesse.
+- Chasse aux lettres : les enfants qui avaient déjà joué reprennent au rythme de leur dernière partie (d'après le nombre de lettres attrapées par minute), ce qui est en général plus doux qu'avant.
 
 ## 0.8.22
 
