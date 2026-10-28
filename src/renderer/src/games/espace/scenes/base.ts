@@ -4,7 +4,7 @@
 //
 // Purement visuel : la logique du jeu (chute, tirs, score) est dans engine.ts.
 
-import type { Lettre } from '../engine'
+import { estMajuscule, type Lettre } from '../engine'
 
 export interface Couleurs {
   principale: string
@@ -217,6 +217,52 @@ export abstract class SceneTheme {
     ctx.restore()
   }
 
+  // Coin en bas à droite de l'objet qui porte la lettre, par rapport au centre
+  // de la lettre : c'est là que se place le repère des majuscules. Les décors
+  // dont l'objet est plus grand qu'une bulle (bouteilles) le redéfinissent.
+  protected coinObjet(_l: Lettre): { dx: number; dy: number } {
+    const R = this.rayon()
+    return { dx: R * 0.82, dy: R * 0.82 }
+  }
+
+  // Repère des majuscules : petite touche claire portant la flèche ⇧ de la
+  // touche Maj, en dessous à droite de l'objet, sans recouvrir la lettre.
+  // Dessinée en traits (la flèche ne dépend pas de la police).
+  private dessinerRepereMaj(ctx: CanvasRenderingContext2D, l: Lettre, x: number, y: number) {
+    const R = this.rayon()
+    const c = Math.max(18, R * 0.62) // côté de la touche
+    const { dx, dy } = this.coinObjet(l)
+    const cx = x + dx + c * 0.12
+    const cy = y + dy + c * 0.12
+    ctx.save()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
+    ctx.shadowBlur = 4
+    ctx.shadowOffsetY = 2
+    roundRect(ctx, cx - c / 2, cy - c / 2, c, c, c * 0.22)
+    ctx.fillStyle = '#ffffff'
+    ctx.fill()
+    ctx.shadowColor = 'rgba(0, 0, 0, 0)'
+    ctx.lineWidth = Math.max(2, c * 0.08)
+    ctx.strokeStyle = '#1e3a8a'
+    ctx.stroke()
+    // flèche creuse : pointe, épaules, tige
+    const u = c / 10
+    ctx.beginPath()
+    ctx.moveTo(cx, cy - 3.6 * u)
+    ctx.lineTo(cx + 3.4 * u, cy + 0.2 * u)
+    ctx.lineTo(cx + 1.5 * u, cy + 0.2 * u)
+    ctx.lineTo(cx + 1.5 * u, cy + 3.4 * u)
+    ctx.lineTo(cx - 1.5 * u, cy + 3.4 * u)
+    ctx.lineTo(cx - 1.5 * u, cy + 0.2 * u)
+    ctx.lineTo(cx - 3.4 * u, cy + 0.2 * u)
+    ctx.closePath()
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = Math.max(1.5, u * 0.9)
+    ctx.strokeStyle = '#1e3a8a'
+    ctx.stroke()
+    ctx.restore()
+  }
+
   // ---------- Boucle ----------
 
   avancer(dt: number, lettres: Lettre[]) {
@@ -257,6 +303,8 @@ export abstract class SceneTheme {
       const p = this.position(l)
       if (l.type) this.dessinerSpecial(ctx, l, p.x, p.y)
       else this.dessinerLettre(ctx, l, p.x, p.y, l.id === visee)
+      // Pas de repère sur un piège : il ne faut pas le taper.
+      if (l.type !== 'piege' && estMajuscule(l.char)) this.dessinerRepereMaj(ctx, l, p.x, p.y)
     }
     for (const f of this.fantomes) this.dessinerFantome(ctx, f)
     this.dessinerEffets(ctx)

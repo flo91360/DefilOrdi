@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { geste } from '../src/renderer/src/keyboard/azerty'
 import { vitesseObjetOcean } from '../src/renderer/src/games/espace/scenes/Ocean'
 import {
   avancer,
   cadence,
+  estMajuscule,
   estTerminee,
   type Etat,
   type Lettre,
@@ -331,5 +333,26 @@ describe('Chasse aux lettres (moteur)', () => {
   it('les records se mesurent par minute en chrono et en lettres attrapées sinon', () => {
     expect(mesureRecord('chrono', 30, 60000)).toBe(30)
     expect(mesureRecord('vies', 30, 90000)).toBe(30)
+  })
+})
+
+describe('repère des majuscules', () => {
+  it('ne concerne que les majuscules', () => {
+    for (const c of 'AZERTYUIOPQSDFGHJKLMWXCVBNÉÀ') expect(estMajuscule(c)).toBe(true)
+    for (const c of 'azertyuiopqsdfghjklmwxcvbnéèàçù1-') expect(estMajuscule(c)).toBe(false)
+  })
+
+  it('aucune lettre des séries de minuscules ne porte le repère', () => {
+    for (const s of SERIES.filter((x) => !x.majuscules)) expect([...s.lettres].some(estMajuscule)).toBe(false)
+    expect([...SERIES.find((x) => x.id === 'majuscules')!.lettres].every(estMajuscule)).toBe(true)
+  })
+
+  it('le clavier à l’écran met en évidence Maj avec la lettre d’une majuscule', () => {
+    for (const c of SERIES.find((x) => x.id === 'majuscules')!.lettres) {
+      const cibles = geste(c)!.etapes[0]
+      expect(cibles).toContain(c.toLowerCase())
+      expect(cibles.some((k) => k.startsWith('maj'))).toBe(true)
+    }
+    expect(geste('a')!.etapes[0]).toEqual(['a'])
   })
 })

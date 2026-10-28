@@ -92,6 +92,12 @@ export class Western extends SceneTheme {
     return { x: ax - Math.sin(angle) * d, y: ay + Math.cos(angle) * d }
   }
 
+  // Bas de la bouteille (sous l'étiquette où est la lettre), côté droit.
+  protected coinObjet(_l: Lettre) {
+    const { H, W } = this.tailleBouteille()
+    return { dx: W * 0.5, dy: H * 0.38 }
+  }
+
   // ---------- Fond fixe ----------
 
   protected dessinerFond(ctx: CanvasRenderingContext2D) {

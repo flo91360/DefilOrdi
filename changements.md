@@ -14,10 +14,8 @@ des changements ».
 
 ## Prochaine version
 
-- Chasse aux lettres : la première partie d'un enfant démarre beaucoup plus doucement, dans les trois aventures : les lettres arrivent une par une, la suivante seulement après que la précédente a été attrapée ou est tombée.
-- Chasse aux lettres : la vitesse s'adapte à l'enfant pendant la partie. Elle monte quand il attrape les lettres rapidement ; elle reste basse, ou redescend un peu, quand il met du temps ou laisse tomber des lettres. Les paliers (« Ça va plus vite ! », deux lettres à la fois) et les modes restent les mêmes.
-- Chasse aux lettres : la vitesse atteinte à la fin d'une partie terminée est retenue pour chaque enfant, et la partie suivante reprend à ce rythme, quelle que soit l'aventure, la série de lettres ou le mode. Une partie arrêtée en cours ne change pas cette vitesse.
-- Chasse aux lettres : les enfants qui avaient déjà joué reprennent au rythme de leur dernière partie (d'après le nombre de lettres attrapées par minute), ce qui est en général plus doux qu'avant.
+- Chasse aux lettres : chaque lettre majuscule qui tombe est accompagnée d'une petite touche avec la flèche ⇧ de la touche Maj, en bas à droite de la météorite, de la bouteille, du poisson ou du coquillage. L'enfant voit tout de suite qu'il doit appuyer sur Maj pour la taper. Les minuscules n'ont pas de flèche, et les pièges non plus, puisqu'il ne faut pas les taper.
+- Chasse aux lettres : avec le clavier à l'écran, la touche Maj s'allume en même temps que la lettre quand la lettre à taper est une majuscule.
 
 ## 0.8.22
 

@@ -65,6 +65,13 @@ export class Ocean extends SceneTheme {
     return { x: Math.max(m, Math.min(this.w - m, base.x + dx)), y: base.y }
   }
 
+  // Les poissons sont plus larges que hauts : le repère des majuscules se
+  // place sous leur ventre, côté droit.
+  protected coinObjet(l: Lettre) {
+    const R = this.rayon()
+    return this.estPoisson(this.objet(l)) ? { dx: R * 0.95, dy: R * 0.72 } : { dx: R * 0.82, dy: R * 0.82 }
+  }
+
   // ---------- Fond fixe ----------
 
   protected dessinerFond(ctx: CanvasRenderingContext2D) {

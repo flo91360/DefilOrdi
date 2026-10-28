@@ -46,6 +46,12 @@ export const SERIES: Serie[] = [
   { id: 'melange', nom: 'Tout mélangé', lettres: MINUSCULES + MAJUSCULES + ACCENTS, niveau: 7, majuscules: true }
 ]
 
+// Lettre majuscule (il faut la touche Maj pour la taper) : les décors
+// l'accompagnent d'un petit repère ⇧. Les accents en minuscule n'en sont pas.
+export function estMajuscule(c: string): boolean {
+  return c !== c.toLocaleLowerCase('fr') && c === c.toLocaleUpperCase('fr')
+}
+
 export const DUREES = [60, 120, 180] as const
 
 export type ModeChasse = 'chrono' | 'vies' | 'pieges'
