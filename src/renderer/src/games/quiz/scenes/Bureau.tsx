@@ -1,10 +1,12 @@
-import { Ico, PATHS, Zone } from './commun'
+import { Fond, Ico, MenuFond, PATHS, Zone } from './commun'
 
-// Bureau Windows (style Windows 11). Menus : demarrer, alimentation, usb.
+// Bureau Windows (style Windows 11). Menus : demarrer, alimentation, usb,
+// contexte-fond, contexte-fond-nouveau (clic droit sur un emplacement vide).
 export function Bureau({ menu }: { menu: string | null }) {
   const startOuvert = menu === 'demarrer' || menu === 'alimentation'
   return (
     <div className="sc-bureau">
+      <Fond />
       <div className="sc-bureau-icones">
         <Zone id="corbeille" className="sc-icone-bureau" titre="Corbeille">
           <span className="sc-icone-image" style={{ background: '#dbe7f5' }}>
@@ -66,6 +68,8 @@ export function Bureau({ menu }: { menu: string | null }) {
           </div>
         </div>
       )}
+
+      <MenuFond menu={menu} haut={90} gauche={330} />
 
       {menu === 'usb' && (
         <div className="sc-popup sc-popup-usb">

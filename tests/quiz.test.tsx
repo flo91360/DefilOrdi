@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { construireBanque, melangerChoix, questionsDisponibles, tirerQuestions } from '../src/renderer/src/games/quiz/engine'
+import { MENU_FOND, MENU_FOND_NOUVEAU, NOUVEAU_DOSSIER_FOND, NOUVEAUX_FICHIERS_FOND, NOUVEAUX_TYPES } from '../src/renderer/src/games/quiz/nouveau'
 import { QUESTIONS } from '../src/renderer/src/games/quiz/questions'
 import { THEMES } from '../src/renderer/src/games/quiz/types'
 import { Ecran, ICONES } from '../src/renderer/src/games/quiz/visuels'
@@ -36,7 +37,7 @@ describe('banque de questions', () => {
     for (const q of QUESTIONS) {
       if (q.type !== 'situation') continue
       const vues = new Set<string>()
-      const explorer = (i: number, menu: string | null): void => {
+      const explorer = (i: number, menu: string | null, relais = 0): void => {
         if (i >= q.etapes.length) return
         const e = q.etapes[i]
         const visibles = zones(q.scene, menu)
@@ -44,9 +45,17 @@ describe('banque de questions', () => {
           if (visibles.has(c.replace(/@droit$/, ''))) vues.add(`${i}:${c}`)
           explorer(i + 1, e.ouvrePar?.[c] ?? e.ouvre ?? menu)
         }
+        // Une zone relais ouvre un sous-menu sans finir l'étape.
+        for (const [c, m] of Object.entries(e.relais ?? {})) {
+          if (!visibles.has(c.replace(/@droit$/, ''))) continue
+          vues.add(`${i}:${c}`)
+          if (relais < 3) explorer(i, m, relais + 1)
+        }
       }
       explorer(0, q.menuDepart ?? null)
-      q.etapes.forEach((e, i) => e.cibles.forEach((c) => expect(vues.has(`${i}:${c}`), `${q.id} étape ${i + 1} : ${c}`).toBe(true)))
+      q.etapes.forEach((e, i) =>
+        [...e.cibles, ...Object.keys(e.relais ?? {})].forEach((c) => expect(vues.has(`${i}:${c}`), `${q.id} étape ${i + 1} : ${c}`).toBe(true))
+      )
     }
   })
 
@@ -71,6 +80,45 @@ describe('banque de questions', () => {
     expect(zones(q.scene, null).has('ctx-supprimer')).toBe(false)
     expect(zones(q.scene, menu).has('ctx-supprimer')).toBe(true)
     expect(e2.cibles).toEqual(expect.arrayContaining(['supprimer', 'ctx-supprimer']))
+  })
+})
+
+describe('création par clic droit sur un emplacement vide', () => {
+  it('le clic droit sur le fond ouvre « Nouveau », puis la liste des types', () => {
+    for (const scene of ['explorateur', 'bureau'] as const) {
+      expect(zones(scene, null).has('fond'), scene).toBe(true)
+      expect(zones(scene, null).has('ctx-nouveau'), scene).toBe(false)
+      const menu = zones(scene, MENU_FOND)
+      expect(menu.has('ctx-nouveau'), scene).toBe(true)
+      expect(menu.has(NOUVEAU_DOSSIER_FOND), scene).toBe(false)
+      const sousMenu = zones(scene, MENU_FOND_NOUVEAU)
+      for (const t of NOUVEAUX_TYPES) expect(sousMenu.has(t.id), `${scene} ${t.nom}`).toBe(true)
+    }
+    expect(NOUVEAUX_TYPES.map((t) => t.nom)).toEqual(['Dossier', 'Raccourci', 'Image', 'Document Word', 'PDF', 'Document PPT', 'Dossier compressé'])
+    expect(NOUVEAUX_FICHIERS_FOND).toHaveLength(6)
+    expect(NOUVEAUX_FICHIERS_FOND).not.toContain(NOUVEAU_DOSSIER_FOND)
+  })
+
+  it('le dossier se crée par le bouton « Nouveau » ou par clic droit → Nouveau → Dossier', () => {
+    const q = QUESTIONS.find((x) => x.id === 'win-nouveau-dossier')
+    if (q?.type !== 'situation') throw new Error()
+    const [e1, e2] = q.etapes
+    // parcours d'origine conservé
+    expect(e1.cibles).toContain('nouveau')
+    expect(e1.ouvre).toBe('nouveau')
+    expect(e2.cibles).toContain('nouveau-dossier')
+    // nouveau chemin
+    expect(e1.cibles).toContain('fond@droit')
+    expect(e1.ouvrePar?.['fond@droit']).toBe(MENU_FOND)
+    expect(e2.relais?.['ctx-nouveau']).toBe(MENU_FOND_NOUVEAU)
+    expect(e2.cibles).toContain(NOUVEAU_DOSSIER_FOND)
+    // un type de fichier ne vaut pas création de dossier
+    for (const f of NOUVEAUX_FICHIERS_FOND) expect(e2.cibles).not.toContain(f)
+  })
+
+  it('aucune question ne demande de créer un fichier par clic droit', () => {
+    const situations = QUESTIONS.filter((x) => x.type === 'situation')
+    expect(situations.some((x) => x.type === 'situation' && x.etapes.some((e) => e.cibles.some((c) => NOUVEAUX_FICHIERS_FOND.includes(c))))).toBe(false)
   })
 })
 

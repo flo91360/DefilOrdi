@@ -1,3 +1,4 @@
+import { MENU_FOND, MENU_FOND_NOUVEAU, NOUVEAU_DOSSIER_FOND } from './nouveau'
 import type { Question } from './types'
 
 // Banque de questions du quiz. Chaque question a un identifiant stable
@@ -187,11 +188,23 @@ export const QUESTIONS: Question[] = [
     niveau: 2,
     scene: 'explorateur',
     question: 'Crée un nouveau dossier pour ranger tes fichiers de l’école.',
+    // Deux chemins : le bouton « Nouveau » de la barre, ou un clic droit sur
+    // un emplacement vide puis « Nouveau » → « Dossier ».
     etapes: [
-      { cibles: ['nouveau'], ouvre: 'nouveau', aide: 'Clique sur « Nouveau », en haut à gauche.' },
-      { cibles: ['nouveau-dossier'], aide: 'Choisis « Dossier ».' }
+      {
+        cibles: ['nouveau', 'fond@droit'],
+        ouvre: 'nouveau',
+        ouvrePar: { 'fond@droit': MENU_FOND },
+        aide: 'Clique sur « Nouveau », en haut à gauche (ou fais un clic droit dans un espace vide de la fenêtre).'
+      },
+      {
+        cibles: ['nouveau-dossier', NOUVEAU_DOSSIER_FOND],
+        relais: { 'ctx-nouveau': MENU_FOND_NOUVEAU },
+        aide: 'Choisis « Dossier » (dans le menu du clic droit, passe d’abord par « Nouveau »).'
+      }
     ],
-    explication: 'Nouveau → Dossier. On peut ensuite lui donner un nom, par exemple « Exposés ».'
+    explication:
+      'Nouveau → Dossier. On peut aussi faire un clic droit dans un espace vide, puis Nouveau → Dossier. On peut ensuite lui donner un nom, par exemple « Exposés ».'
   },
   {
     id: 'win-supprimer',

@@ -419,6 +419,13 @@ function Situation({
     // Un clic droit n'est une erreur que s'il est attendu à ce moment-là :
     // sinon il est simplement ignoré (le menu du navigateur est déjà bloqué).
     if (zone.endsWith('@droit') && !e.cibles.some((c) => c.endsWith('@droit'))) return
+    // Un clic sur un emplacement vide n'est compté que s'il est attendu.
+    if (zone.replace(/@droit$/, '') === 'fond' && !e.cibles.includes(zone) && !e.relais?.[zone]) return
+    const relais = e.relais?.[zone]
+    if (relais) {
+      setMenu(relais)
+      return
+    }
     if (e.cibles.includes(zone)) {
       const ouvre = e.ouvrePar?.[zone] ?? e.ouvre
       if (ouvre) setMenu(ouvre)

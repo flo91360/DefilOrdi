@@ -47,6 +47,9 @@ export interface Etape {
   // menu à afficher selon la zone choisie, quand elle diffère de `ouvre`
   // (ex. clic droit : « fichier@droit » ouvre le menu contextuel)
   ouvrePar?: Record<string, string>
+  // zones qui ouvrent un sous-menu sans finir l'étape (ex. « Nouveau » du
+  // menu du clic droit, qui ouvre la liste des types à créer)
+  relais?: Record<string, string>
   aide: string // indice donné après deux erreurs
 }
 
