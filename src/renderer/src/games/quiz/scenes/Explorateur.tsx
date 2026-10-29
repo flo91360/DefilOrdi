@@ -1,7 +1,8 @@
-import { Ico, PATHS, Zone } from './commun'
+import { Fond, Ico, MenuFond, PATHS, Zone } from './commun'
 
 // Explorateur de fichiers. Menus : nouveau, selection-brouillon,
-// selection-expose, contexte-brouillon, contexte-expose (clic droit sur le fichier).
+// selection-expose, contexte-brouillon, contexte-expose (clic droit sur le fichier),
+// contexte-fond, contexte-fond-nouveau (clic droit sur un emplacement vide).
 const FICHIERS = [
   { id: 'dossier-ecole', nom: 'École', type: 'Dossier de fichiers', date: '02/10/2026', dossier: true },
   { id: 'fichier-expose', nom: 'Exposé volcans.docx', type: 'Document texte', date: '10/10/2026' },
@@ -76,6 +77,7 @@ export function Explorateur({ menu }: { menu: string | null }) {
           ))}
         </div>
         <div className="sc-explo-liste">
+          <Fond />
           <div className="sc-explo-entete">
             <span>Nom</span>
             <span>Modifié le</span>
@@ -92,6 +94,7 @@ export function Explorateur({ menu }: { menu: string | null }) {
           ))}
         </div>
       </div>
+      <MenuFond menu={menu} haut={130} gauche={430} />
       {(menu === 'contexte-brouillon' || menu === 'contexte-expose') && (
         <div className="sc-popup sc-popup-contexte">
           <Zone id="ctx-ouvrir" className="sc-popup-item" titre="Ouvrir">

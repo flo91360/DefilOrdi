@@ -14,8 +14,9 @@ des changements ».
 
 ## Prochaine version
 
-- Chasse aux lettres : chaque lettre majuscule qui tombe est accompagnée d'une petite touche avec la flèche ⇧ de la touche Maj, en bas à droite de la météorite, de la bouteille, du poisson ou du coquillage. L'enfant voit tout de suite qu'il doit appuyer sur Maj pour la taper. Les minuscules n'ont pas de flèche, et les pièges non plus, puisqu'il ne faut pas les taper.
-- Chasse aux lettres : avec le clavier à l'écran, la touche Maj s'allume en même temps que la lettre quand la lettre à taper est une majuscule.
+- Quiz, mise en situation « Crée un nouveau dossier » : l'enfant peut maintenant aussi faire un clic droit dans un espace vide de la fenêtre, puis choisir « Nouveau » et « Dossier ». Le bouton « Nouveau » en haut de la fenêtre fonctionne toujours comme avant.
+- Quiz : le menu du clic droit dans un espace vide (dans l'Explorateur et sur le Bureau) propose « Nouveau », qui affiche la liste Dossier, Raccourci, Image, Document Word, PDF, Document PPT et Dossier compressé. Choisir « Dossier » compte pour créer un dossier ; un autre type compte pour créer un fichier.
+- Quiz : un clic dans un espace vide de l'écran n'est pas compté comme une erreur, sauf s'il est attendu.
 
 ## 0.8.22
 

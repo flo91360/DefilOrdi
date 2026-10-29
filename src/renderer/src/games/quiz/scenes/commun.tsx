@@ -1,4 +1,5 @@
 import { createContext, type CSSProperties, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { MENU_FOND, MENU_FOND_NOUVEAU, NOUVEAUX_TYPES } from '../nouveau'
 
 // Les écrans du quiz sont dessinés en HTML à une taille fixe (960 × 540),
 // puis mis à l'échelle de la place disponible. Chaque élément cliquable est
@@ -121,4 +122,43 @@ export const PATHS = {
   gauche: 'M4 6h16 M4 10h10 M4 14h16 M4 18h10',
   centre: 'M4 6h16 M7 10h10 M4 14h16 M7 18h10',
   droite: 'M4 6h16 M10 10h10 M4 14h16 M10 18h10'
+}
+
+// Clic droit sur un emplacement vide : voir ../nouveau.ts.
+// Fond cliquable (placé sous les éléments de la fenêtre ou du bureau).
+export function Fond() {
+  return <Zone id="fond" className="sc-fond" titre="Emplacement vide" />
+}
+
+export function MenuFond({ menu, haut, gauche }: { menu: string | null; haut: number; gauche: number }) {
+  if (menu !== MENU_FOND && menu !== MENU_FOND_NOUVEAU) return null
+  return (
+    <>
+      <div className="sc-popup sc-popup-fond" style={{ top: haut, left: gauche }}>
+        <span className="sc-popup-item sc-popup-inactif">Affichage</span>
+        <span className="sc-popup-item sc-popup-inactif">Trier par</span>
+        <Zone id="ctx-actualiser" className="sc-popup-item" titre="Actualiser">
+          <Ico d={PATHS.actualiser} size={16} /> Actualiser
+        </Zone>
+        <Zone id="ctx-nouveau" className={menu === MENU_FOND_NOUVEAU ? 'sc-popup-item sc-popup-ouvert' : 'sc-popup-item'} titre="Nouveau">
+          <Ico d={PATHS.plus} size={16} /> Nouveau <span className="sc-popup-fleche">›</span>
+        </Zone>
+        <Zone id="ctx-proprietes" className="sc-popup-item" titre="Propriétés">
+          Propriétés
+        </Zone>
+      </div>
+      {menu === MENU_FOND_NOUVEAU && (
+        <div className="sc-popup sc-popup-fond-nouveau" style={{ top: haut + 111, left: gauche + 192 }}>
+          {NOUVEAUX_TYPES.map((t) => (
+            <Zone key={t.id} id={t.id} className="sc-popup-item" titre={t.nom}>
+              <span className={`sc-type-icone sc-type-${t.id.replace('ctx-nouveau-', '')}`}>
+                {t.dossier ? <Ico d={PATHS.dossier} size={16} stroke="#a77b00" fill="#ffd45a" /> : t.icone}
+              </span>
+              {t.nom}
+            </Zone>
+          ))}
+        </div>
+      )}
+    </>
+  )
 }
