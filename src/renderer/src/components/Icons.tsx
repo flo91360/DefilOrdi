@@ -222,6 +222,26 @@ export function GameArt({ game }: { game: JeuId }) {
           </text>
         </svg>
       )
+    case 'klavicoeur':
+      return (
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <rect x="4" y="22" width="112" height="52" rx="10" fill="var(--tile-ink)" opacity="0.9" />
+          {[0, 1, 2].map((row) =>
+            Array.from({ length: 8 - row * 2 }, (_, i) => {
+              const x = 12 + row * 6 + i * 12.5
+              const couleur = x < 46 ? '#f08c8a' : x > 70 ? '#7fcf9c' : '#9ad3f5'
+              return <rect key={`${row}-${i}`} x={x} y={30 + row * 14} width="9" height="10" rx="2" fill={row === 1 && i === 2 ? '#ffffff' : couleur} />
+            })
+          )}
+          <path
+            d="M60 18 C60 18 44 9 44 1 C44 -4 52 -6 56 -1 L60 3 L64 -1 C68 -6 76 -4 76 1 C76 9 60 18 60 18 Z"
+            transform="translate(0 7)"
+            fill="#e2504c"
+            stroke="var(--tile-ink)"
+            strokeWidth="2"
+          />
+        </svg>
+      )
     default:
       return jamais(game)
   }

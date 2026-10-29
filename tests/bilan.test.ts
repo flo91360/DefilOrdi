@@ -39,7 +39,7 @@ const quiz = (jour: string, justes: number): ResultatQuiz => ({
 
 describe('liste des jeux', () => {
   it('donne un nom à chaque jeu, dans l’ordre du Hub', () => {
-    expect(ORDRE_JEUX).toEqual(['espace', 'memoire', 'couleurs', 'petitbac', 'dactylo', 'quiz'])
+    expect(ORDRE_JEUX).toEqual(['espace', 'memoire', 'couleurs', 'petitbac', 'klavicoeur', 'dactylo', 'quiz'])
     for (const j of ORDRE_JEUX) expect(nomJeu(j)).toBe(JEUX[j].titre)
   })
 

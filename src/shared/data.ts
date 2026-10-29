@@ -76,6 +76,7 @@ export interface Profile {
   // terminée, reprise à la partie suivante (toutes aventures, séries et modes).
   // null = pas encore mémorisée (déduite des parties existantes).
   vitesseChasse: number | null
+  klavicoeur: ProgressionKlavicoeur
 }
 
 // Vitesse de la Chasse aux lettres : 1 = ancien rythme de départ du niveau 1.
@@ -127,6 +128,51 @@ export interface ProgressionMemoire {
 
 export function defaultProgressionMemoire(): ProgressionMemoire {
   return { progressionId: '', palier: PALIER_MIN, reussites: 0, echecs: 0, listeId: '' }
+}
+
+// « Klavicoeur » : 11 niveaux, débloqués un par un en validant le précédent.
+export const NIVEAU_KLAVICOEUR_MAX = 11
+
+// Progression mémorisée dans le profil de l'enfant.
+export interface ProgressionKlavicoeur {
+  debloque: number // plus haut niveau débloqué (1 à 11)
+  niveau: number // niveau proposé à la prochaine partie (1 à debloque)
+  echecs: number // temps dépassé de suite à ce niveau (0 ou 1 ; au 2e, niveau inférieur)
+}
+
+export function defaultProgressionKlavicoeur(): ProgressionKlavicoeur {
+  return { debloque: 1, niveau: 1, echecs: 0 }
+}
+
+export function niveauKlavicoeurValide(v: unknown): v is number {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= NIVEAU_KLAVICOEUR_MAX
+}
+
+function normalizeProgressionKlavicoeur(v: unknown): ProgressionKlavicoeur {
+  const d = defaultProgressionKlavicoeur()
+  if (!isObj(v)) return d
+  const debloque = niveauKlavicoeurValide(v.debloque) ? v.debloque : d.debloque
+  const niveau = niveauKlavicoeurValide(v.niveau) ? Math.min(v.niveau, debloque) : Math.min(d.niveau, debloque)
+  return { debloque, niveau, echecs: Math.min(1, count(v.echecs)) }
+}
+
+// Une partie de « Klavicoeur » : placer à la souris les lettres d'un clavier caché.
+export interface ResultatKlavicoeur {
+  id: string
+  profileId: string
+  jeu: 'klavicoeur'
+  date: string
+  complete: boolean // false : partie arrêtée avant la fin (« Arrêter »)
+  niveau: number // 1 à 11
+  tempsLimite: number // secondes, 0 = sans limite
+  dureeMs: number
+  lettres: number // lettres à placer
+  placees: number // lettres placées au bon endroit
+  hesitations: number // lettres mal placées, mises de côté puis replacées
+  hesitationsParLettre: Record<string, number> // lettre -> fois où elle a été mise de côté
+  reussi: boolean // toutes les lettres placées dans le temps
+  tempsDepasse: boolean
+  niveauSuivant: number // niveau proposé ensuite (0 = inconnu)
 }
 
 // Réglages du jeu de dactylographie, propres à chaque enfant.
@@ -324,7 +370,14 @@ export interface ResultatPetitBac {
   reponses: ReponseBac[]
 }
 
-export type Resultat = ResultatDactylo | ResultatCouleurs | ResultatMemoire | ResultatEspace | ResultatQuiz | ResultatPetitBac
+export type Resultat =
+  | ResultatDactylo
+  | ResultatCouleurs
+  | ResultatMemoire
+  | ResultatEspace
+  | ResultatQuiz
+  | ResultatPetitBac
+  | ResultatKlavicoeur
 export type JeuId = Resultat['jeu']
 
 // Code de l'espace ergothérapeute à l'installation : à changer au premier accès.
@@ -449,7 +502,8 @@ export function newProfile(id: string, creeLe: string, classe: Classe): Profile 
     dactylo: defaultOptionsDactylo(),
     memoire: defaultProgressionMemoire(),
     medailles: [],
-    vitesseChasse: null
+    vitesseChasse: null,
+    klavicoeur: defaultProgressionKlavicoeur()
   }
 }
 
@@ -521,7 +575,8 @@ function normalizeProfile(v: unknown, clavierMasque = false): Profile | null {
     dactylo: clavierMasque ? { ...normalizeOptions(v.dactylo), clavier: false } : normalizeOptions(v.dactylo),
     memoire: normalizeProgressionMemoire(v.memoire),
     medailles: normalizeMedailles(v.medailles),
-    vitesseChasse: normalizeVitesseChasse(v.vitesseChasse)
+    vitesseChasse: normalizeVitesseChasse(v.vitesseChasse),
+    klavicoeur: normalizeProgressionKlavicoeur(v.klavicoeur)
   }
 }
 
@@ -738,6 +793,27 @@ function normalizeResultat(v: unknown, profileIds: Set<string>): Resultat | null
         .map(normalizeReponseBac)
         .filter((r): r is ReponseBac => r !== null)
         .slice(0, CATEGORIES_MAX)
+    }
+  }
+  if (v.jeu === 'klavicoeur') {
+    const lettres = count(v.lettres)
+    const niveau = niveauKlavicoeurValide(v.niveau) ? v.niveau : 1
+    const parLettre: Record<string, number> = {}
+    for (const [k, n] of Object.entries(compteurs(v.hesitationsParLettre))) {
+      if (/^[A-Z]$/.test(k)) parLettre[k] = n
+    }
+    return {
+      ...base,
+      jeu: 'klavicoeur',
+      niveau,
+      tempsLimite: count(v.tempsLimite),
+      lettres,
+      placees: Math.min(count(v.placees), lettres),
+      hesitations: count(v.hesitations),
+      hesitationsParLettre: parLettre,
+      reussi: v.reussi === true,
+      tempsDepasse: v.tempsDepasse === true,
+      niveauSuivant: niveauKlavicoeurValide(v.niveauSuivant) ? v.niveauSuivant : 0
     }
   }
   // Sans « jeu » : résultat de l'étape 2, forcément Dactylo. Un jeu inconnu

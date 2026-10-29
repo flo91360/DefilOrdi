@@ -1,0 +1,285 @@
+/* ---------- Klavicoeur ---------- */
+
+/* Code couleur du clavier : main gauche en rouge, main droite en vert, zone
+   du milieu en bleu clair ; T, G et V en gras. */
+.kc-lettre {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+}
+
+.kc-gauche {
+  background: #fde0df;
+  border-color: #d93a36;
+  color: #a3201d;
+}
+
+.kc-droite {
+  background: #dcf3e4;
+  border-color: #2f9e5a;
+  color: #1c6b3b;
+}
+
+.kc-milieu {
+  background: #dff1fd;
+  border-color: #5fb4ea;
+  color: #1d6593;
+}
+
+.kc-gras {
+  font-weight: 900;
+  border-width: 4px;
+}
+
+.kc-regle {
+  max-width: 760px;
+  margin: 0 0 18px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.kc-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  margin: 0 0 22px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.kc-legende-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kc-legende .kc-lettre {
+  min-width: 38px;
+  height: 38px;
+  font-size: 22px;
+}
+
+.kc-niveaux {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  margin-bottom: 24px;
+}
+
+.liste-card.kc-verrouille {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.liste-card.kc-verrouille:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--line);
+}
+
+/* Partie */
+.kc-main {
+  --kc-touche: clamp(52px, 7.2vw, 88px);
+  --kc-ecart: clamp(6px, 0.8vw, 12px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.6vh, 24px);
+  padding: 0 24px 24px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.kc-main .compte-a-rebours {
+  width: min(100%, 880px);
+  flex-shrink: 0;
+}
+
+.kc-pioche {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+}
+
+.kc-consigne {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.kc-aide {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.kc-lettre.kc-en-cours {
+  width: 104px;
+  height: 104px;
+  border-radius: 22px;
+  font-size: 64px;
+  cursor: grab;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+}
+
+.kc-lettre.kc-vide {
+  background: transparent;
+  border: 3px dashed var(--line);
+  box-shadow: none;
+  cursor: default;
+}
+
+.kc-clavier {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kc-ecart);
+  padding: clamp(12px, 2vw, 24px);
+  border-radius: 22px;
+  background: #3b3f4a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.kc-rangee {
+  display: flex;
+  gap: var(--kc-ecart);
+  margin-left: calc(var(--kc-decalage, 0) * (var(--kc-touche) + var(--kc-ecart)));
+}
+
+.kc-touche {
+  width: var(--kc-touche);
+  height: var(--kc-touche);
+  border-radius: 12px;
+  border: 3px solid #5b6070;
+  background: #f4f4f0;
+  box-shadow: 0 4px 0 #1f2330;
+  font-family: inherit;
+  font-size: calc(var(--kc-touche) * 0.5);
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.1s;
+}
+
+.kc-touche:not(:disabled):hover {
+  background: #fff;
+  transform: translateY(-2px);
+  outline: 3px solid var(--accent);
+}
+
+.kc-touche.kc-lettre {
+  display: block;
+  padding: 0;
+  min-width: 0;
+  cursor: default;
+}
+
+.kc-touche.kc-gauche {
+  background: #fde0df;
+  border-color: #d93a36;
+}
+
+.kc-touche.kc-droite {
+  background: #dcf3e4;
+  border-color: #2f9e5a;
+}
+
+.kc-touche.kc-milieu {
+  background: #dff1fd;
+  border-color: #5fb4ea;
+}
+
+.kc-touche.kc-gras {
+  font-weight: 900;
+  border-width: 4px;
+}
+
+.kc-touche.kc-placee {
+  animation: kc-pose 0.3s ease-out;
+}
+
+.kc-touche.kc-erreur {
+  animation: kc-secoue 0.4s ease-in-out;
+  background: #fbe9e8;
+}
+
+@keyframes kc-pose {
+  from {
+    transform: scale(0.7);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes kc-secoue {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.kc-de-cote {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+}
+
+.kc-de-cote .kc-consigne {
+  font-size: 19px;
+}
+
+.kc-lettre.kc-petite {
+  min-width: 40px;
+  height: 40px;
+  font-size: 22px;
+}
+
+/* Récapitulatif de fin de partie : lettres hésitées */
+.kc-recap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px auto 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.kc-recap-lettre {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kc-recap-fois {
+  font-size: 17px;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kc-touche.kc-placee,
+  .kc-touche.kc-erreur {
+    animation: none;
+  }
+}
