@@ -421,9 +421,11 @@ function Situation({
     if (zone.endsWith('@droit') && !e.cibles.some((c) => c.endsWith('@droit'))) return
     // Un clic sur un emplacement vide n'est compté que s'il est attendu.
     if (zone.replace(/@droit$/, '') === 'fond' && !e.cibles.includes(zone) && !e.relais?.[zone]) return
+    // Zone relais : ouvre un sous-menu, sans finir l'étape ni compter d'erreur.
     const relais = e.relais?.[zone]
     if (relais) {
       setMenu(relais)
+      setMessage(null)
       return
     }
     if (e.cibles.includes(zone)) {
