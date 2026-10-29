@@ -27,6 +27,10 @@ export const JEUX: Record<JeuId, InfoJeu> = {
     titre: 'Petit bac',
     description: 'Une lettre au hasard : trouve un mot pour chaque catégorie.'
   },
+  klavicoeur: {
+    titre: 'Klavicoeur',
+    description: 'Le clavier est caché : place chaque lettre à sa place avec la souris.'
+  },
   dactylo: {
     titre: 'Dactylo',
     description: 'Tape les phrases le plus juste et le plus vite possible.'

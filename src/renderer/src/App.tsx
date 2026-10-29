@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type AppData, CODE_DEFAUT, type JeuId, type PhraseEnfant, type Profile, type ProgressionMemoire, type Resultat } from '../../shared/data'
+import { type AppData, CODE_DEFAUT, type JeuId, type PhraseEnfant, type Profile, type ProgressionKlavicoeur, type ProgressionMemoire, type Resultat } from '../../shared/data'
 import { listesAvecPhrasesEnfants } from '../../shared/phrases'
 import { api } from './api'
 import { themeStyle } from './theme'
@@ -13,6 +13,7 @@ import { PinPad } from './components/PinPad'
 import { Couleurs } from './games/couleurs/Couleurs'
 import { Dactylo } from './games/dactylo/Dactylo'
 import { Espace } from './games/espace/Espace'
+import { Klavicoeur } from './games/klavicoeur/Klavicoeur'
 import { Memoire } from './games/memoire/Memoire'
 import { PetitBac } from './games/petitbac/PetitBac'
 import { construireBanque } from './games/quiz/engine'
@@ -104,6 +105,12 @@ export function App() {
     if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, memoire } : p)) })
   }
 
+  // Klavicoeur : niveaux débloqués et niveau proposé, mémorisés dans le profil.
+  const saveProgressionKlavicoeur = (profileId: string, klavicoeur: ProgressionKlavicoeur) => {
+    const d = dataRef.current
+    if (d) update({ ...d, profiles: d.profiles.map((p) => (p.id === profileId ? { ...p, klavicoeur } : p)) })
+  }
+
   // Chasse aux lettres : vitesse reprise à la partie suivante.
   const saveVitesseChasse = (profileId: string, vitesseChasse: number) => {
     const d = dataRef.current
@@ -189,6 +196,9 @@ export function App() {
           break
         case 'petitbac':
           content = <PetitBac {...commun} reglages={data.petitBac} />
+          break
+        case 'klavicoeur':
+          content = <Klavicoeur {...commun} onProgression={(k) => saveProgressionKlavicoeur(active.id, k)} />
           break
         case 'couleurs':
           content = <Couleurs {...commun} reglages={data.couleurs} />

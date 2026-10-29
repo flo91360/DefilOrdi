@@ -9,6 +9,7 @@ import { COLONNES_COULEURS, GROUPE_COULEURS, INDICATEURS_COULEURS, StatsCouleurs
 import { COLONNES_DACTYLO, GROUPE_DACTYLO, INDICATEURS_DACTYLO, StatsDactylo } from './dactylo'
 import { COLONNES_ESPACE, GROUPE_ESPACE, INDICATEURS_ESPACE, StatsEspace } from './espace'
 import { colonnesMemoire, GROUPE_MEMOIRE, INDICATEURS_MEMOIRE, resumerProgressions, StatsMemoire } from './memoire'
+import { COLONNES_KLAVICOEUR, GROUPE_KLAVICOEUR, INDICATEURS_KLAVICOEUR, StatsKlavicoeur } from './klavicoeur'
 import { COLONNES_PETITBAC, GROUPE_PETITBAC, INDICATEURS_PETITBAC, StatsPetitBac } from './petitbac'
 import { COLONNES_QUIZ, GROUPE_QUIZ, INDICATEURS_QUIZ, StatsQuiz } from './quiz'
 
@@ -33,6 +34,8 @@ export function resumePartie(r: Resultat): string {
       return `${r.justes}/${r.categories} mots (lettre ${r.lettre})`
     case 'espace':
       return `${r.detruites} lettres attrapées`
+    case 'klavicoeur':
+      return `niveau ${r.niveau}, ${r.hesitations} hésitation${r.hesitations > 1 ? 's' : ''}`
     default:
       return jamais(r)
   }
@@ -55,6 +58,8 @@ export function csvDuJeu(jeu: JeuId, resultats: Resultat[], profile: Profile): s
       return versCsv(partiesDe(jeu, resultats), COLONNES_QUIZ)
     case 'petitbac':
       return versCsv(partiesDe(jeu, resultats), COLONNES_PETITBAC)
+    case 'klavicoeur':
+      return versCsv(partiesDe(jeu, resultats), COLONNES_KLAVICOEUR)
     default:
       return jamais(jeu)
   }
@@ -76,6 +81,8 @@ export function indicateursDu(jeu: JeuId): Indicateur<Resultat>[] {
       return tous(INDICATEURS_QUIZ)
     case 'petitbac':
       return tous(INDICATEURS_PETITBAC)
+    case 'klavicoeur':
+      return tous(INDICATEURS_KLAVICOEUR)
     default:
       return jamais(jeu)
   }
@@ -98,6 +105,8 @@ export function groupeDu(jeu: JeuId): (r: Resultat) => string {
       return tous(GROUPE_QUIZ)
     case 'petitbac':
       return tous(GROUPE_PETITBAC)
+    case 'klavicoeur':
+      return tous(GROUPE_KLAVICOEUR)
     default:
       return jamais(jeu)
   }
@@ -130,6 +139,8 @@ export function StatsDuJeu({
       return <StatsQuiz parties={partiesDe(jeu, resultats)} questionsPerso={questionsPerso} onSupprimer={onSupprimer} />
     case 'petitbac':
       return <StatsPetitBac parties={partiesDe(jeu, resultats)} onSupprimer={onSupprimer} />
+    case 'klavicoeur':
+      return <StatsKlavicoeur parties={partiesDe(jeu, resultats)} profile={profile} onSupprimer={onSupprimer} />
     default:
       return jamais(jeu)
   }

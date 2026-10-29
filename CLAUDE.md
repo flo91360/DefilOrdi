@@ -93,6 +93,12 @@ le code et les commentaires aussi.
   de la première lettre) testé dans `tests/petitbac.test.ts`. Catégories et
   lettres réglées par l'ergothérapeute : `petitBac` dans les données, éditeur
   dans `screens/PetitBacEditor.tsx`.
+- `src/renderer/src/games/klavicoeur/` : Klavicoeur (clavier caché, lettres
+  posées à la souris). `engine.ts` (rangées, code couleur `zoneDe`/`enGras`,
+  `NIVEAUX_KLAVICOEUR`, `placer` : lettre fausse mise de côté = hésitation,
+  reproposée à la fin ; `avancerProgression` : réussite = niveau suivant
+  débloqué, 2 temps dépassés de suite = niveau inférieur, déblocages gardés)
+  testé dans `tests/klavicoeur.test.ts`. Progression dans `Profile.klavicoeur`.
 - Résultats : union `Resultat` (champ `jeu`) dans `src/shared/data.ts` ;
   statistiques dans `screens/ErgoStats.tsx` (onglets, exports, accès au bilan)
   et `screens/stats/` : un fichier par jeu (colonnes de l'export, écran,

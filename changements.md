@@ -14,9 +14,12 @@ des changements ».
 
 ## Prochaine version
 
-- Quiz, mise en situation « Crée un nouveau dossier » : l'enfant peut maintenant aussi faire un clic droit dans un espace vide de la fenêtre, puis choisir « Nouveau » et « Dossier ». Le bouton « Nouveau » en haut de la fenêtre fonctionne toujours comme avant.
-- Quiz : le menu du clic droit dans un espace vide (dans l'Explorateur et sur le Bureau) propose « Nouveau », qui affiche la liste Dossier, Raccourci, Image, Document Word, PDF, Document PPT et Dossier compressé. Choisir « Dossier » compte pour créer un dossier ; un autre type compte pour créer un fichier.
-- Quiz : un clic dans un espace vide de l'écran n'est pas compté comme une erreur, sauf s'il est attendu.
+- Nouveau jeu « Klavicoeur » pour apprendre le clavier par cœur : le clavier est caché et l'enfant pose chaque lettre à sa place avec la souris, une lettre après l'autre.
+- Klavicoeur : les lettres suivent le code couleur du clavier (main gauche en rouge, main droite en vert, zone du milieu T G V Y H en bleu clair) ; T, G et V sont en gras.
+- Klavicoeur : 11 niveaux, de la rangée du haut seule jusqu'à toutes les rangées mélangées en 2 minutes. Les niveaux sans limite de temps servent à placer les lettres tranquillement, après l'apprentissage des rangées fait en séance.
+- Klavicoeur : une lettre mal placée est mise de côté et revient à la fin. Chaque lettre mise de côté compte comme une hésitation, et le récapitulatif de fin de partie montre les lettres concernées.
+- Klavicoeur : si le temps est dépassé, l'enfant rejoue le niveau ; après un deuxième dépassement de suite, le jeu lui propose le niveau d'avant. Les niveaux se débloquent un par un, et la progression est gardée dans le profil de l'enfant.
+- Espace ergo, Statistiques et bilan : Klavicoeur a son onglet, avec le temps, les hésitations, le niveau, les lettres les plus hésitées sur le clavier et l'export Excel.
 
 ## 0.8.22
 
